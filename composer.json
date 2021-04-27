@@ -1,0 +1,27 @@
+{
+    "name": "paupololi/sheetsformbuilder",
+    "description": "testing propouse",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "paupololi"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^8.37"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+               "paupololi\\sheetsformbuilder\\SheetsFormBuilderProvider"
+            ]
+        }
+    },
+	"autoload": {
+        "psr-4": {
+          "paupololi\\sheetsformbuilder\\": "src"
+        }
+      }
+    
+}
