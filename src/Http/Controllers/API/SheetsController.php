@@ -8,6 +8,7 @@ use GuzzleHttp\Client as GuzzleClient;
 
 use Validator;
 
+
 class SheetsController extends Controller
 {
     private $headers, $clientBuilder;
@@ -41,6 +42,14 @@ class SheetsController extends Controller
     {
         $endpoint = "form/{$id}";
 
+        if (!env('SHEETS_EXTERNAL')) {
+            $headers = collect($request->header())->transform(function ($item) {
+                return $item[0];
+            });
+
+            $this->clientBuilder['headers'] = $headers->toArray();
+        }
+
         $client = new GuzzleClient($this->clientBuilder);
         $response = $client->request('GET', $endpoint);
 
@@ -50,6 +59,14 @@ class SheetsController extends Controller
     public function getrecord($entityname,$recordid)
     {
         $endpoint =  'entity/data/' . $entityname . '/' . $recordid;
+
+        if (!env('SHEETS_EXTERNAL')) {
+            $headers = collect($request->header())->transform(function ($item) {
+                return $item[0];
+            });
+
+            $this->clientBuilder['headers'] = $headers->toArray();
+        }
 
         $client = new GuzzleClient($this->clientBuilder);
         $response = $client->request('GET', $endpoint);
@@ -176,6 +193,14 @@ class SheetsController extends Controller
     public function entity_info($id)
     {
         $endpoint = "entity/info/{$id}";
+
+        if (!env('SHEETS_EXTERNAL')) {
+            $headers = collect($request->header())->transform(function ($item) {
+                return $item[0];
+            });
+
+            $this->clientBuilder['headers'] = $headers->toArray();
+        }
 
         $client = new GuzzleClient($this->clientBuilder);
         $response = $client->request('GET', $endpoint);
