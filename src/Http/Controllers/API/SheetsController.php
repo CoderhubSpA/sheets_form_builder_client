@@ -190,7 +190,7 @@ class SheetsController extends Controller
         }
     }
 
-    public function entity_info($id)
+    public function entity_info(Request $request, $id)
     {
         $endpoint = "entity/info/{$id}";
 
