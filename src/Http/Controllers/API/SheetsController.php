@@ -10,9 +10,9 @@ use Validator;
 
 class SheetsController extends Controller
 {
-    private $headers, $client;
+    private $headers, $clientBuilder;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
         if (env('SHEETS_EXTERNAL')) {
             $this->headers = [
@@ -21,59 +21,55 @@ class SheetsController extends Controller
                 'Authorization' => env('SECURITY_BEARER'),
             ];
 
-            $this->client = new GuzzleClient([
+            $this->clientBuilder = [
                 'headers' => $this->headers,
                 'http_errors' => false,
                 'verify' => false,
-                'base_uri' => env('SHEETS_API_URL')
-            ]);
+                'base_uri' => env('SHEETS_API_URL'),
+            ];
         }
         else {
-            app('session')->regenerate();
-
-            $this->headers = [
-                'X-CSRF-TOKEN' => csrf_token()
-            ];
-
-            $this->client = new GuzzleClient([
-                'headers' => $this->headers,
+            $this->clientBuilder = [
                 'http_errors' => false,
                 'verify' => false,
                 'base_uri' => env('APP_URL'),
-            ]);
+            ];
         }
     }
 
-    public function index($id)
+    public function index(Request $request, $id)
     {
         $endpoint = "form/{$id}";
-        $response = $this->client->request('GET', $endpoint);
 
-        return $response->getBody()->getContents();;
+        $client = new GuzzleClient($this->clientBuilder);
+        $response = $client->request('GET', $endpoint);
+
+        return $response->getBody()->getContents();
     }
 
     public function getrecord($entityname,$recordid)
     {
         $endpoint =  'entity/data/' . $entityname . '/' . $recordid;
 
-        $response = $this->client->request('GET', $endpoint);
+        $client = new GuzzleClient($this->clientBuilder);
+        $response = $client->request('GET', $endpoint);
 
-        return $response->getBody()->getContents();;
+        return $response->getBody()->getContents();
     }
 
     public function saveFile(Request $request)
     {
         try {
-            $id = $request->fileId;
+            // $fileId = $request->fileId;
 
             $file = $request->file('file');
+
             $name = $file->getClientOriginalName();
 
             $file->move(storage_path('app'), $name);
 
             $path =  storage_path('app')."/{$name}";
 
-            $method = 'POST';
             $endpoint = 'document';
 
             $data =  [
@@ -85,20 +81,22 @@ class SheetsController extends Controller
                     ]
                 ]
             ];
-            $r = $this->client->request($method, $endpoint, $data);
 
-            $status = $r->getStatusCode();
+            if (!env('SHEETS_EXTERNAL')) {
+                $headers = collect($request->header())->transform(function ($item) {
+                    return $item[0];
+                });
 
-            $response = $r->getBody()->getContents();
+                $this->clientBuilder['headers'] = $headers->toArray();
+            }
+            $client = new GuzzleClient($this->clientBuilder);
 
-            if($status === 200)
-                return response()->json(['success' => true, 'content' => $response]);
+            $response = $client->request('post', $endpoint, $data);
 
-            else
-                return response()->json(['success' => false, 'content' => json_decode($response)]);
-
-            return response()->json(json_decode($response));
-
+            return response()->json([
+                'success' => $response->getStatusCode() === 200,
+                'content' => $response->getBody()->getContents()
+            ]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }
@@ -107,52 +105,68 @@ class SheetsController extends Controller
     public function sendForm(Request $request)
     {
         try {
+            $endpoint = 'entity';
+
             $entity_key = $request->entityKey;
 
-            $entity = new \stdClass();
+            $req = new \stdClass();
+            $req->$entity_key = \json_decode($request->$entity_key);
 
-            $entity->$entity_key = \json_decode($request->$entity_key);
+            $this->clientBuilder[\GuzzleHttp\RequestOptions::JSON] = $req;
 
-            $endpoint =  'entity';
+            if (!env('SHEETS_EXTERNAL')) {
+                $headers = collect($request->header())->transform(function ($item) {
+                    return $item[0];
+                });
 
-            $response = null;
+                $this->clientBuilder['headers'] = $headers->toArray();
+            }
 
-            $r = $this->client->request('POST', $endpoint);
+            $client = new GuzzleClient($this->clientBuilder);
 
-            $status = $r->getStatusCode();
+            $response = $client->request('post', $endpoint);
 
-            $response = $r->getBody()->getContents();
-
-            if($status === 200)
-                return response()->json(['success' => true, 'content' => $response]);
-            else
-                return response()->json(['success' => false, 'content' => json_decode($response)]);
+            return response()->json([
+                'success' => $response->getStatusCode() === 200,
+                'content' => $response->getBody()->getContents()
+            ]);
 
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }
+
     }
 
     public function sendFormUpdate(Request $request)
     {
         try {
             $entity_key = $request->entityKey;
-            $entity = new \stdClass();
-            $entity->$entity_key = \json_decode($request->$entity_key);
 
-            $method = 'post';
+            $req = new \stdClass();
+            $req->$entity_key = json_decode($request->$entity_key);
+
             $endpoint = 'entity';
 
-            $r = $this->client->request($method, $endpoint);
+            $this->clientBuilder[\GuzzleHttp\RequestOptions::JSON] = $req;
 
-            $status = $r->getStatusCode();
+            if (!env('SHEETS_EXTERNAL')) {
+                $headers = collect($request->header())->transform(function ($item) {
+                    return $item[0];
+                });
 
-            $response = $r->getBody()->getContents();
+                $this->clientBuilder['headers'] = $headers->toArray();
+            }
 
-            if($status === 200)
-                return response()->json(['success' => true, 'content' => $response]);
-            else
-                return response()->json(['success' => false, 'content' => json_decode($response)]);
+
+
+            $client = new GuzzleClient($this->clientBuilder);
+
+            $response = $client->request('post', $endpoint);
+
+            return response()->json([
+                'success' => $response->getStatusCode() === 200,
+                'content' => $response->getBody()->getContents()
+            ]);
 
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
@@ -163,10 +177,12 @@ class SheetsController extends Controller
     {
         $endpoint = "entity/info/{$id}";
 
-        $res = $this->client->request('GET', $endpoint);
+        $client = new GuzzleClient($this->clientBuilder);
+        $response = $client->request('GET', $endpoint);
+
         return response()->json([
             'success' => true,
-            'content' => $res->getBody()->getContents()
+            'content' => $response->getBody()->getContents()
         ]);
     }
 }
