@@ -41,7 +41,12 @@ class SheetsController extends Controller
         $method = 'get';
         $baseUrl = env('SHEETS_API_URL') . 'form/' . $id;
         $response = null;
-       
+		$headers = [
+            'Content-Type' => 'application/json',
+            'AccessToken' => 'key',
+            'Authorization' => env('SECURITY_BEARER'),
+        ];
+	   
 		if (!env('SHEETS_EXTERNAL')) {
             $headers = collect($request->header())->transform(function ($item) {
                 return $item[0];
@@ -65,6 +70,11 @@ class SheetsController extends Controller
         $method = 'get';
         $baseUrl = env('SHEETS_API_URL') . 'entity/data/' . $entityname . '/' . $recordid;
         $response = null;
+		$headers = [
+            'Content-Type' => 'application/json',
+            'AccessToken' => 'key',
+            'Authorization' => env('SECURITY_BEARER'),
+        ];
         		
 		 if (!env('SHEETS_EXTERNAL')) {
             $headers = collect($request->header())->transform(function ($item) {
