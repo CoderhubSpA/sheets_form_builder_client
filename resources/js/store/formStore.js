@@ -1,4 +1,5 @@
 import axios from "axios";
+import Vue from "vue";
 
 export default {
     namespaced: true,
@@ -11,7 +12,8 @@ export default {
         filearray: [],
         pendingfiles: 0,
         entityname: null,
-        recordid: null
+        recordid: null,
+        entities_fk: null
     },
     getters: {
         loading: state => state.loading,
@@ -22,7 +24,8 @@ export default {
         filearray: state => state.filearray,
         pendingfiles: state => state.pendingfiles,
         entityname: state => state.entityname,
-        recordid: state => state.recordid
+        recordid: state => state.recordid,
+        entities_fk: state => state.entities_fk
     },
     mutations: {
         LOADING(state, loading) {
@@ -45,11 +48,11 @@ export default {
         },
         FILES(state, file) {
             state.files = true;
-            if(!(file.id in state.filearray)){
+            if (!(file.id in state.filearray)) {
                 state.pendingfiles = state.pendingfiles + 1;
             }
         },
-        UPLOADEDFILE(state){
+        UPLOADEDFILE(state) {
             state.pendingfiles = state.pendingfiles - 1;
         },
         PUSHFILES(state, file) {
@@ -64,18 +67,17 @@ export default {
             state.files = false;
             state.filearray = [];
         },
-        FILTERFIELDSVALUES(state,ids){
-            const fieldsValues = Object.assign(
-                {},
-                state.fieldsvalues
-            );
+        FILTERFIELDSVALUES(state, ids) {
+            const fieldsValues = Object.assign({}, state.fieldsvalues);
             state.fieldsvalues = {};
             ids.map(id => {
-                state.fieldsvalues[id] = fieldsValues[id];
-            })
-            /*if(fieldsValues['id']){
-                state.fieldsvalues['id'] = fieldsValues['id'];
-            }*/
+                if (fieldsValues[id] !== null) {
+                    state.fieldsvalues[id] = fieldsValues[id];
+                }
+            });
+        },
+        ENTITIESFK(state, entities_fk) {
+            state.entities_fk = entities_fk;
         }
     },
     actions: {
@@ -141,7 +143,8 @@ export default {
                                     responseField => {
                                         return (
                                             responseField.form_section_id ===
-                                            sectionToPush.id && responseField.permission !== 0
+                                                sectionToPush.id &&
+                                            responseField.permission !== 0
                                         );
                                     }
                                 );
@@ -155,10 +158,13 @@ export default {
                         rows.sort((a, b) => {
                             return a.order > b.order ? 1 : -1;
                         });
+                        const actions = apiResponse.actions.sort((a, b) => {
+                            return a.save_form > b.save_form ? 1 : -1;
+                        });
                         const data = {
                             rows,
                             title: apiResponse.name.toUpperCase(),
-                            actions: apiResponse.actions
+                            actions
                         };
                         resolve(data);
                     })
@@ -172,19 +178,28 @@ export default {
             commit("RECORDID", data.recordid);
             return new Promise((resolve, reject) => {
                 axios
-                    .get(`/api/sheets/getrecord/${data.entityname}/${data.recordid}`)
+                    .get(
+                        `/api/sheets/getrecord/${data.entityname}/${data.recordid}`
+                    )
                     .then(response => {
-                        const notApplicableKeys = ['contract_type_id','path_id','tiene_permiso_crear','tiene_permiso_lectura','tiene_permiso_edicion'];
+                        const notApplicableKeys = [
+                            "contract_type_id",
+                            "path_id",
+                            "tiene_permiso_crear",
+                            "tiene_permiso_lectura",
+                            "tiene_permiso_edicion"
+                        ];
                         const fields = response.data.content.data[0];
                         Object.keys(fields).forEach(key => {
                             const commitData = {
                                 key,
                                 value: fields[key]
-                            }
-                            if(!notApplicableKeys.includes(key)){
+                            };
+                            if (!notApplicableKeys.includes(key)) {
                                 commit("FIELDSVALUES", commitData);
                             }
-                        })
+                        });
+                        commit("ENTITIESFK", response.data.content.entities_fk);
 
                         resolve({});
                     })
@@ -230,7 +245,7 @@ export default {
                     .finally(() => {});
             });
         },
-        save_form_update({commit}, formData){
+        save_form_update({ commit }, formData) {
             return new Promise((resolve, reject) => {
                 axios
                     .post(`/api/sheets/save/form/update`, formData, {})

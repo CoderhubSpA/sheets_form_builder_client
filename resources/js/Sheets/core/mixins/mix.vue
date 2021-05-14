@@ -106,7 +106,7 @@ export default {
                 case 'NUMBER':
                 case 'CLP':
                 case 'PERCENTAGE':
-                    return 'number'
+                    return 'text'
                 case 'PASSWORD':
                     return 'password'
                 case 'DATE':
@@ -119,6 +119,8 @@ export default {
                     return 'url'
                 case 'EMAIL':
                     return 'email'
+                case 'MAPA':
+                    return 'map'
                 case 'DOCUMENT':
                 case 'DOCUMENT[IMAGE]':
                     return 'file'

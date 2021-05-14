@@ -76,8 +76,20 @@ export default {
                     {},
                     this.$store.getters["form/fieldsvalues"]
                 );
+                console.log('allValues[this.id]', allValues[this.id]);
             if(allValues[this.id]){
-                this.picker = new Date(allValues[this.id]);
+                const valueDate = allValues[this.id].split(' ');
+                let dateToPicker = null;
+                let preDate = null;
+                if(valueDate.length > 1){
+                    let dateStamp = valueDate[0].split('-');
+                    let timeStamp = valueDate[1].split(':');
+                    preDate = dateStamp.concat(timeStamp);
+                    this.picker = new Date(parseInt(preDate[2]),parseInt(preDate[0]) - 1,parseInt(preDate[1]),parseInt(preDate[3]),parseInt(preDate[4]));
+                }else{
+                    preDate = valueDate[0].split('-');
+                    this.picker = new Date(parseInt(preDate[2]),parseInt(preDate[0]) - 1,parseInt(preDate[1]));
+                }
                 this.editionParseDate(allValues[this.id]);
             }else{
                 this.picker = null;
@@ -91,6 +103,7 @@ export default {
             this.$emit('sheets-input-change', value, this.id);
         },
         editionParseDate(date){
+            console.log(date)
             let searchRegExp = /\//gi;
             let replaceWith = '-';
             let parsed = date.replace(searchRegExp, replaceWith);

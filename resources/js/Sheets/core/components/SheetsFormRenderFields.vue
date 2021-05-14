@@ -18,6 +18,7 @@
                 v-if="
                     formField.format === 'SELECTOR' ||
                         formField.format === 'SELECTOR[MULTIPLE]' ||
+                        formField.format === 'SELECTOR[1XN][ALL]' ||
                         formField.format === 'SELECTOR[MULTIPLE][ADVANCED]'
                 "
                 :field="fieldParsedSelect"
@@ -31,6 +32,20 @@
                 :form="fieldParsedDate"
                 v-on:sheets-input-change="inputChange"
             ></sheets-datepicker>
+            <br/>
+            <small
+                class="SheetsFormRenderFields__smallDefault"
+                v-if="
+                    (formField.format === 'DATE' ||
+                        formField.format === 'DATETIME' ||
+                        formField.format === 'SELECTOR' ||
+                        formField.format === 'SELECTOR[1XN][ALL]' ||
+                        formField.format === 'SELECTOR[MULTIPLE]' ||
+                        formField.format === 'SELECTOR[MULTIPLE][ADVANCED]') &&
+                        formField.default_value
+                "
+                >Por Defecto: {{ formField.default_value }}
+            </small>
             <!--
                 <sheets-input
                 v-if="formField.format !== 'SELECTOR' &&
@@ -111,7 +126,8 @@ export default {
                 options: this.field.options,
                 multiple:
                     this.field.format == "SELECTOR[MULTIPLE][ADVANCED]" ||
-                    this.field.format == "SELECTOR[MULTIPLE]",
+                    this.field.format == "SELECTOR[MULTIPLE]" ||
+                    this.field.format == "SELECTOR[1XN][ALL]",
                 required: this.field.required === 1,
                 disabled: this.formField.permission === 1
             };
@@ -181,7 +197,12 @@ export default {
 .vs__dropdown-toggle {
     background-color: white;
 }
-.mx-datepicker{
+.mx-datepicker {
     width: 100%;
+}
+.SheetsFormRenderFields__smallDefault {
+    position: relative;
+    top: -10px;
+    right: -1px;
 }
 </style>

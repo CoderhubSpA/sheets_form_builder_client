@@ -184,7 +184,7 @@ export default {
         saveForm() {
             this.loading = true;
             this.error = false;
-            this.backendMsg = 'Ocurrió un error al guardar los datos';
+            this.backendMsg = "Ocurrió un error al guardar los datos";
             this.success = false;
             this.backendMsg = "";
             const files = this.$store.getters["form/files"];
@@ -223,10 +223,24 @@ export default {
                             } else {
                                 this.loading = false;
                                 this.error = true;
-                                if(response.response.data.content.errors){
-                                    Object.keys(response.response.data.content.errors).forEach((key) => {
-                                        this.backendMsg = response.response.data.content.errors[key];
-                                    })
+                                if (response.response.data.content) {
+                                    if (response.response.data.content.errors) {
+                                        Object.keys(
+                                            response.response.data.content
+                                                .errors
+                                        ).forEach(key => {
+                                            this.backendMsg =
+                                                response.response.data.content.errors[
+                                                    key
+                                                ];
+                                        });
+                                    } else {
+                                        this.backendMsg =
+                                            "Ocurrió un error al guardar el formulario";
+                                    }
+                                } else {
+                                    this.backendMsg =
+                                        "Ocurrió un error al guardar el formulario";
                                 }
                                 console.log(
                                     "error de guardado",
@@ -298,10 +312,24 @@ export default {
                             } else {
                                 this.loading = false;
                                 this.error = true;
-                                if(response.response.data.content.errors){
-                                    Object.keys(response.response.data.content.errors).forEach((key) => {
-                                        this.backendMsg = response.response.data.content.errors[key];
-                                    })
+                                if (response.response.data.content) {
+                                    if (response.response.data.content.errors) {
+                                        Object.keys(
+                                            response.response.data.content
+                                                .errors
+                                        ).forEach(key => {
+                                            this.backendMsg =
+                                                response.response.data.content.errors[
+                                                    key
+                                                ];
+                                        });
+                                    } else {
+                                        this.backendMsg =
+                                            "Ocurrió un error al guardar el formulario";
+                                    }
+                                } else {
+                                    this.backendMsg =
+                                        "Ocurrió un error al guardar el formulario";
                                 }
                                 console.log(
                                     "error de guardado",
@@ -332,10 +360,24 @@ export default {
                             } else {
                                 this.loading = false;
                                 this.error = true;
-                                if(response.response.data.content.errors){
-                                    Object.keys(response.response.data.content.errors).forEach((key) => {
-                                        this.backendMsg = response.response.data.content.errors[key];
-                                    })
+                                if (response.response.data.content) {
+                                    if (response.response.data.content.errors) {
+                                        Object.keys(
+                                            response.response.data.content
+                                                .errors
+                                        ).forEach(key => {
+                                            this.backendMsg =
+                                                response.response.data.content.errors[
+                                                    key
+                                                ];
+                                        });
+                                    } else {
+                                        this.backendMsg =
+                                            "Ocurrió un error al guardar el formulario";
+                                    }
+                                } else {
+                                    this.backendMsg =
+                                        "Ocurrió un error al guardar el formulario";
                                 }
                                 console.log(
                                     "error de guardado",
@@ -359,7 +401,8 @@ export default {
     padding: 25px;
     background: rgb(230, 230, 230);
     border-radius: 10px;
-    margin: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 .SheetsFormRender__form-title {
     font-weight: bolder;

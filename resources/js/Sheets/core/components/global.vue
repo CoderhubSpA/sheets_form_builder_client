@@ -27,14 +27,19 @@
                     :type="sheetType"
                     :class="applyStyles"
                     :value="value"
-                    v-on:input="
-                        $emit('sheets-input-change', $event.target.value, id)
-                    "
+                    v-on:input="sheetsInputChange($event)"
+                    @paste="pasteInput($event)"
                 />
             </div>
         </div>
         <div v-else-if="sheetType == 'date' || sheetType == 'datetime'">
             <sheet-date :form="form"></sheet-date>
+        </div>
+        <div v-else-if="sheetType == 'map'">
+            <sheet-map
+                :form="form"
+                v-on:sheets-map-selector-change="mapSelectionChange"
+            ></sheet-map>
         </div>
         <div v-else-if="sheetType == 'checkbox'">
             <sheet-checkbox
@@ -62,12 +67,14 @@
 import abstract from "../mixins/mix";
 import SheetDocument from "./document";
 import SheetsCheckbox from "./checkbox";
+import SheetsMapSelector from "./map";
 import SheetsDate from "./dates";
 export default {
     components: {
         "sheet-date": SheetsDate,
         "sheet-document": SheetDocument,
-        "sheet-checkbox": SheetsCheckbox
+        "sheet-checkbox": SheetsCheckbox,
+        "sheet-map": SheetsMapSelector
     },
     mixins: [abstract],
     props: {},
@@ -96,7 +103,11 @@ export default {
                         this.originalType === "CLP" ||
                         this.originalType === "PERCENTAGE"
                     ) {
-                        valueParsed = allValues[this.id].replace(",", ".");
+                        if (isNaN(allValues[this.id])) {
+                            valueParsed = allValues[this.id].replace(",", ".");
+                        } else {
+                            valueParsed = allValues[this.id];
+                        }
                     } else {
                         valueParsed = allValues[this.id];
                     }
@@ -105,7 +116,7 @@ export default {
                     return null;
                 }
             } else {
-                this.$emit('sheets-input-change', null, this.id)
+                this.$emit("sheets-input-change", null, this.id);
                 return null;
             }
         }
@@ -116,6 +127,48 @@ export default {
         }
     },
     methods: {
+        sheetsInputChange(event) {
+            if (this.originalType === "RUT") {
+                const rutFormatted = this.formatRut(event.target.value);
+                event.target.value = rutFormatted;
+                this.$emit("sheets-input-change", event.target.value, this.id);
+            } else {
+                this.$emit("sheets-input-change", event.target.value, this.id);
+            }
+        },
+        pasteInput(event) {
+            if (
+                this.originalType === "NUMBER" ||
+                this.originalType === "CLP" ||
+                this.originalType === "PERCENTAGE"
+            ) {
+                event.preventDefault();
+            }
+        },
+        formatRut(rut) {
+            let actual = rut.replace(/^0+/, "");
+            if (actual != "" && actual.length > 1) {
+                let sinPuntos = actual.replace(/\./g, "");
+                let actualLimpio = sinPuntos.replace(/-/g, "");
+                let inicio = actualLimpio.substring(0, actualLimpio.length - 1);
+                let rutPuntos = "";
+                let i = 0;
+                let j = 1;
+                for (i = inicio.length - 1; i >= 0; i--) {
+                    let letra = inicio.charAt(i);
+                    rutPuntos = letra + rutPuntos;
+                    if (j % 3 == 0 && j <= inicio.length - 1) {
+                        rutPuntos = "." + rutPuntos;
+                    }
+                    j++;
+                }
+                let dv = actualLimpio.substring(actualLimpio.length - 1);
+                rutPuntos = rutPuntos + "-" + dv;
+                return rutPuntos;
+            } else {
+                return actual;
+            }
+        },
         checkboxChange(fieldId, val) {
             this.$emit("sheets-input-change", val, fieldId);
         },
@@ -124,6 +177,9 @@ export default {
         },
         onClickSelectedOption(option) {
             console.log(option);
+        },
+        mapSelectionChange(data) {
+            this.$emit("sheets-input-change", data.value, data.id);
         },
         returnData(event) {
             if (this.sheetType == "checkbox") {
