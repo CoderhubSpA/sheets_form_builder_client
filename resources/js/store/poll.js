@@ -6,7 +6,7 @@ export default {
     state: {
         loading: false,
         titlePoll: '',
-        active_section: 'waiting for id'
+        active_section: ''
     },
     mutations: {
         LOADING(state, val) {
@@ -39,7 +39,10 @@ export default {
                         section['fields'] = []
 
                         let field =  data.content.fields.find(f => f.form_section_id === section.id)
-                        section.fields.push(field)
+                        if (field) {
+                            section.fields.push(field)
+                        }
+
 
                         rows[index].sections.push(section)
 
@@ -48,10 +51,20 @@ export default {
                     rows.forEach(row => {
                         row.sections.sort((a, b) => a.order > b.order ? 1 : b.order > a.order ? -1 : 0)
                     })
+                    let active_section = ''
+                    for (let i = 0; i < rows[0].sections.length; i++) {
+                        if (rows[0].sections[i].visible_on_load === 1) {
+                            active_section = rows[0].sections[i].id
+                            break
+                        }
 
-                    commit('ACTIVE_SECTION', rows[0].sections[0].id)
+                    }
 
-                    resolve(rows)
+                    resolve({
+                        rows: rows,
+                        active_section: active_section,
+                        entity_id: data.content.entity_type_id
+                    })
                 })
                 .catch(error => {
                     reject(error.response)
@@ -61,20 +74,6 @@ export default {
                 })
             })
         },
-        nextQuestion({ commit }, section_id) {
-            commit('LOADING', true)
-            return new Promise((resolve, reject) => {
-                try {
-                    commit('ACTIVE_SECTION', section_id)
-                    resolve(section_id)
-                } catch (error) {
-                    reject(error)
-                }
-                finally {
-                    commit('LOADING', false)
-                }
-            })
-        }
     },
     getters: {
         title: state => state.titlePoll,

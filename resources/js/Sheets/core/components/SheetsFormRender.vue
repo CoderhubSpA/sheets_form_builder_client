@@ -208,11 +208,10 @@ export default {
                         .dispatch("form/save_file", formData)
                         .then(response => {
                             if (response.response.data.success === true) {
+                                const content = JSON.parse(response.response.data.content);
                                 const dataResponse = {
                                     key: file[1].fileid,
-                                    value:
-                                        response.response.data.content
-                                            .inserted_id
+                                    value: content.content.inserted_id
                                 };
                                 this.$store.commit(
                                     "form/FIELDSVALUES",

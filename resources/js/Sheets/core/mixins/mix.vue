@@ -82,7 +82,7 @@ export default {
          * Boolean. A value is required or must be check for the form to be submittable
          */
         required() {
-            return (this.form.required) ? true : false
+            return (this.form.required == 1) ? true : false
         },
         /**
          * Incremental values that are valid.
@@ -124,6 +124,10 @@ export default {
                 case 'DOCUMENT':
                 case 'DOCUMENT[IMAGE]':
                     return 'file'
+                case 'QUESTION':
+                    return 'question'
+                case 'INFO':
+                    return 'info'
                 default:
                     return this.form.format
             }
@@ -145,7 +149,7 @@ export default {
                 return this.$attrs["error-message"].join(' ')
             }
             return null
-        }
+        },
     },
     methods: {
         uuid() {

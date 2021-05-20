@@ -4,6 +4,7 @@
             <label :for="name">
                 {{ label }} <span v-if="required" class="text-danger">*</span>
             </label>
+            <!-- INPUTS TIPO TEXT -->
             <div :class="originalType == 'CLP' ? 'input-group-prepend' : ''">
                 <span
                     class="input-group-text"
@@ -32,15 +33,18 @@
                 />
             </div>
         </div>
+        <!-- INPUTS FECHA -->
         <div v-else-if="sheetType == 'date' || sheetType == 'datetime'">
             <sheet-date :form="form"></sheet-date>
         </div>
+        <!-- INPUT MAPA -->
         <div v-else-if="sheetType == 'map'">
             <sheet-map
                 :form="form"
                 v-on:sheets-map-selector-change="mapSelectionChange"
             ></sheet-map>
         </div>
+        <!-- INPUT CHECKBOX -->
         <div v-else-if="sheetType == 'checkbox'">
             <sheet-checkbox
                 :label="label"
@@ -51,11 +55,31 @@
                 v-model="checkboxResponse"
             ></sheet-checkbox>
         </div>
+        <!-- INPUT FILE -->
         <div v-else-if="sheetType == 'file'">
-            <sheet-document
-                :form="form"
-                v-on:sheets-file-change="fileChange"
-            ></sheet-document>
+            <sheet-document :form="form" v-on:sheets-file-change="fileChange" />
+        </div>
+        <!-- PREGUNTA PARA ENCUESTA -->
+        <div v-else-if="sheetType == 'question'">
+            <label>
+                {{ name }} <span v-if="required" class="text-danger">*</span>
+            </label>
+            <v-select :options="optionsQuestion" v-model="selectedQuestion"> </v-select>
+            <button
+                :class="`btn btn-info mt-4 float-right ${endForm ? 'hide' : 'show'}`"
+                v-if="can_go_next_question"
+                @click="next">
+                Siguiente
+            </button>
+        </div>
+        <!-- INFO PARA ENCUESTA -->
+        <div v-else-if="sheetType == 'info'">
+            <div v-html="name"></div>
+            <button
+                :class="`btn btn-info mt-4 float-right ${endForm ? 'hide' : 'show'}`"
+                @click="next">
+                Siguiente
+            </button>
         </div>
         <small v-if="errorMessage" class="text-danger">
             {{ errorMessage }}
@@ -77,11 +101,17 @@ export default {
         "sheet-map": SheetsMapSelector
     },
     mixins: [abstract],
-    props: {},
+    props: {
+        endForm: {
+            type: Boolean,
+            default: false
+        }
+    },
     data: () => ({
         types: ["text", "email", "number", "password", "datetime-local", "url"],
         // selected: '',
-        checkboxResponse: false
+        checkboxResponse: false,
+        selectedQuestion: null,
     }),
     computed: {
         options() {
@@ -119,14 +149,62 @@ export default {
                 this.$emit("sheets-input-change", null, this.id);
                 return null;
             }
-        }
+        },
+        optionsQuestion() {
+            let options = [];
+
+            if (this.sheetType === 'question') {
+                Object.keys(this.form.options).forEach(key => {
+                    options.push({
+                        id: key,
+                        label: this.form.options[key]
+                    });
+                });
+            }
+            return options;
+        },
+        /**
+         *
+         */
+        can_go_next_question() {
+            if (this.sheetType != 'info')
+                return (this.required && !!this.selected) || !this.required
+            else
+                return true
+        },
     },
     watch: {
         checkboxResponse(val) {
             this.$emit("input", val);
+        },
+        selectedQuestion(val) {
+            if (!!val) {
+                this.next();
+            }
         }
     },
     methods: {
+        /**
+         *
+         */
+        next() {
+            const data = {
+                selected_value: this.sheetType == 'question' ? this.selectedQuestion : null,
+                alternative: !!this.selectedQuestion ? this.form.alternatives[this.selectedQuestion.id] : null,
+                section_owner: this.form.form_section_id
+            };
+
+            if (this.sheetType == 'question') {
+                this.$emit("input", this.selectedQuestion.id);
+                this.$emit(
+                    "optionSelected",
+                    this.form.id,
+                    this.form.alternatives[this.selectedQuestion.id]
+                );
+            }
+
+            this.$emit("next", data);
+        },
         sheetsInputChange(event) {
             if (this.originalType === "RUT") {
                 const rutFormatted = this.formatRut(event.target.value);
