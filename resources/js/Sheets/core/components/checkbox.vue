@@ -11,7 +11,7 @@
             @change="onChange"
         />
         <label class="form-check-label">
-            {{ label }}
+            {{ label }} <span v-if="required" class="text-danger">*</span>
         </label>
     </div>
 </template>
@@ -47,6 +47,10 @@ export default {
             default: ""
         },
         disabled: {
+            type: Boolean,
+            default: false
+        },
+        required: {
             type: Boolean,
             default: false
         }

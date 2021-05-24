@@ -54,7 +54,7 @@
 import question from "./question";
 import info from "./info";
 import global from '../global'
-import LoadingMessage from "../LoadingMessage.vue";
+import LoadingMessage from "../loading-message";
 
 export default {
     components: {

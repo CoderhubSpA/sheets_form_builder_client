@@ -28,7 +28,7 @@
 /**
  *@author Jorge Peraza
  */
-import LoadingMessage from "./LoadingMessage";
+import LoadingMessage from "./loading-message";
 export default {
     name: "sheet-input-select",
     components: {

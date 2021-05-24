@@ -8,6 +8,24 @@
         </div>
         <div class="row">
             <div class="col text-center">
+                <div class="form-group">
+                    <label for="mapSearch">
+                        <b>Buscador</b>
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Escriba la dirección y presione enter para buscar..."
+                        v-on:keyup.enter="searchAddress"
+                    />
+                </div>
+                <p class="text-danger" v-if="showErrorMsgAddress">
+                    {{ errorMsgAddress }}
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
                 <p>
                     Haga click sobre el mapa para posicionar el marcador y
                     seleccionar las coordenadas
@@ -28,17 +46,24 @@
                 </p>
             </div>
         </div>
+        <loading-message :status="loading"></loading-message>
     </div>
 </template>
 
 <script>
 import abstract from "../mixins/mix";
+import LoadingMessage from "./loading-message";
 
 export default {
-    components: {},
+    components: {
+        LoadingMessage
+    },
     mixins: [abstract],
     props: {},
     data: () => ({
+        loading: false,
+        errorMsgAddress: "Dirección no encontrada, intente con otra dirección",
+        showErrorMsgAddress: false,
         myMap: null,
         marker: null,
         selectedLat: "",
@@ -121,6 +146,52 @@ export default {
                 this.selectedLat = value[0];
                 this.selectedLng = value[1];
             }
+        },
+        resetMap(lat, lng, zoom) {
+            this.myMap.remove();
+            this.myMap = L.map("SheetsMap__mapcontainer").setView(
+                [lat, lng],
+                zoom
+            );
+            L.tileLayer(
+                "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic21hbmF1cmU5MyIsImEiOiJja28xcDY4bHgwbmpuMzFvaWx3YW83NG5kIn0.vfx8Fuf3bD-j7_k6pdSoqQ",
+                {
+                    maxZoom: 18,
+                    attribution:
+                        'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: "mapbox/streets-v11",
+                    tileSize: 512,
+                    zoomOffset: -1
+                }
+            ).addTo(this.myMap);
+
+            this.myMap.on("click", this.clickOnMap);
+        },
+        searchAddress(e) {
+            this.showErrorMsgAddress = false;
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`;
+            this.loading = true;
+            axios
+                .get(url)
+                .then(response => {
+                    this.loading = false;
+                    console.log("response", response);
+                    if (response.data.length === 0 || response.status !== 200) {
+                        this.showErrorMsgAddress = true;
+                    } else {
+                        const firstFound = response.data[0];
+                        this.resetMap(firstFound.lat, firstFound.lon, 25);
+                    }
+                })
+                .catch(error => {
+                    this.loading = false;
+                    this.showErrorMsgAddress = true;
+                    console.log(
+                        "Ocurrió un error al consultar dirección",
+                        error
+                    );
+                });
         }
     }
 };

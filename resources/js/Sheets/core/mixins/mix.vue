@@ -106,7 +106,7 @@ export default {
                 case 'NUMBER':
                 case 'CLP':
                 case 'PERCENTAGE':
-                    return 'text'
+                    return 'number'
                 case 'PASSWORD':
                     return 'password'
                 case 'DATE':
