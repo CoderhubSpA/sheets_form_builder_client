@@ -11,7 +11,9 @@
                 "
                 :form="fieldParsed"
                 :styles="fieldParsed.styles"
+                :bus="bus"
                 v-on:sheets-input-change="inputChange"
+                v-on:sheets-input-search-map="inputSearchMap"
                 v-on:sheets-input-file-change="inputFileChange"
             ></sheets-input>
             <sheets-select
@@ -80,12 +82,16 @@ export default {
         value: {
             type: Object,
             default: () => {}
+        },
+        bus:{
+            type: Object,
+            default: () => {}
         }
     },
     data: () => ({
         customInputDate: null,
         inputData: null,
-        selected: []
+        selected: [],
     }),
     watch: {
         inputData(val) {
@@ -152,6 +158,13 @@ export default {
         applyStyle() {
             return this.styles.join(" ");
         },
+        inputSearchMap(value){
+            const dataToSearch = {
+                value,
+                col_name: this.formField.col_name
+            }
+            this.searchMap(dataToSearch);
+        },
         inputChange(value, fieldId) {
             const data = {
                 key: fieldId,
@@ -179,6 +192,9 @@ export default {
             if (this.formField.permission === 2) {
                 this.$store.commit("form/FIELDSVALUES", field);
             }
+        },
+        searchMap(data){
+            this.$emit("sheets-search-map-section", data);
         }
     }
 };

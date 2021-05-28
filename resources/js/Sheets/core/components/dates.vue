@@ -76,7 +76,6 @@ export default {
                     {},
                     this.$store.getters["form/fieldsvalues"]
                 );
-                console.log('allValues[this.id]', allValues[this.id]);
             if(allValues[this.id]){
                 const valueDate = allValues[this.id].split(' ');
                 let dateToPicker = null;
@@ -103,7 +102,6 @@ export default {
             this.$emit('sheets-input-change', value, this.id);
         },
         editionParseDate(date){
-            console.log(date)
             let searchRegExp = /\//gi;
             let replaceWith = '-';
             let parsed = date.replace(searchRegExp, replaceWith);

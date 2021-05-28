@@ -6,24 +6,7 @@
                 <h3>{{ this.form.label }}</h3>
             </div>
         </div>
-        <div class="row">
-            <div class="col text-center">
-                <div class="form-group">
-                    <label for="mapSearch">
-                        <b>Buscador</b>
-                    </label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Escriba la dirección y presione enter para buscar..."
-                        v-on:keyup.enter="searchAddress"
-                    />
-                </div>
-                <p class="text-danger" v-if="showErrorMsgAddress">
-                    {{ errorMsgAddress }}
-                </p>
-            </div>
-        </div>
+
         <div class="row">
             <div class="col text-center">
                 <p>
@@ -35,6 +18,14 @@
         <div class="row">
             <div class="col text-center">
                 <div id="SheetsMap__mapcontainer"></div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col text-center">
+                <p class="text-danger" v-if="showErrorMsgAddress">
+                    {{ errorMsgAddress }}
+                </p>
             </div>
         </div>
         <br />
@@ -59,7 +50,12 @@ export default {
         LoadingMessage
     },
     mixins: [abstract],
-    props: {},
+    props: {
+        bus: {
+            type: Object,
+            default: () => ({})
+        }
+    },
     data: () => ({
         loading: false,
         errorMsgAddress: "Dirección no encontrada, intente con otra dirección",
@@ -76,6 +72,11 @@ export default {
     mounted() {
         this.setUpMap();
         this.getEditValue();
+        this.bus.$on("searchMap", args => {
+            if (this.form.col_filter_by === args.col_name) {
+                this.searchAddress(args.value);
+            }
+        });
     },
     methods: {
         setUpMap() {
@@ -168,15 +169,13 @@ export default {
 
             this.myMap.on("click", this.clickOnMap);
         },
-        searchAddress(e) {
+        searchAddress(value) {
             this.showErrorMsgAddress = false;
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`;
-            this.loading = true;
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${value}`;
             axios
                 .get(url)
                 .then(response => {
                     this.loading = false;
-                    console.log("response", response);
                     if (response.data.length === 0 || response.status !== 200) {
                         this.showErrorMsgAddress = true;
                     } else {

@@ -130,14 +130,14 @@ class SheetsController extends Controller
                     ]
                 ]
             ]);
-            $status = $r->getStatusCode();
-            $response = $r->getBody()->getContents();
-            if($status === 200){
-                return response()->json(['success' => true, 'content' => $response]);
-            }else{
-                return response()->json(['success' => false, 'content' => json_decode($response)]);
-            }
-            return response()->json(json_decode($response->getBody()->getContents()));
+            $res = new \stdClass();
+
+            $res->success = $r->getStatusCode() === 200;
+				  
+            $res->content = json_decode($r->getBody()->getContents());
+
+            return response()->json($res);
+
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }
@@ -164,13 +164,13 @@ class SheetsController extends Controller
                 \GuzzleHttp\RequestOptions::JSON => $entity,
             ]);
             $r = $client->request($method, $baseUrl);
-            $status = $r->getStatusCode();
-            $response = $r->getBody()->getContents();
-            if($status === 200){
-                return response()->json(['success' => true, 'content' => $response]);
-            }else{
-                return response()->json(['success' => false, 'content' => json_decode($response), 'status'=> $status]);
-            }
+           $res = new \stdClass();
+
+            $res->success = $r->getStatusCode() === 200;
+            $res->content = json_decode($r->getBody()->getContents());
+            $res->status = $r->getStatusCode();
+
+            return response()->json($res, $r->getStatusCode());
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => json_encode($th->getMessage())]);
         }
@@ -198,13 +198,13 @@ class SheetsController extends Controller
                 \GuzzleHttp\RequestOptions::JSON => $entity,
             ]);
             $r = $client->request($method, $baseUrl);
-            $status = $r->getStatusCode();
-            $response = $r->getBody()->getContents();
-            if($status === 200){
-                return response()->json(['success' => true, 'content' => $response]);
-            }else{
-                return response()->json(['success' => false, 'content' => json_decode($response)]);
-            }
+          $res = new \stdClass();
+
+            $res->success = $r->getStatusCode() === 200;
+            $res->content = json_decode($r->getBody()->getContents());
+            $res->status = $r->getStatusCode();
+
+            return response()->json($res, $r->getStatusCode());
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }
@@ -212,6 +212,7 @@ class SheetsController extends Controller
 
     public function entity_info($id)
     {
+		 try {
         $endpoint = env('SHEETS_API_URL') . "entity/info/{$id}";
         $headers = [
             'Content-Type' => 'application/json',
@@ -223,11 +224,17 @@ class SheetsController extends Controller
             'http_errors' => false,
             'verify' => false,
         ]);
+            $res = $client->request('GET', $endpoint);
+            $response = new \stdClass();
 
-        $res = $client->request('GET', $endpoint);
-        return response()->json([
-            'success' => true,
-            'content' => $res->getBody()->getContents()
-        ]);
+            $response->success = $res->getStatusCode() === 200;
+            $response->content = json_decode($res->getBody()->getContents());
+            $response->status = $res->getStatusCode();
+
+            return response()->json($response, $response->status);
+
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false, 'content' => $th->getMessage()]);
+        }
     }
 }

@@ -29,6 +29,7 @@
                     :class="applyStyles"
                     :value="value"
                     v-on:input="sheetsInputChange($event)"
+                    v-on:keyup.enter="searchMap"
                     @paste="pasteInput($event)"
                 />
             </div>
@@ -41,6 +42,7 @@
         <div v-else-if="sheetType == 'map'">
             <sheet-map
                 :form="form"
+                :bus="bus"
                 v-on:sheets-map-selector-change="mapSelectionChange"
             ></sheet-map>
         </div>
@@ -51,6 +53,7 @@
                 :name="name"
                 :id="id"
                 :disabled="disabled"
+                :required="required"
                 v-on:sheets-checkbox-change="checkboxChange"
                 v-model="checkboxResponse"
             ></sheet-checkbox>
@@ -105,7 +108,11 @@ export default {
         endForm: {
             type: Boolean,
             default: false
-        }
+        },
+        bus: {
+            type: Object,
+            default: () => ({})
+        },
     },
     data: () => ({
         types: ["text", "email", "number", "password", "datetime-local", "url"],
@@ -183,6 +190,7 @@ export default {
             }
         }
     },
+    mounted() {},
     methods: {
         /**
          *
@@ -254,10 +262,13 @@ export default {
             this.$emit("sheets-input-file-change", event, fieldId);
         },
         onClickSelectedOption(option) {
-            console.log(option);
+            
         },
         mapSelectionChange(data) {
             this.$emit("sheets-input-change", data.value, data.id);
+        },
+        searchMap(event){
+            this.$emit('sheets-input-search-map',event.target.value);
         },
         returnData(event) {
             if (this.sheetType == "checkbox") {

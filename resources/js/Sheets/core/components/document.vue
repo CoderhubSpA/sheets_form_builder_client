@@ -86,14 +86,11 @@ export default {
                 Object.keys(entities_fk).forEach(key => {
                     entities_fk[key].map(entity => {
                         if (entity.id === fileId) {
-                            console.log('entró', entity);
                             this.labelInput = entity.name;
                             this.fileEditUrl = `${this.storage_url}${entity.src}`;
                         }
                     });
                 });
-            } else {
-                console.log("no es edit");
             }
         },
         onChange(event) {

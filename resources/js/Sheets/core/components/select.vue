@@ -95,7 +95,7 @@ export default {
         getOptions() {
             if (this.field.entity_type_fk == null) {
                 if (this.field.options != null) {
-                    const optionsTest = JSON.parse(this.field.options);
+                    const optionsTest = this.field.options;
                     let optionArray = [];
                     Object.keys(optionsTest).forEach(key => {
                         let newOption = {
@@ -111,7 +111,7 @@ export default {
                     );
                     if (allValues[this.id]) {
                         if (allValues[this.id].includes('["')) {
-                            this.selected = JSON.parse(allValues[this.id]);
+                            this.selected = allValues[this.id];
                         } else {
                             this.selected = allValues[this.id];
                         }
@@ -125,7 +125,7 @@ export default {
                     .get(`/api/sheets/entity/info/${this.field.entity_type_id}`)
                     .then(response => {
                         this.loading = false;
-                        const data = JSON.parse(response.data.content);
+                        const data = response.data.content;
                         this.options =
                             data.content.entities_fk[this.field.entity_type_fk];
                         const allValues = Object.assign(
@@ -134,7 +134,7 @@ export default {
                         );
                         if (allValues[this.id]) {
                             if (allValues[this.id].includes('["')) {
-                                this.selected = JSON.parse(allValues[this.id]);
+                                this.selected = allValues[this.id];
                             } else {
                                 this.selected = allValues[this.id];
                             }

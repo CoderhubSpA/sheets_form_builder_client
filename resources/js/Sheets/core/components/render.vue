@@ -15,7 +15,9 @@
                 :key="index"
             >
                 <sheets-form-render-row
+                    :bus="bus"
                     :row="row"
+                    v-on:sheets-search-map-form="searchMap"
                     v-model="result[index]"
                 ></sheets-form-render-row>
             </div>
@@ -77,13 +79,17 @@ export default {
         error: false,
         success: false,
         backendMsg: "",
-        actions: []
+        actions: [],
+        bus: new Vue()
     }),
     computed: {},
     mounted() {
         this.getForm();
     },
     methods: {
+        searchMap(data){
+            this.bus.$emit('searchMap', data);
+        },
         getForm() {
             this.error = false;
             this.success = false;
@@ -182,7 +188,7 @@ export default {
             }
         },
         saveForm() {
-            this.loading = true;
+            // this.loading = true;
             this.error = false;
             this.backendMsg = "Ocurrió un error al guardar los datos";
             this.success = false;
@@ -211,7 +217,7 @@ export default {
                                 const dataResponse = {
                                     key: file[1].fileid,
                                     value:
-                                        response.response.data.content
+                                        response.response.data.content.content
                                             .inserted_id
                                 };
                                 this.$store.commit(
