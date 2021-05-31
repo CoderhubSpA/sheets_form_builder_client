@@ -36,16 +36,12 @@ class SheetsController extends Controller
         }
     }
 	
-    public function index($id)
+    public function index($id,Request $request)
     {
+       
         $method = 'get';
-        $baseUrl = env('SHEETS_API_URL') . 'form/' . $id;
+        $endpoint = "form/{$id}";
         $response = null;
-		$headers = [
-            'Content-Type' => 'application/json',
-            'AccessToken' => 'key',
-            'Authorization' => env('SECURITY_BEARER'),
-        ];
 	   
 		if (!env('SHEETS_EXTERNAL')) {
             $headers = collect($request->header())->transform(function ($item) {
@@ -54,28 +50,19 @@ class SheetsController extends Controller
 
             $this->clientBuilder['headers'] = $headers->toArray();
         }
-		
-        $client = new GuzzleClient([
-            'headers' => $headers,
-            'http_errors' => false,
-            'verify' => false
-        ]);
-        $r = $client->request($method, $baseUrl);
-        $response = $r->getBody()->getContents();
-        return $response;
+      
+      
+        $client = new GuzzleClient($this->clientBuilder);
+        $response = $client->request('GET', $endpoint);
+
+        return $response->getBody()->getContents();
     }
 
-    public function getrecord($entityname,$recordid)
+    public function getrecord($entityname,$recordid,Request $request)
     {
-        $method = 'get';
-        $baseUrl = env('SHEETS_API_URL') . 'entity/data/' . $entityname . '/' . $recordid;
+        $endpoint =  'entity/data/' . $entityname . '/' . $recordid;
         $response = null;
-		$headers = [
-            'Content-Type' => 'application/json',
-            'AccessToken' => 'key',
-            'Authorization' => env('SECURITY_BEARER'),
-        ];
-        		
+	        		
 		 if (!env('SHEETS_EXTERNAL')) {
             $headers = collect($request->header())->transform(function ($item) {
                 return $item[0];
@@ -84,14 +71,10 @@ class SheetsController extends Controller
             $this->clientBuilder['headers'] = $headers->toArray();
         }
 		
-        $client = new GuzzleClient([
-            'headers' => $headers,
-            'http_errors' => false,
-            'verify' => false
-        ]);
-        $r = $client->request($method, $baseUrl);
-        $response = $r->getBody()->getContents();
-        return $response;
+        $client = new GuzzleClient($this->clientBuilder);
+        $response = $client->request('GET', $endpoint);
+
+        return $response->getBody()->getContents();
     }
 
     public function saveFile(Request $request)
