@@ -6,7 +6,8 @@ export default {
     state: {
         loading: false,
         titlePoll: '',
-        active_section: ''
+        active_section: '',
+        record: []
     },
     mutations: {
         LOADING(state, val) {
@@ -17,6 +18,9 @@ export default {
         },
         ACTIVE_SECTION: (state , val) => {
             state.active_section = val
+        },
+        RECORD(state, val) {
+            state.record.push(val)
         }
     },
     actions: {
@@ -26,7 +30,8 @@ export default {
                 axios.get(`/api/sheets/form/${id}`)
                 .then(response => {
                     const data = response.data
-
+                    // const data = require('./json.json')
+                    // console.log(data)
                     commit('TITLE_POLL', data.content.name)
                     let rows = data.content.rows.map(row =>{
                         row['sections'] = []
@@ -57,12 +62,12 @@ export default {
                             active_section = rows[0].sections[i].id
                             break
                         }
-
                     }
-
+                    // console.log(active_section)
+                    commit('ACTIVE_SECTION', active_section)
                     resolve({
                         rows: rows,
-                        active_section: active_section,
+                        // active_section: active_section,
                         entity_id: data.content.entity_type_id
                     })
                 })
@@ -78,6 +83,7 @@ export default {
     getters: {
         title: state => state.titlePoll,
         active_section: state => state.active_section,
-        loading: state => state.loading
+        loading: state => state.loading,
+        record: state => state.record
     }
 }

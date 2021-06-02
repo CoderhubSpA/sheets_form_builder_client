@@ -169,8 +169,44 @@ export default {
 
             this.myMap.on("click", this.clickOnMap);
         },
+        resetMapSearch(lat, lng, zoom) {
+            this.myMap.remove();
+            this.myMap = L.map("SheetsMap__mapcontainer").setView(
+                [lat, lng],
+                zoom
+            );
+            L.tileLayer(
+                "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic21hbmF1cmU5MyIsImEiOiJja28xcDY4bHgwbmpuMzFvaWx3YW83NG5kIn0.vfx8Fuf3bD-j7_k6pdSoqQ",
+                {
+                    maxZoom: 18,
+                    attribution:
+                        'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: "mapbox/streets-v11",
+                    tileSize: 512,
+                    zoomOffset: -1
+                }
+            ).addTo(this.myMap);
+
+            this.myMap.on("click", this.clickOnMap);
+            this.myMap.eachLayer(layer => {
+                if (!layer._container) {
+                    this.myMap.removeLayer(layer);
+                }
+            });
+            this.selectedLat = lat;
+            this.selectedLng = lng;
+            this.marker = L.marker([lat, lng]).addTo(this.myMap);
+            const value = `${this.selectedLat},${this.selectedLng}`;
+            const data = {
+                id: this.form.id,
+                value
+            };
+            this.$emit("sheets-map-selector-change", data);
+        },
         searchAddress(value) {
             this.showErrorMsgAddress = false;
+            this.loading = true;
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${value}`;
             axios
                 .get(url)
@@ -180,7 +216,7 @@ export default {
                         this.showErrorMsgAddress = true;
                     } else {
                         const firstFound = response.data[0];
-                        this.resetMap(firstFound.lat, firstFound.lon, 25);
+                        this.resetMapSearch(firstFound.lat, firstFound.lon, 17);
                     }
                 })
                 .catch(error => {

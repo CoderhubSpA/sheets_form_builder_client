@@ -1,20 +1,19 @@
 <template>
     <div :class="`col col-${sm} col-${md} col-${xl}`">
+
         <label>
-            {{ title }} <span v-if="required" class="question-required">*</span>
+            {{ label }} <span v-if="required" class="question-required">*</span>
         </label>
-        <v-select :options="options" v-model="selected"> </v-select>
-        <button
-            :class="`btn btn-info mt-4 float-right ${endForm ? 'hide' : 'show'}`"
-            v-if="can_go_next_question"
-            @click="next">
-            Siguiente
-        </button>
+        <v-select
+            :options="options"
+            v-model="selected"></v-select>
     </div>
 </template>
 
 <script>
+import abstract from "../../mixins/mix"
 export default {
+    mixins: [abstract],
     props: {
         question: {
             type: Object,
@@ -24,15 +23,18 @@ export default {
         endForm: {
             type: Boolean,
             default: false
+        },
+        errors: {
+            type: Array,
+            default: () => []
         }
     },
     data: () => ({
-        selected: null,
-        show_send_poll: false
+        selected: null
     }),
     computed: {
-        title() {
-            return this.question.name;
+        label() {
+            return this.question.name
         },
         sm() {
             return this.question.col_sm;
@@ -55,38 +57,48 @@ export default {
         },
         required() {
             return this.question.required == 1;
-        },
-        can_go_next_question() {
-            return (this.required && !!this.selected) || this.required == false;
         }
     },
     watch: {
         selected(val) {
             if (!!val) {
-                this.next();
+                const data = {
+                    id: this.question.id,
+                    selected_value: val,
+                    alternative: !! val ? this.question.alternatives[val.id] : null,
+                    section_owner: this.question.form_section_id
+                }
+                this.optionSelected(data)
             }
         }
     },
     mounted() {},
     methods: {
-        next() {
-            const data = {
-                selected_value: this.selected,
-                alternative: !!this.selected
-                    ? this.question.alternatives[this.selected.id]
-                    : null,
-                section_owner: this.question.form_section_id
-            };
-            this.$emit("input", this.selected.id);
-            this.$emit(
-                "optionSelected",
-                this.question.id,
-                this.question.alternatives[this.selected.id]
-            );
-            this.$emit("next", data);
+        optionSelected(value) {
+            if (value){
+                this.$emit('input', value.selected_value.id)
+            }
+            else
+                this.$emit('input', null)
+
+            this.$emit("optionSelected", value)
         }
+        // next() {
+        //     const data = {
+        //         selected_value: this.selected,
+        //         alternative: !!this.selected ? this.question.alternatives[this.selected.id] : null,
+        //         section_owner: this.question.form_section_id
+        //     };
+        //     this.$emit("input", this.selected.id);
+        //     this.$emit(
+        //         "optionSelected",
+        //         this.question.id,
+        //         this.question.alternatives[this.selected.id]
+        //     );
+        //     this.$emit("next", data);
+        // }
     }
-};
+}
 </script>
 
 <style lang="scss">

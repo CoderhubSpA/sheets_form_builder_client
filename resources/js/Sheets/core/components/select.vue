@@ -92,10 +92,16 @@ export default {
         this.getOptions();
     },
     methods: {
+        parseOptions(options){
+            return JSON.parse(options);
+        },
         getOptions() {
             if (this.field.entity_type_fk == null) {
                 if (this.field.options != null) {
-                    const optionsTest = this.field.options;
+                    let optionsTest = this.field.options;
+                    if(typeof optionsTest === 'string'){
+                        optionsTest = this.parseOptions(optionsTest);
+                    }
                     let optionArray = [];
                     Object.keys(optionsTest).forEach(key => {
                         let newOption = {
@@ -121,34 +127,26 @@ export default {
                 }
             } else {
                 this.loading = true;
-                axios
-                    .get(`/api/sheets/entity/info/${this.field.entity_type_id}`)
-                    .then(response => {
-                        this.loading = false;
-                        const data = response.data.content;
-                        this.options =
-                            data.content.entities_fk[this.field.entity_type_fk];
-                        const allValues = Object.assign(
-                            {},
-                            this.$store.getters["form/fieldsvalues"]
-                        );
-                        if (allValues[this.id]) {
-                            if (allValues[this.id].includes('["')) {
-                                this.selected = allValues[this.id];
-                            } else {
-                                this.selected = allValues[this.id];
-                            }
-                        } else {
-                            this.selected = null;
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error.response);
-                    });
+                const data = this.$store.getters["form/contentinfo"];
+                this.loading = false;
+                this.options =
+                    data.content.entities_fk[this.field.entity_type_fk];
+                const allValues = Object.assign(
+                    {},
+                    this.$store.getters["form/fieldsvalues"]
+                );
+                if (allValues[this.id]) {
+                    if (allValues[this.id].includes('["')) {
+                        this.selected = JSON.parse(allValues[this.id]);
+                    } else {
+                        this.selected = allValues[this.id];
+                    }
+                } else {
+                    this.selected = null;
+                }
             }
         }
     }
 };
 </script>
-
 <style></style>

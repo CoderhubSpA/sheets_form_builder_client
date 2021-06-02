@@ -1,45 +1,46 @@
 <template>
     <div :class="`col col-${sm} col-${md} col-${xl}`">
-        <span v-html="info"></span>
+        <div v-html="info"></div>
         <br />
-        <button :class="`btn btn-info mt-4 float-right`" @click="next">
-            Siguiente
-        </button>
     </div>
 </template>
 
 <script>
+/**
+ * @author Jorge Peraza
+ */
+import abstract from "../../mixins/mix"
 export default {
-    props: {
-        field: {
-            type: Object,
-            default: () => {},
-            require: true
-        }
-    },
-    data: () => ({
-        info: `<ul><li> item 1</li><li> item 2</li></ul>`
-    }),
+    mixins: [abstract],
     computed: {
-        title() {
-            return this.field.name;
+        info() {
+            return this.form.name;
         },
         sm() {
-            return this.field.col_sm;
+            return this.form.col_sm;
         },
         md() {
-            return this.field.col_md;
+            return this.form.col_md;
         },
         xl() {
-            return this.field.col_xl;
+            return this.form.col_xl;
         }
     },
-    watch: {},
-    mounted() {},
-    methods: {
-        next() {
-            console.log("siguiente sección");
+    watch: {
+
+    },
+    mounted() {
+        let data = {
+            type: 'info',
+            id: this.form.id,
+            value: this.form.form_field_id
+
         }
+        this.$emit('info', data)
+
+    },
+    methods: {
+
     }
 };
 </script>

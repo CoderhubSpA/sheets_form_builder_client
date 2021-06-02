@@ -13,7 +13,8 @@ export default {
         pendingfiles: 0,
         entityname: null,
         recordid: null,
-        entities_fk: null
+        entities_fk: null,
+        contentinfo: null
     },
     getters: {
         loading: state => state.loading,
@@ -25,7 +26,8 @@ export default {
         pendingfiles: state => state.pendingfiles,
         entityname: state => state.entityname,
         recordid: state => state.recordid,
-        entities_fk: state => state.entities_fk
+        entities_fk: state => state.entities_fk,
+        contentinfo: state => state.contentinfo
     },
     mutations: {
         LOADING(state, loading) {
@@ -78,6 +80,9 @@ export default {
         },
         ENTITIESFK(state, entities_fk) {
             state.entities_fk = entities_fk;
+        },
+        CONTENTINFO(state, contentinfo) {
+            state.contentinfo = contentinfo;
         }
     },
     actions: {
@@ -87,86 +92,71 @@ export default {
                     .get(`/api/sheets/form/${id}`)
                     .then(response => {
                         let rows = [];
-                        // CAMPO DE PRUEBA
-                        // response.data.content.fields.push({
-                        //     form_field_id: "b69c263a-8a8d-11eb-965c-test",
-                        //     order: 4,
-                        //     name: "FILE TEST",
-                        //     permission: 1,
-                        //     form_section_id: "cdaf5c0d-9522-47fe-b7d1-2e63f62666fc",
-                        //     required: 1,
-                        //     format: "DOCUMENT",
-                        //     col_md: 6,
-                        //     col_xl: 6,
-                        //     col_sm: 12,
-                        //     id: "04c0c94c-40dd-44e1-a5a2-3cd7e3016705",
-                        //     column_group_id: null,
-                        //     entity_type_id: "2168fdd5-840f-11eb-965c-test",
-                        //     col_name: "test",
-                        //     entity_type_fk: null,
-                        //     entity_type_permission_fk: null,
-                        //     col_name_fk: null,
-                        //     pivot_table: null,
-                        //     entity_type_pivot_fk: null,
-                        //     default_value: null,
-                        //     col_fk_1_n: null,
-                        //     col_fk_n_1: null,
-                        //     col_fk_filter: null,
-                        //     col_filter_by: null,
-                        //     options: null,
-                        //     created_by: null,
-                        //     width: null,
-                        //     filter: null,
-                        //     color: null,
-                        //     text_color: null
-                        // });
                         let apiResponse = response.data.content;
                         commit("ENTITYID", apiResponse.entity_type_id);
                         commit("ENTITYNAME", apiResponse.entity_type_name);
-                        apiResponse.rows.map(responseRow => {
-                            let rowToPush = responseRow;
-                            rowToPush["sections"] = null;
-
-                            rowToPush.sections = apiResponse.sections.filter(
-                                responseSection => {
-                                    return (
-                                        responseSection.form_row_id ===
-                                        responseRow.id
-                                    );
-                                }
-                            );
-                            rowToPush.sections.sort((a, b) => {
-                                return a.order > b.order ? 1 : -1;
-                            });
-                            rowToPush.sections.map(sectionToPush => {
-                                sectionToPush.fields = apiResponse.fields.filter(
-                                    responseField => {
-                                        return (
-                                            responseField.form_section_id ===
-                                                sectionToPush.id &&
-                                            responseField.permission !== 0
-                                        );
-                                    }
+                        axios
+                            .get(
+                                `/api/sheets/entity/info/${apiResponse.entity_type_id}`
+                            )
+                            .then(responseInfo => {
+                                commit(
+                                    "CONTENTINFO",
+                                    responseInfo.data.content
                                 );
-                                sectionToPush.fields.sort((a, b) => {
+                                apiResponse.rows.map(responseRow => {
+                                    let rowToPush = responseRow;
+                                    rowToPush["sections"] = null;
+
+                                    rowToPush.sections = apiResponse.sections.filter(
+                                        responseSection => {
+                                            return (
+                                                responseSection.form_row_id ===
+                                                responseRow.id
+                                            );
+                                        }
+                                    );
+                                    rowToPush.sections.sort((a, b) => {
+                                        return a.order > b.order ? 1 : -1;
+                                    });
+                                    rowToPush.sections.map(sectionToPush => {
+                                        sectionToPush.fields = apiResponse.fields.filter(
+                                            responseField => {
+                                                return (
+                                                    responseField.form_section_id ===
+                                                        sectionToPush.id &&
+                                                    responseField.permission !==
+                                                        0
+                                                );
+                                            }
+                                        );
+                                        sectionToPush.fields.sort((a, b) => {
+                                            return a.order > b.order ? 1 : -1;
+                                        });
+                                    });
+                                    rows.push(rowToPush);
+                                });
+
+                                rows.sort((a, b) => {
                                     return a.order > b.order ? 1 : -1;
                                 });
+                                const actions = apiResponse.actions.sort(
+                                    (a, b) => {
+                                        return a.save_form > b.save_form
+                                            ? 1
+                                            : -1;
+                                    }
+                                );
+                                const data = {
+                                    rows,
+                                    title: apiResponse.name.toUpperCase(),
+                                    actions
+                                };
+                                resolve(data);
+                            })
+                            .catch(error => {
+                                reject(error);
                             });
-                            rows.push(rowToPush);
-                        });
-
-                        rows.sort((a, b) => {
-                            return a.order > b.order ? 1 : -1;
-                        });
-                        const actions = apiResponse.actions.sort((a, b) => {
-                            return a.save_form > b.save_form ? 1 : -1;
-                        });
-                        const data = {
-                            rows,
-                            title: apiResponse.name.toUpperCase(),
-                            actions
-                        };
-                        resolve(data);
                     })
                     .catch(error => {
                         reject(error);

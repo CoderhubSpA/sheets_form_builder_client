@@ -2,17 +2,17 @@
     <div>
         <div class="form-group">
             <label>
-                {{ form.label }}
+                {{ label }}
                 <span v-if="form.required" class="text-danger">*</span>
             </label>
             <div class="custom-file">
                 <input
                     type="file"
                     class="custom-file-input"
-                    :name="form.name"
-                    :id="formatId"
+                    :name="name"
+                    :id="id"
                     :accept="accept"
-                    :disabled="form.disabled"
+                    :disabled="disabled"
                     v-on:change="onChange"
                 />
                 <label class="custom-file-label" :for="formatId">{{

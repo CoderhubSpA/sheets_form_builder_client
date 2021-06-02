@@ -6,19 +6,15 @@
         <div class="row" v-for="(row, rowKey) in rows" :key="rowKey">
             <div v-for="(section, sectionKey) in row.sections"
                 :key="sectionKey"
-                :class="`col-${section.col_md} col-${section.col_sm} col-${section.col_xl} ${activeClass(active_section,section)} PollIndex___section-container`">
+                :class="`col-${section.col_md} col-${section.col_sm} col-${section.col_xl} ${activeClass(active_section,section)} section_container`"
+                :id="section.id">
                 <h5>
                     {{ section.name }}
                 </h5>
-
-                <div v-for="(field, fieldKey) in section.fields" :key="fieldKey">
-                    <sheet-input
-                        :form="field"
-                        @next="nextSection"
-                        @optionSelected="setSelectedOption"
-                        @sheets-input-change="inputSelectChange"
-                        :endForm="endForm(section)"></sheet-input>
-                </div>
+                <poll-section
+                    :id="section.id"
+                    :fields="section.fields"
+                    @next_section="changeSection(section, $event)"/>
             </div>
         </div>
         <br />
@@ -44,6 +40,12 @@
             </div>
         </div>
         <loading-message :status="loading"></loading-message>
+        <code>
+            Historial
+            <pre>
+                {{ historial }}
+            </pre>
+        </code>
     </div>
 </template>
 
@@ -55,9 +57,10 @@ import question from "./question";
 import info from "./info";
 import global from '../global'
 import LoadingMessage from "../loading-message";
-
+import section from './section'
 export default {
     components: {
+        'poll-section': section,
         "poll-question": question,
         "poll-info": info,
         'sheet-input': global,
@@ -81,6 +84,9 @@ export default {
         data: {}
     }),
     computed: {
+        historial() {
+            return this.$store.getters['poll/record']
+        },
         title() {
             return this.$store.getters["poll/title"];
         }
@@ -88,46 +94,39 @@ export default {
     watch: {},
     mounted() {
         this.loading = true;
-        this.$store
-            .dispatch("poll/getPoll", this.id)
+        this.$store.dispatch("poll/getPoll", this.id)
             .then(response => {
-                this.loading = false;
                 this.$store.commit("form/ENTITYID", response.entity_id);
                 this.rows = response.rows;
-                this.active_section = response.active_section;
+                // this.active_section = response.active_section;
+                this.active_section = this.$store.getters['poll/active_section']
             })
             .catch(err => {
-                this.loading = false;
+
                 console.log(err);
-            });
+            })
+            .finally(() => {
+                this.loading = false
+            })
     },
     methods: {
         endForm(section) {
             return !section.default_next_form_section
         },
-        /**
-         * @param val => valor retornado por el evento
-         */
-        nextSection(val) {
-            console.log(val)
-            if (val.alternative) {
-                if (!val.alternative.next_form_section)
-                    this.can_send_poll = true;
+        changeSection(section, event) {
+            if (event == null) {
+                if (section.default_next_form_section == null)
+                    this.can_send_poll = true
                 else
-                    this.active_section = val.alternative.next_form_section
-            } else {
-                let section = this.rows[0].sections.filter(
-                    section => section.id == val.section_owner
-                );
-                this.active_section = section[0].default_next_form_section
+                    this.active_section = section.default_next_form_section
             }
+            else
+                this.active_section = event
 
-            const sect = this.rows[0].sections.filter(section => section.id === this.active_section)
-            if (!sect[0].default_next_form_section) {
-                this.can_send_poll = true
-            }
+            this.$store.commit('poll/ACTIVE_SECTION', this.active_section)
 
         },
+        //
         setSelectedOption(id, val) {
             const action_id = {
                 key: id,
@@ -156,44 +155,39 @@ export default {
             return opts;
         },
         activeClass(active_section, section) {
-            return active_section === section.id
-                ? "active_section"
-                : "inactive_section";
+            return active_section === section.id ? "active_section" : "inactive_section";
         },
         sendForm() {
-            const fieldsValues = Object.assign(
-                {},
-                this.$store.getters["form/fieldsvalues"]
-            );
-            let data = [];
-            data[this.$store.getters["form/entityid"]] = [];
-            data[this.$store.getters["form/entityid"]].push(fieldsValues);
+            const record = this.$store.getters['poll/record']
+            const entity_id = this.$store.getters['form/entityid']
 
-            const formData = new FormData();
-            formData.append("entityKey", this.$store.getters["form/entityid"]);
+            let req = []
+            req[entity_id] = []
 
-            Object.keys(data).forEach(key => {
-                formData.append(key, JSON.stringify(data[key]));
-            });
-            this.loading = true;
-            this.$store
-                .dispatch("form/save_form", formData)
-                .then(response => {
-                    this.loading = false;
-                    if (response.response.data.success === true) {
-                        this.pollsaved = true;
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
-                    } else {
-                        this.errorBackend = true;
-                    }
-                })
-                .catch(err => {
-                    this.loading = false;
-                    this.errorBackend = true;
-                    console.log("error", err);
-                });
+            let answers = []
+            record.forEach(rec => {
+                answers[rec.question] = rec.answer
+            })
+            req[entity_id].push(answers)
+
+
+            let form = new FormData()
+            form.append('entityKey', entity_id)
+
+            Object.keys(req).forEach(key => {
+                form.append(key, JSON.stringify(req[key]))
+            })
+
+            this.$store.dispatch('form/save_form', form)
+            .then(response => {
+                console.log(response)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+            .finally(() => {
+
+            })
         }
     }
 };
@@ -209,11 +203,8 @@ export default {
     animation-name: activate_section;
     animation-duration: 1s;
 }
-.PollIndex___section-container {
+.section_container {
     padding: 25px;
-}
-.PollIndex___padding-0 {
-    padding: 0;
 }
 .inactive_section {
     display: none;

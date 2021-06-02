@@ -83,12 +83,17 @@ export default {
         bus: new Vue()
     }),
     computed: {},
+    created() {
+        if (this.recordid === "") {
+            this.$store.commit("form/CLEARFIELDSVALUES");
+        }
+    },
     mounted() {
         this.getForm();
     },
     methods: {
-        searchMap(data){
-            this.bus.$emit('searchMap', data);
+        searchMap(data) {
+            this.bus.$emit("searchMap", data);
         },
         getForm() {
             this.error = false;
@@ -188,7 +193,7 @@ export default {
             }
         },
         saveForm() {
-            // this.loading = true;
+            this.loading = true;
             this.error = false;
             this.backendMsg = "Ocurrió un error al guardar los datos";
             this.success = false;
@@ -276,6 +281,7 @@ export default {
         },
         sendForm(fieldsIds) {
             const pendingFiles = this.$store.getters["form/pendingfiles"];
+            this.bus.$emit("cleanValidation", {});
             fieldsIds.push("action_id");
             if (pendingFiles === 0) {
                 if (this.recordid != "") {
@@ -345,7 +351,15 @@ export default {
                         })
                         .catch(err => {
                             this.loading = false;
-                            console.log("error", err);
+                            console.log("error", err.response);
+                            this.loading = false;
+                            console.log("error", err.response);
+                            if(err.response.status === 400){
+                                const failedFields = Object.keys(err.response.data.content.errors);
+                                this.error = true;
+                                this.backendMsg = err.response.data.content.message;
+                                this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
+                            }
                         });
                 } else {
                     this.$store
@@ -393,7 +407,13 @@ export default {
                         })
                         .catch(err => {
                             this.loading = false;
-                            console.log("error", err);
+                            console.log("error", err.response);
+                            if(err.response.status === 400){
+                                const failedFields = Object.keys(err.response.data.content.errors);
+                                this.error = true;
+                                this.backendMsg = err.response.data.content.message;
+                                this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
+                            }
                         });
                 }
             }

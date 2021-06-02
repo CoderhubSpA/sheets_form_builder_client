@@ -1,6 +1,6 @@
 <template>
     <div :class="getClasses()" class="SheetsFormRenderField__main-container">
-        <div class="SheetsFormRenderField__container">
+        <div class="SheetsFormRenderField__container" :class="{'SheetsFormRenderField__requiredFailed' : validationError}">
             <sheets-input
                 v-if="
                     formField.format !== 'SELECTOR' &&
@@ -48,6 +48,9 @@
                 "
                 >Por Defecto: {{ formField.default_value }}
             </small>
+            <span v-if="validationError" class="text-danger text-center">
+                {{errorMsg}}
+            </span>
             <!--
                 <sheets-input
                 v-if="formField.format !== 'SELECTOR' &&
@@ -92,6 +95,8 @@ export default {
         customInputDate: null,
         inputData: null,
         selected: [],
+        validationError:false,
+        errorMsg:''
     }),
     watch: {
         inputData(val) {
@@ -108,19 +113,9 @@ export default {
         fieldParsed() {
             let parsed = {
                 ...this.field,
-                required: this.field.required === 1,
                 disabled: this.formField.permission === 1,
-                placeholder: this.formField.default_value
-                    ? this.formField.default_value
-                    : "",
-                label: this.formField.name,
-                name: this.formField.col_name,
-                styles:
-                    this.formField.format === "DOCUMENT" ||
-                    this.formField.format === "DOCUMENT[IMAGE]"
-                        ? ["custom-file-input"]
-                        : ["form-control"]
-            };
+                styles: (this.formField.format === "DOCUMENT") || (this.formField.format === "DOCUMENT[IMAGE]") ? ["custom-file-input"] : ['form-control']
+            }
             return parsed;
         },
         fieldParsedSelect() {
@@ -150,7 +145,20 @@ export default {
             };
         }
     },
-    mounted() {},
+    mounted() {
+        this.bus.$on("requiredFailed", (args,obj) => {
+            console.log("en fields", this.formField.id);
+            if(args.includes(this.formField.id)){
+                this.validationError = true;
+                this.errorMsg = obj[this.formField.id];
+            }
+            console.log("en fields", obj);
+        });
+
+        this.bus.$on("cleanValidation", (args) => {
+            this.validationError = false;
+        });
+    },
     methods: {
         getClasses() {
             return `col-sm-${this.formField.col_sm} col-md-${this.formField.col_md} col-xl-${this.formField.col_xl}`;
@@ -209,6 +217,9 @@ export default {
     margin-bottom: 10px;
     border-radius: 15px;
     padding: 15px;
+}
+.SheetsFormRenderField__requiredFailed {
+    border: 2px solid red;
 }
 .vs__dropdown-toggle {
     background-color: white;

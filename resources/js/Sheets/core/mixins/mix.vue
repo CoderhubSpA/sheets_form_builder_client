@@ -66,7 +66,7 @@ export default {
          * Name of the form control. Submitted with the form as part of a name/value pair.
          */
         name() {
-            return this.form.name
+            return this.form.col_name
         },
         /**
          * Text that appears in the form control when it has no value set
@@ -133,16 +133,18 @@ export default {
             }
         },
         label() {
-            return this.form.label
+            return this.form.name
         },
         id() {
             return (this.form.id) ? this.form.id : this.uuid()
         },
         applyStyles() {
+            let style  = null
             if (typeof(this.styles) === 'string') {
                 return this.styles
             }
-            return this.styles.join(' ')
+            style = this.styles.join(' ')
+            return style
         },
         errorMessage() {
             if (this.$attrs["error-message"]) {
