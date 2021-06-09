@@ -98,6 +98,8 @@ export default {
          */
         sheetType() {
             switch (this.form.format) {
+                case 'TEXT[AREA]':
+                    return 'textarea'
                 case 'TEXT':
                 case 'RUT':
                 case 'URL':

@@ -1,14 +1,15 @@
 <template>
-    <div>
+    <div :id="id">
+
         <div v-for="(field, key) in fields" :key="key">
             <div v-for="(field, fieldKey) in fields" :key="fieldKey">
+
                 <sheet-input
                     :form="field"
                     :styles="parsedFieldStyles(field)"
                     :active_section="$store.getters['poll/active_section']"
                     v-on:question:selected="getAnswer($event)"
-                    @info-data="getInfo"
-                    @sheets-input-change="getAnswer($event, field.id)"
+                    @sheets-input-change="getAnswer($event, field.form_field_id)"
                     :error-message="errors_messages[fieldKey].msg"
                     ></sheet-input>
             </div>
@@ -28,8 +29,8 @@ export default {
         'sheet-input' : global
     },
     props: {
-        id: {
-            type: String,
+        section: {
+            type: Object,
             require: true
         },
         fields: {
@@ -55,8 +56,34 @@ export default {
         }
     },
     computed: {
+        id() {
+            return this.section.id
+        },
         endForm() {
-            return false
+            let hasNext = false
+            this.fields.forEach(field => {
+                if (field.alternatives) {
+                    for (const key in field.alternatives) {
+                        hasNext = !!field.alternatives[key].next_form_section
+                    }
+                }
+            })
+            return !(hasNext || !!this.section.default_next_form_section)
+        },
+    },
+    watch: {
+        active_section(val) {
+            this.fields.forEach(field => {
+                if (field.format == "INFO" && field.form_section_id == val) {
+                    let data = {
+                        question: field.id,
+                        answer: field.name, //info.form_field_id,
+                        required: field.required == 1,
+                        next_section: !!field.next_form_section ? field.next_form_section : null
+                    }
+                    this.$store.commit('poll/RECORD', data)
+                }
+            })
         }
     },
     mounted() {
@@ -64,7 +91,7 @@ export default {
         this.errors_messages = []
         this.fields.forEach(element => {
             const pre = {
-                question: element.id,
+                question: element.form_field_id,
                 answer: null,
                 required: !!element.required
             }
@@ -74,20 +101,12 @@ export default {
                 msg: []
             }
             this.errors_messages.push(err)
-
         })
+        //
     },
     methods: {
         parsedFieldStyles(field) {
             return (field.format === "DOCUMENT") || (field.format === "DOCUMENT[IMAGE]") ? ["custom-file-input"] : ['form-control']
-        },
-        getInfo(info) {
-            let q = this.responses.find(q => q.question === info.question)
-            info['required'] = !!q.required
-            const index = this.responses.indexOf(q)
-            q = info
-
-            Vue.set(this.responses, index, q)
         },
         getAnswer(e, id = null) {
             let answer = {}
@@ -107,6 +126,7 @@ export default {
             }
 
             let q = this.responses.find(q => q.question === answer.question)
+
             answer['required'] = !!q.required
             const index = this.responses.indexOf(q)
             q = answer
@@ -152,9 +172,9 @@ export default {
                     }
                 }
             })
+
             return this.errors_messages.every(err => err.msg.length == 0 )
         }
-
     }
 }
 </script>

@@ -147,12 +147,10 @@ export default {
     },
     mounted() {
         this.bus.$on("requiredFailed", (args,obj) => {
-            console.log("en fields", this.formField.id);
             if(args.includes(this.formField.id)){
                 this.validationError = true;
                 this.errorMsg = obj[this.formField.id];
             }
-            console.log("en fields", obj);
         });
 
         this.bus.$on("cleanValidation", (args) => {

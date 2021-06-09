@@ -35,8 +35,7 @@
                     <span v-if="form.format === 'DOCUMENT'">
                         Ver Archivo: {{ labelInput }}
                     </span>
-                    <img
-                        v-if="form.format === 'DOCUMENT[IMAGE]'"
+                    <img v-if="form.format === 'DOCUMENT[IMAGE]'"
                         :src="fileEditUrl"
                         alt=""
                         id="previewImageEdit"

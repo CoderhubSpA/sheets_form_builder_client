@@ -80,7 +80,10 @@ export default {
         success: false,
         backendMsg: "",
         actions: [],
-        bus: new Vue()
+        bus: new Vue(),
+        windowName: `SheetsFormRendered${new Date().getTime()}`,
+        parentWindow: null,
+        parentIFrameURL: process.env.MIX_SHEETS_PARENT_IFRAME_URL,
     }),
     computed: {},
     created() {
@@ -89,6 +92,8 @@ export default {
         }
     },
     mounted() {
+        window.name = this.windowName;
+        this.parentWindow = window.parent;
         this.getForm();
     },
     methods: {
@@ -348,10 +353,11 @@ export default {
                                     response.response.data.content
                                 );
                             }
+                            if(this.parentWindow.name !== this.windowName){
+                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
+                            }
                         })
                         .catch(err => {
-                            this.loading = false;
-                            console.log("error", err.response);
                             this.loading = false;
                             console.log("error", err.response);
                             if(err.response.status === 400){
@@ -359,6 +365,9 @@ export default {
                                 this.error = true;
                                 this.backendMsg = err.response.data.content.message;
                                 this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
+                            }
+                            if(this.parentWindow.name !== this.windowName){
+                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
                             }
                         });
                 } else {
@@ -404,15 +413,20 @@ export default {
                                     response.response.data.content
                                 );
                             }
+                            if(this.parentWindow.name !== this.windowName){
+                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
+                            }
                         })
                         .catch(err => {
                             this.loading = false;
-                            console.log("error", err.response);
                             if(err.response.status === 400){
                                 const failedFields = Object.keys(err.response.data.content.errors);
                                 this.error = true;
                                 this.backendMsg = err.response.data.content.message;
                                 this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
+                            }
+                            if(this.parentWindow.name !== this.windowName){
+                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
                             }
                         });
                 }

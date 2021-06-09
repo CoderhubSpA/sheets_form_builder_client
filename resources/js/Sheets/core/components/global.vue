@@ -34,6 +34,27 @@
                 />
             </div>
         </div>
+        <!-- INPUTS TEXT[AREA] -->
+        <div class="form-group" v-else-if="sheetType == 'textarea'">
+            <label :for="name">
+                {{ label }} <span v-if="required" class="text-danger">*</span>
+            </label>
+            <div>
+                <textarea
+                    :disabled="disabled"
+                    :name="name"
+                    :readonly="readonly"
+                    :required="required"
+                    :id="id"
+                    :class="applyStyles"
+                    v-on:input="sheetsInputChange($event)"
+                    v-on:blur="searchMap"
+                    cols="30"
+                    rows="10"
+                    :value="value"
+                ></textarea>
+            </div>
+        </div>
         <!-- INPUTS FECHA -->
         <div v-else-if="sheetType == 'date' || sheetType == 'datetime'">
             <sheet-date :form="form"></sheet-date>
@@ -66,17 +87,16 @@
         <div v-else-if="sheetType == 'question'">
             <sheet-question
                 :question="form"
-                @optionSelected="option_selected"></sheet-question>
+                @optionSelected="option_selected"
+            ></sheet-question>
         </div>
         <!-- INFO PARA ENCUESTA -->
         <div v-else-if="sheetType == 'info'">
-            <sheet-info
-                :form="form"/>
+            <sheet-info :form="form" @info="infoResponse" />
         </div>
         <small v-if="errorMessage" class="text-danger">
             {{ errorMessage }}
         </small>
-
     </div>
 </template>
 
@@ -86,8 +106,8 @@ import SheetDocument from "./document";
 import SheetsCheckbox from "./checkbox";
 import SheetsMapSelector from "./map";
 import SheetsDate from "./dates";
-import Question from "./poll/question"
-import Info from './poll/info'
+import Question from "./poll/question";
+import Info from "./poll/info";
 export default {
     components: {
         "sheet-date": SheetsDate,
@@ -109,7 +129,7 @@ export default {
         },
         active_section: {
             type: String,
-            default: '',
+            default: "",
             require: false
         }
     },
@@ -117,7 +137,7 @@ export default {
         types: ["text", "email", "number", "password", "datetime-local", "url"],
         // selected: '',
         checkboxResponse: false,
-        selectedQuestion: null,
+        selectedQuestion: null
     }),
     computed: {
         options() {
@@ -163,49 +183,52 @@ export default {
         },
         active_section(val) {
             if (val == this.form.form_section_id) {
-                this.infoResponse()
+                this.infoResponse();
             }
         }
     },
-    mounted() {
-
-    },
+    mounted() {},
     methods: {
         infoResponse() {
-            let data  = {
+            let data = {
                 question: this.form.id,
                 answer: this.form.form_field_id,
-                next_section: !!this.form.next_form_section ? this.form.next_form_section : null
-            }
-            console.log('global', data)
-            this.$emit('info-data', data)
+                next_section: !!this.form.next_form_section
+                    ? this.form.next_form_section
+                    : null
+            };
+
+            this.$emit("info-data", data);
         },
         option_selected(value) {
-            this.$emit('question:selected', value)
+            this.$emit("question:selected", value);
         },
         sheetsInputChange(event) {
-            if (this.originalType === "RUT") {
+            console.log("registró", event.target.value);
+            /*if (this.originalType === "RUT") {
                 const rutFormatted = this.formatRut(event.target.value);
                 event.target.value = rutFormatted;
                 this.$emit("sheets-input-change", event.target.value, this.id);
             } else {
                 this.$emit("sheets-input-change", event.target.value, this.id);
-            }
+            }*/
         },
         pasteInput(event) {
-            const regex =  /^-?(0|[1-9]\d*)(\.\d+)?$/;
-            const pasted = (event.clipboardData || window.clipboardData).getData('text');
+            const regex = /^-?(0|[1-9]\d*)(\.\d+)?$/;
+            const pasted = (
+                event.clipboardData || window.clipboardData
+            ).getData("text");
             if (
                 this.originalType === "NUMBER" ||
                 this.originalType === "CLP" ||
                 this.originalType === "PERCENTAGE"
             ) {
                 event.preventDefault();
-                if(regex.test(pasted)){
+                if (regex.test(pasted)) {
                     event.target.value = pasted;
                 }
             }
-            const changed = new Event('input');
+            const changed = new Event("input");
             event.target.dispatchEvent(changed);
         },
         formatRut(rut) {
@@ -238,14 +261,12 @@ export default {
         fileChange(event, fieldId) {
             this.$emit("sheets-input-file-change", event, fieldId);
         },
-        onClickSelectedOption(option) {
-
-        },
+        onClickSelectedOption(option) {},
         mapSelectionChange(data) {
             this.$emit("sheets-input-change", data.value, data.id);
         },
-        searchMap(event){
-            this.$emit('sheets-input-search-map',event.target.value);
+        searchMap(event) {
+            this.$emit("sheets-input-search-map", event.target.value);
         },
         returnData(event) {
             if (this.sheetType == "checkbox") {

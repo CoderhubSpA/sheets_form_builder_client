@@ -7,7 +7,8 @@ export default {
         loading: false,
         titlePoll: '',
         active_section: '',
-        record: []
+        record: [],
+        entity_type_id: ''
     },
     mutations: {
         LOADING(state, val) {
@@ -21,6 +22,9 @@ export default {
         },
         RECORD(state, val) {
             state.record.push(val)
+        },
+        ENTITY_TYPE_ID(state, val) {
+            state.entity_type_id = val
         }
     },
     actions: {
@@ -33,6 +37,7 @@ export default {
                     // const data = require('./json.json')
                     // console.log(data)
                     commit('TITLE_POLL', data.content.name)
+                    commit('ENTITY_TYPE_ID', data.content.entity_type_id)
                     let rows = data.content.rows.map(row =>{
                         row['sections'] = []
                         return row
@@ -84,6 +89,7 @@ export default {
         title: state => state.titlePoll,
         active_section: state => state.active_section,
         loading: state => state.loading,
-        record: state => state.record
+        record: state => state.record,
+        entity_type_id: state => state.entity_type_id
     }
 }

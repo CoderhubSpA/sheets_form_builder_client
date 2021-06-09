@@ -63,7 +63,7 @@ export default {
         selected(val) {
             if (!!val) {
                 const data = {
-                    id: this.question.id,
+                    id: this.question.form_field_id,
                     selected_value: val,
                     alternative: !! val ? this.question.alternatives[val.id] : null,
                     section_owner: this.question.form_section_id

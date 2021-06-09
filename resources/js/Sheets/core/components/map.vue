@@ -43,7 +43,7 @@
 
 <script>
 import abstract from "../mixins/mix";
-import LoadingMessage from "./loading-message";
+import LoadingMessage from "./loader-field";
 
 export default {
     components: {

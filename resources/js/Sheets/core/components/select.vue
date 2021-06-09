@@ -81,25 +81,25 @@ export default {
             } else {
                 value = val;
             }
-            const data = {
+            let data = {
                 id: this.id,
                 value
             };
             this.$emit("sheets-input-select-change", data);
         }
     },
-    mounted() {
+    created() {
         this.getOptions();
     },
     methods: {
-        parseOptions(options){
+        parseOptions(options) {
             return JSON.parse(options);
         },
         getOptions() {
             if (this.field.entity_type_fk == null) {
                 if (this.field.options != null) {
                     let optionsTest = this.field.options;
-                    if(typeof optionsTest === 'string'){
+                    if (typeof optionsTest === "string") {
                         optionsTest = this.parseOptions(optionsTest);
                     }
                     let optionArray = [];
@@ -116,10 +116,10 @@ export default {
                         this.$store.getters["form/fieldsvalues"]
                     );
                     if (allValues[this.id]) {
-                        if (allValues[this.id].includes('["')) {
-                            this.selected = allValues[this.id];
+                        if (allValues[this.id].toString().includes('["')) {
+                            this.selected = JSON.parse(allValues[this.id]);
                         } else {
-                            this.selected = allValues[this.id];
+                            this.selected = allValues[this.id].toString();
                         }
                     } else {
                         this.selected = null;
@@ -136,7 +136,7 @@ export default {
                     this.$store.getters["form/fieldsvalues"]
                 );
                 if (allValues[this.id]) {
-                    if (allValues[this.id].includes('["')) {
+                    if (allValues[this.id].toString().includes('["')) {
                         this.selected = JSON.parse(allValues[this.id]);
                     } else {
                         this.selected = allValues[this.id];

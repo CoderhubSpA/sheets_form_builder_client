@@ -12,8 +12,10 @@
                     {{ section.name }}
                 </h5>
                 <poll-section
-                    :id="section.id"
+                    :section="section"
                     :fields="section.fields"
+                    :endform="!!section.default_next_form_section"
+                    :active_section="active_section"
                     @next_section="changeSection(section, $event)"/>
             </div>
         </div>
@@ -91,7 +93,16 @@ export default {
             return this.$store.getters["poll/title"];
         }
     },
-    watch: {},
+    watch: {
+        active_section(val) {
+            const section = this.rows[0].sections.find(s => s.id == val)
+            section.fields.forEach(f => {
+                if (f.format == 'INFO' && !f.next_form_section) {
+                    this.can_send_poll = true
+                }
+            })
+        }
+    },
     mounted() {
         this.loading = true;
         this.$store.dispatch("poll/getPoll", this.id)
@@ -122,8 +133,7 @@ export default {
             }
             else
                 this.active_section = event
-
-            this.$store.commit('poll/ACTIVE_SECTION', this.active_section)
+            // this.$store.commit('poll/ACTIVE_SECTION', this.active_section)
 
         },
         //
@@ -158,18 +168,20 @@ export default {
             return active_section === section.id ? "active_section" : "inactive_section";
         },
         sendForm() {
+            this.loading = true
             const record = this.$store.getters['poll/record']
-            const entity_id = this.$store.getters['form/entityid']
+            const entity_id = this.$store.getters['poll/entity_type_id']
 
             let req = []
             req[entity_id] = []
 
             let answers = []
+
             record.forEach(rec => {
                 answers[rec.question] = rec.answer
             })
-            req[entity_id].push(answers)
 
+            req[entity_id].push(answers)
 
             let form = new FormData()
             form.append('entityKey', entity_id)
@@ -180,14 +192,47 @@ export default {
 
             this.$store.dispatch('form/save_form', form)
             .then(response => {
-                console.log(response)
+                console.log(response.response)
+                this.pollsaved = response.data.success
             })
             .catch(error => {
                 console.log(error)
             })
             .finally(() => {
-
+                this.loading = false
             })
+            // const record = this.$store.getters['poll/record']
+            // const entity_type_id = this.$store.getters['poll/entity_type_id']
+
+            // let req = []
+            // req[entity_type_id] = []
+
+            // let answers = {}
+            // record.forEach(rec => {
+            //     answers[rec.question] = rec.answer
+            // })
+
+            // req['entityKey'] = entity_type_id
+            // req[entity_type_id] = []
+            // req[entity_type_id].push(answers)
+
+            // console.log(JSON.parse(req[entity_type_id]))
+
+            // let form = new FormData()
+            // form.append('entityKey', entity_type_id)
+
+            // form.append(entity_id, JSON.parse(req[entity_id]))
+
+            // this.$store.dispatch('form/save_form', form)
+            // .then(response => {
+            //     console.log(response)
+            // })
+            // .catch(error => {
+            //     console.log(error)
+            // })
+            // .finally(() => {
+
+            // })
         }
     }
 };

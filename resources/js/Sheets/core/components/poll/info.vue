@@ -24,22 +24,7 @@ export default {
         },
         xl() {
             return this.form.col_xl;
-        }
-    },
-    watch: {
-
-    },
-    mounted() {
-        let data = {
-            type: 'info',
-            id: this.form.id,
-            value: this.form.form_field_id
-
-        }
-        this.$emit('info', data)
-
-    },
-    methods: {
+        },
 
     }
 };
