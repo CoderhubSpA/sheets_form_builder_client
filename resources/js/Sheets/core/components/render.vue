@@ -73,7 +73,7 @@ export default {
     },
     data: () => ({
         rows: [],
-        loading: false,
+        // loading: false,
         title: "RENDERIZADO DE FORMULARIO",
         result: [],
         error: false,
@@ -83,17 +83,22 @@ export default {
         bus: new Vue(),
         windowName: `SheetsFormRendered${new Date().getTime()}`,
         parentWindow: null,
-        parentIFrameURL: process.env.MIX_SHEETS_PARENT_IFRAME_URL,
+
     }),
-    computed: {},
+    computed: {
+        loading() {
+            return this.$store.getters['form/loading']
+        }
+    },
     created() {
         if (this.recordid === "") {
             this.$store.commit("form/CLEARFIELDSVALUES");
+
         }
     },
     mounted() {
         window.name = this.windowName;
-        this.parentWindow = window.parent;
+        this.window = window;
         this.getForm();
     },
     methods: {
@@ -108,12 +113,13 @@ export default {
                 {},
                 this.$store.getters["form/fieldsvalues"]
             );
-            this.loading = true;
+
             if (this.recordid != "") {
                 this.$store
                     .dispatch("form/get_form", this.formid)
                     .then(response => {
-                        this.loading = true;
+
+
                         const entityname = this.$store.getters[
                             "form/entityname"
                         ];
@@ -127,7 +133,7 @@ export default {
                                 this.$store
                                     .dispatch("form/get_form", this.formid)
                                     .then(response => {
-                                        this.loading = false;
+
                                         this.title = response.title;
                                         this.rows = response.rows;
                                         this.actions = response.actions;
@@ -150,31 +156,33 @@ export default {
                                         }
                                     })
                                     .catch(err => {
-                                        this.loading = false;
+
                                         console.log("error", err);
                                     });
                             })
                             .catch(err => {
-                                this.loading = false;
+
                                 console.log("error", err);
                             });
                     })
                     .catch(err => {
-                        this.loading = false;
+
                         console.log("error", err);
                         this.actions = response.actions;
                     });
             } else {
+                console.log('else', this.formid)
                 this.$store
                     .dispatch("form/get_form", this.formid)
                     .then(response => {
-                        this.loading = false;
+
                         this.title = response.title;
                         this.rows = response.rows;
                         this.actions = response.actions;
                     })
                     .catch(err => {
-                        this.loading = false;
+                        console.log('aca')
+
                         console.log("error", err);
                     });
             }
@@ -198,7 +206,7 @@ export default {
             }
         },
         saveForm() {
-            this.loading = true;
+            // this.loading = true;
             this.error = false;
             this.backendMsg = "Ocurrió un error al guardar los datos";
             this.success = false;
@@ -237,7 +245,7 @@ export default {
                                 this.$store.commit("form/UPLOADEDFILE");
                                 this.sendForm(fieldIds);
                             } else {
-                                this.loading = false;
+                                // this.loading = false;
                                 this.error = true;
                                 if (response.response.data.content) {
                                     if (response.response.data.content.errors) {
@@ -265,7 +273,7 @@ export default {
                             }
                         })
                         .catch(err => {
-                            this.loading = false;
+                            // this.loading = false;
                             this.error = true;
                             console.log(
                                 "error de guardado",
@@ -282,11 +290,14 @@ export default {
         resetForm() {
             this.rows = [];
             this.$store.commit("form/CLEARFIELDSVALUES");
+            console.log('limpia')
             this.getForm();
         },
         sendForm(fieldsIds) {
             const pendingFiles = this.$store.getters["form/pendingfiles"];
+            //---------------------------------------
             this.bus.$emit("cleanValidation", {});
+            //---------------------------------------
             fieldsIds.push("action_id");
             if (pendingFiles === 0) {
                 if (this.recordid != "") {
@@ -315,7 +326,7 @@ export default {
                         .dispatch("form/save_form_update", formData)
                         .then(response => {
                             if (response.response.data.success === true) {
-                                this.loading = false;
+                                // this.loading = false;
                                 this.success = true;
                                 this.backendMsg =
                                     "Formulario enviado con exito";
@@ -327,7 +338,7 @@ export default {
                                     this.getForm();
                                 }, 1500);
                             } else {
-                                this.loading = false;
+                                // this.loading = false;
                                 this.error = true;
                                 if (response.response.data.content) {
                                     if (response.response.data.content.errors) {
@@ -353,12 +364,10 @@ export default {
                                     response.response.data.content
                                 );
                             }
-                            if(this.parentWindow.name !== this.windowName){
-                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
-                            }
+                            try{this.window.parent.postMessage(response.response.data, "*");}catch(e){console.warn(e);}
                         })
                         .catch(err => {
-                            this.loading = false;
+                            // this.loading = false;
                             console.log("error", err.response);
                             if(err.response.status === 400){
                                 const failedFields = Object.keys(err.response.data.content.errors);
@@ -366,16 +375,14 @@ export default {
                                 this.backendMsg = err.response.data.content.message;
                                 this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
                             }
-                            if(this.parentWindow.name !== this.windowName){
-                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
-                            }
+                            try{this.window.parent.postMessage(err.response.data, "*");}catch(e){console.warn(e);}
                         });
                 } else {
                     this.$store
                         .dispatch("form/save_form", formData)
                         .then(response => {
                             if (response.response.data.success === true) {
-                                this.loading = false;
+                                // this.loading = false;
                                 this.success = true;
                                 this.backendMsg =
                                     "Formulario enviado con exito";
@@ -387,7 +394,7 @@ export default {
                                     this.getForm();
                                 }, 1500);
                             } else {
-                                this.loading = false;
+                                // this.loading = false;
                                 this.error = true;
                                 if (response.response.data.content) {
                                     if (response.response.data.content.errors) {
@@ -413,20 +420,20 @@ export default {
                                     response.response.data.content
                                 );
                             }
-                            if(this.parentWindow.name !== this.windowName){
-                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
-                            }
+                            try{this.window.parent.postMessage(response.response.data, "*");}catch(e){console.warn(e);}
                         })
                         .catch(err => {
-                            this.loading = false;
+                            // this.loading = false;
                             if(err.response.status === 400){
                                 const failedFields = Object.keys(err.response.data.content.errors);
                                 this.error = true;
                                 this.backendMsg = err.response.data.content.message;
                                 this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
                             }
-                            if(this.parentWindow.name !== this.windowName){
-                                this.parentWindow.postMessage(response.response.data, this.parentIFrameURL);
+                            try{
+                                this.window.parent.postMessage(err.response.data, "*");
+                            }catch(e){
+                                console.warn(e);
                             }
                         });
                 }

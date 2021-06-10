@@ -204,14 +204,13 @@ export default {
             this.$emit("question:selected", value);
         },
         sheetsInputChange(event) {
-            console.log("registró", event.target.value);
-            /*if (this.originalType === "RUT") {
+            if (this.originalType === "RUT") {
                 const rutFormatted = this.formatRut(event.target.value);
                 event.target.value = rutFormatted;
                 this.$emit("sheets-input-change", event.target.value, this.id);
             } else {
                 this.$emit("sheets-input-change", event.target.value, this.id);
-            }*/
+            }
         },
         pasteInput(event) {
             const regex = /^-?(0|[1-9]\d*)(\.\d+)?$/;

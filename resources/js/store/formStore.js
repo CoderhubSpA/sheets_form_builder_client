@@ -87,18 +87,16 @@ export default {
     },
     actions: {
         get_form({ commit }, id) {
+            commit('LOADING', true)
             return new Promise((resolve, reject) => {
-                axios
-                    .get(`/api/sheets/form/${id}`)
+                axios.get(`/api/sheets/form/${id}`)
                     .then(response => {
+                        console.log(response)
                         let rows = [];
                         let apiResponse = response.data.content;
                         commit("ENTITYID", apiResponse.entity_type_id);
                         commit("ENTITYNAME", apiResponse.entity_type_name);
-                        axios
-                            .get(
-                                `/api/sheets/entity/info/${apiResponse.entity_type_id}`
-                            )
+                        axios.get(`/api/sheets/entity/info/${apiResponse.entity_type_id}`)
                             .then(responseInfo => {
                                 commit(
                                     "CONTENTINFO",
@@ -161,7 +159,9 @@ export default {
                     .catch(error => {
                         reject(error);
                     })
-                    .finally(() => {});
+                    .finally(() => {
+                        commit('LOADING', false)
+                    });
             });
         },
         get_row({ commit }, data) {
