@@ -115,7 +115,7 @@ export default {
                         {},
                         this.$store.getters["form/fieldsvalues"]
                     );
-                    if (allValues[this.id]) {
+                    if (allValues[this.id].toString()) {
                         if (allValues[this.id].toString().includes('["')) {
                             this.selected = JSON.parse(allValues[this.id]);
                         } else {
