@@ -91,7 +91,6 @@ export default {
             return new Promise((resolve, reject) => {
                 axios.get(`/api/sheets/form/${id}`)
                     .then(response => {
-                        console.log(response)
                         let rows = [];
                         let apiResponse = response.data.content;
                         commit("ENTITYID", apiResponse.entity_type_id);

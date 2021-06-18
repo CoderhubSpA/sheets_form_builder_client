@@ -87,6 +87,7 @@
         <div v-else-if="sheetType == 'question'">
             <sheet-question
                 :question="form"
+                :valSelected="value"
                 @optionSelected="option_selected"
             ></sheet-question>
         </div>
@@ -106,8 +107,8 @@ import SheetDocument from "./document";
 import SheetsCheckbox from "./checkbox";
 import SheetsMapSelector from "./map";
 import SheetsDate from "./dates";
-import Question from "./poll/question";
-import Info from "./poll/info";
+import Question from "./question";
+import Info from "./info";
 export default {
     components: {
         "sheet-date": SheetsDate,
@@ -131,13 +132,18 @@ export default {
             type: String,
             default: "",
             require: false
+        },
+        model: {
+            type: Object,
+            default: () => ({})
         }
     },
     data: () => ({
         types: ["text", "email", "number", "password", "datetime-local", "url"],
         // selected: '',
         checkboxResponse: false,
-        selectedQuestion: null
+        selectedQuestion: null,
+        value: null
     }),
     computed: {
         options() {
@@ -145,8 +151,32 @@ export default {
         },
         item_text() {
             return this.form.option_key;
+        }
+    },
+    watch: {
+        checkboxResponse(val) {
+            this.$emit("input", val);
         },
-        value() {
+        active_section(val) {
+            if (val == this.form.form_section_id) {
+                this.infoResponse();
+            }
+        },
+        model(val) {
+            if (typeof val.answer === "string") {
+                this.value = val.answer;
+            } else {
+                if (JSON.stringify(val) === JSON.stringify({})) {
+                    this.validValuePoll();
+                }
+            }
+        }
+    },
+    mounted() {
+        this.getValue();
+    },
+    methods: {
+        getValue() {
             if (this.originalType !== "PASSWORD") {
                 const allValues = Object.assign(
                     {},
@@ -167,28 +197,55 @@ export default {
                     } else {
                         valueParsed = allValues[this.id];
                     }
-                    return valueParsed;
+                    this.value = valueParsed;
                 } else {
-                    return null;
+                    this.value = null;
                 }
             } else {
                 this.$emit("sheets-input-change", null, this.id);
-                return null;
+                this.value = null;
             }
-        }
-    },
-    watch: {
-        checkboxResponse(val) {
-            this.$emit("input", val);
         },
-        active_section(val) {
-            if (val == this.form.form_section_id) {
-                this.infoResponse();
+        validValuePoll() {
+            // verificar col_name para polls
+            const currentValuesPoll = this.$store.getters["poll/record"];
+            if (currentValuesPoll.length > 0) {
+                currentValuesPoll.map(value => {
+                    if (value.col_name === this.form.col_name) {
+                        if (value.answer !== null) {
+                            if (this.originalType === "QUESTION") {
+                                const data = {
+                                    id: this.form.id,
+                                    alternative: null,
+                                    section_owner: this.form.form_section_id,
+                                    col_name: this.form.col_name
+                                };
+                                Object.keys(this.form.alternatives).forEach(
+                                    key => {
+                                        if (
+                                            value.alternative.name ===
+                                            this.form.alternatives[key].name
+                                        ) {
+                                            data.alternative = this.form.alternatives[
+                                                key
+                                            ];
+                                        }
+                                    }
+                                );
+                                this.option_selected(data);
+                            } else {
+                                this.$emit(
+                                    "input",
+                                    value.answer,
+                                    this.form.id,
+                                    this.form.col_name
+                                );
+                            }
+                        }
+                    }
+                });
             }
-        }
-    },
-    mounted() {},
-    methods: {
+        },
         infoResponse() {
             let data = {
                 question: this.form.id,
@@ -202,15 +259,32 @@ export default {
         },
         option_selected(value) {
             this.$emit("question:selected", value);
+            this.$emit("input", value);
         },
         sheetsInputChange(event) {
             if (this.originalType === "RUT") {
                 const rutFormatted = this.formatRut(event.target.value);
                 event.target.value = rutFormatted;
-                this.$emit("sheets-input-change", event.target.value, this.id);
+                this.$emit(
+                    "sheets-input-change",
+                    event.target.value,
+                    this.id,
+                    this.form.col_name
+                );
             } else {
-                this.$emit("sheets-input-change", event.target.value, this.id);
+                this.$emit(
+                    "sheets-input-change",
+                    event.target.value,
+                    this.id,
+                    this.form.col_name
+                );
             }
+            this.$emit(
+                "input",
+                event.target.value,
+                this.id,
+                this.form.col_name
+            );
         },
         pasteInput(event) {
             const regex = /^-?(0|[1-9]\d*)(\.\d+)?$/;

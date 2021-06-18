@@ -1,73 +1,59 @@
 <template>
-    <div class="container-fluid">
+    <div class="___PollIndex-container">
         <h3>
             {{ title }}
         </h3>
-        <div class="row" v-for="(row, rowKey) in rows" :key="rowKey">
-            <div v-for="(section, sectionKey) in row.sections"
-                :key="sectionKey"
-                :class="`col-${section.col_md} col-${section.col_sm} col-${section.col_xl} ${activeClass(active_section,section)} section_container`"
-                :id="section.id">
-                <h5>
-                    {{ section.name }}
-                </h5>
+        <div class="row">
+            <div class="col">
                 <poll-section
-                    :section="section"
-                    :fields="section.fields"
-                    :endform="!!section.default_next_form_section"
-                    :active_section="active_section"
-                    @next_section="changeSection(section, $event)"/>
+                    :section="active_section"
+                    :questions="workingQuestions"
+                    :identificador="identificador"
+                    @next-section="handleNextSection"
+                >
+                </poll-section>
             </div>
         </div>
-        <br />
-        <div class="row">
-            <div class="col-12 text-right PollIndex___padding-0">
+        <div class="row" v-if="show_guardar">
+            <div class="col text-right" style="padding-right: 40px;">
                 <button
-                    v-if="can_send_poll"
-                    @click="sendForm"
-                    class="btn btn-outline-primary float-right">
-                    ENVIAR
+                    :disabled="isDisabledSave()"
+                    @click="savePoll()"
+                    :class="`btn btn-success`"
+                >
+                    GUARDAR
                 </button>
             </div>
         </div>
-        <br />
-        <div class="row" v-if="errorBackend">
-            <div class="col-12 text-right PollIndex___padding-0">
-                <span class="text-danger">{{ errorBackendMsg }}</span>
+        <div class="row" v-if="error">
+            <div class="col text-right" style="padding-right: 40px;">
+                <br />
+                <p class="text-danger">
+                    {{ backendMsg }}
+                </p>
             </div>
         </div>
-        <div class="row" v-if="pollsaved">
-            <div class="col-12 text-right PollIndex___padding-0">
-                <span class="text-success">Encuesta guardada exitosamente</span>
+        <div class="row" v-if="success">
+            <div class="col text-right" style="padding-right: 40px;">
+                <br />
+                <p class="text-success">
+                    {{ backendMsg }}
+                </p>
             </div>
         </div>
+
         <loading-message :status="loading"></loading-message>
-        <code>
-            Historial
-            <pre>
-                {{ historial }}
-            </pre>
-        </code>
     </div>
 </template>
 
 <script>
-/**
- * @author Jorge Peraza
- */
-import question from "./question";
-import info from "./info";
-import global from '../global'
 import LoadingMessage from "../loading-message";
-import section from './section'
+import PollSection from "./section.vue";
+
 export default {
     components: {
-        'poll-section': section,
-        "poll-question": question,
-        "poll-info": info,
-        'sheet-input': global,
-        LoadingMessage,
-
+        "poll-section": PollSection,
+        LoadingMessage
     },
     props: {
         id: {
@@ -76,169 +62,169 @@ export default {
         }
     },
     data: () => ({
+        title: "",
+        error: false,
+        success: false,
+        backendMsg: "",
         loading: false,
-        errorBackend: false,
-        errorBackendMsg: "Ocurrió un error inesperado al guardar la encuesta",
-        pollsaved: false,
-        rows: [],
-        active_section: "",
-        can_send_poll: false,
-        data: {}
+        sections: [],
+        questions: [],
+        active_section: {},
+        entity_type_id: null,
+        show_guardar: false,
+        identificador: null
     }),
     computed: {
-        historial() {
-            return this.$store.getters['poll/record']
-        },
-        title() {
-            return this.$store.getters["poll/title"];
-        }
-    },
-    watch: {
-        active_section(val) {
-            const section = this.rows[0].sections.find(s => s.id == val)
-            section.fields.forEach(f => {
-                if (f.format == 'INFO' && !f.next_form_section) {
-                    this.can_send_poll = true
-                }
-            })
+        workingQuestions() {
+            return this.questions.filter(
+                q => q.form_section_id === this.active_section.id
+            );
         }
     },
     mounted() {
         this.loading = true;
-        this.$store.dispatch("poll/getPoll", this.id)
+        this.identificador = Date.now().toString();
+        this.$store
+            .dispatch("poll/get_poll", this.id)
             .then(response => {
-                this.$store.commit("form/ENTITYID", response.entity_id);
-                this.rows = response.rows;
-                // this.active_section = response.active_section;
-                this.active_section = this.$store.getters['poll/active_section']
-            })
-            .catch(err => {
-
-                console.log(err);
-            })
-            .finally(() => {
-                this.loading = false
-            })
-    },
-    methods: {
-        endForm(section) {
-            return !section.default_next_form_section
-        },
-        changeSection(section, event) {
-            if (event == null) {
-                if (section.default_next_form_section == null)
-                    this.can_send_poll = true
-                else
-                    this.active_section = section.default_next_form_section
-            }
-            else
-                this.active_section = event
-            // this.$store.commit('poll/ACTIVE_SECTION', this.active_section)
-
-        },
-        //
-        setSelectedOption(id, val) {
-            const action_id = {
-                key: id,
-                value: val.id
-            };
-            this.$store.commit("form/FIELDSVALUES", action_id);
-            // this.sendForm();
-        },
-        inputSelectChange(data) {
-            const field = {
-                key: data.id,
-                value: data.value
-            };
-            if (this.formField.permission === 2) {
-                this.$store.commit("form/FIELDSVALUES", field);
-            }
-        },
-        formatOptions(options) {
-            let opts = [];
-            Object.keys(options).forEach(key => {
-                opts.push({
-                    id: key,
-                    label: options[key]
-                });
-            });
-            return opts;
-        },
-        activeClass(active_section, section) {
-            return active_section === section.id ? "active_section" : "inactive_section";
-        },
-        sendForm() {
-            this.loading = true
-            const record = this.$store.getters['poll/record']
-            const entity_id = this.$store.getters['poll/entity_type_id']
-
-            let req = []
-            req[entity_id] = []
-
-            let answers = []
-
-            record.forEach(rec => {
-                answers[rec.question] = rec.answer
-            })
-
-            req[entity_id].push(answers)
-
-            let form = new FormData()
-            form.append('entityKey', entity_id)
-
-            Object.keys(req).forEach(key => {
-                form.append(key, JSON.stringify(req[key]))
-            })
-
-            this.$store.dispatch('form/save_form', form)
-            .then(response => {
-                console.log(response.response)
-                this.pollsaved = response.data.success
+                this.title = response.name;
+                this.sections = response.sections;
+                this.questions = response.questions;
+                this.active_section = response.active_section;
+                this.entity_type_id = response.entity_type_id;
+                this.questions.map(
+                    q =>
+                        (q.answer = {
+                            question: q.id,
+                            answer: null,
+                            next_section: null,
+                            alternative: null
+                        })
+                );
             })
             .catch(error => {
-                console.log(error)
+                console.log(error);
             })
             .finally(() => {
-                this.loading = false
-            })
-            // const record = this.$store.getters['poll/record']
-            // const entity_type_id = this.$store.getters['poll/entity_type_id']
-
-            // let req = []
-            // req[entity_type_id] = []
-
-            // let answers = {}
-            // record.forEach(rec => {
-            //     answers[rec.question] = rec.answer
-            // })
-
-            // req['entityKey'] = entity_type_id
-            // req[entity_type_id] = []
-            // req[entity_type_id].push(answers)
-
-            // console.log(JSON.parse(req[entity_type_id]))
-
-            // let form = new FormData()
-            // form.append('entityKey', entity_type_id)
-
-            // form.append(entity_id, JSON.parse(req[entity_id]))
-
-            // this.$store.dispatch('form/save_form', form)
-            // .then(response => {
-            //     console.log(response)
-            // })
-            // .catch(error => {
-            //     console.log(error)
-            // })
-            // .finally(() => {
-
-            // })
+                this.loading = false;
+            });
+    },
+    methods: {
+        reloadPoll() {
+            this.loading = true;
+            this.title= "";
+            this.error= false;
+            this.success= false;
+            this.backendMsg= "";
+            this.sections= [];
+            this.questions= [];
+            this.active_section= {};
+            this.entity_type_id= null;
+            this.show_guardar= false;
+            this.identificador = Date.now().toString();
+            this.$store
+                .dispatch("poll/get_poll", this.id)
+                .then(response => {
+                    this.title = response.name;
+                    this.sections = response.sections;
+                    this.questions = response.questions;
+                    this.active_section = response.active_section;
+                    this.entity_type_id = response.entity_type_id;
+                    this.questions.map(
+                        q =>
+                            (q.answer = {
+                                question: q.id,
+                                answer: null,
+                                next_section: null,
+                                alternative: null
+                            })
+                    );
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
+        },
+        handleNextSection(answersArray, sectionId) {
+            const firstAFound = answersArray.find(answer => {
+                return (
+                    answer.next_section !== null &&
+                    answer.section_id === sectionId
+                );
+            });
+            this.active_section = this.sections.find(section => {
+                return section.id === firstAFound.next_section;
+            });
+            this.$store.commit("poll/RECORD", answersArray);
+            if (this.active_section.default_next_form_section === null) {
+                this.show_guardar = true;
+            }
+        },
+        isDisabledSave() {
+            const currentValues = this.$store.getters["poll/record"];
+            var disabled = false;
+            currentValues.map(val => {
+                if (val.required === true && val.answer === null) {
+                    disabled = true;
+                }
+            });
+            return disabled;
+        },
+        savePoll() {
+            this.loading = true;
+            this.error = false;
+            this.success = false;
+            const formData = new FormData();
+            formData.append("entityKey", this.entity_type_id);
+            const data = [];
+            data[this.entity_type_id] = [];
+            const currentValues = this.$store.getters["poll/record"];
+            let field = {};
+            currentValues.map(val => {
+                field[val.question] = val.answer;
+            });
+            data[this.entity_type_id].push(field);
+            Object.keys(data).forEach(key => {
+                formData.append(key, JSON.stringify(data[key]));
+            });
+            this.$store
+                .dispatch("form/save_form", formData)
+                .then(response => {
+                    if (response.response.data.success === true) {
+                        this.loading = false;
+                        this.success = true;
+                        this.backendMsg = "Encuesta guardada con exito";
+                        setTimeout(() => {
+                            this.$store.commit('poll/CLEANRECORD');
+                            this.reloadPoll();
+                        }, 1500);
+                    } else {
+                        this.loading = false;
+                        this.error = true;
+                        this.backendMsg =
+                            "Ocurrió un error al guardar la encuesta";
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                    this.error = true;
+                    this.backendMsg = "Ocurrió un error al guardar la encuesta";
+                });
         }
     }
 };
 </script>
 
 <style lang="scss">
+.___PollIndex-container {
+    padding: 25px;
+    margin: 15px;
+    background: #dddddd;
+    border: 1px solid #999999;
+    border-radius: 5px;
+}
 .active_section {
     background-color: rgb(226, 226, 221);
     border: 1px solid red;

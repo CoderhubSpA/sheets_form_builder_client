@@ -171,7 +171,7 @@ export default {
             }
             this.searchMap(dataToSearch);
         },
-        inputChange(value, fieldId) {
+        inputChange(value, fieldId, col_name = null) {
             const data = {
                 key: fieldId,
                 value

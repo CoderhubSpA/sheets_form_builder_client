@@ -4,92 +4,87 @@ import Vue from 'vue'
 export default {
     namespaced: true,
     state: {
-        loading: false,
-        titlePoll: '',
-        active_section: '',
+        sections: [],
+        questions: [],
+        // title: '',
+        active_section: {
+            id: "",
+            order: null,
+            form_id: "",
+            form_row_id: "",
+            name: "",
+            color: null,
+            text_color: null,
+            area_id: "",
+            owner_id: "",
+            valid: 1,
+            col_md: 12,
+            col_xl: 12,
+            col_sm: 12,
+            visible_on_load: 1,
+            default_next_form_section: ""
+        },
         record: [],
-        entity_type_id: ''
+        // entity_type_id: ''
+    },
+    getters: {
+        sections: state => state.sections,
+        questions: state => state.questions,
+        active_section: state => state.active_section,
+        record: state => state.record,
+
+        // title: state => state.titlePoll,
+        // active_section: state => state.active_section,
+        // loading: state => state.loading,
+        
+        // entity_type_id: state => state.entity_type_id
     },
     mutations: {
-        LOADING(state, val) {
-            state.loading = val
+        SECTIONS(state, val) {
+            state.sections = val
         },
-        TITLE_POLL(state, val) {
-            state.titlePoll = val
+        QUESTIONS(state, val) {
+            state.questions = val
         },
-        ACTIVE_SECTION: (state , val) => {
-            state.active_section = val
+        ACTIVE_SECTION(state, val) {
+            Object.keys(val).forEach(key => {
+                Vue.set(state.active_section, key, val[key])
+            })
+            console.log(state.active_section)
         },
         RECORD(state, val) {
-            state.record.push(val)
+            state.record = val;
         },
-        ENTITY_TYPE_ID(state, val) {
-            state.entity_type_id = val
+        CLEANRECORD(state){
+            state.record = [];
         }
     },
     actions: {
-        getPoll({ commit }, id) {
-            commit('LOADING', true)
+        get_poll({ commit }, id) {
             return new Promise((resolve, reject) => {
                 axios.get(`/api/sheets/form/${id}`)
                 .then(response => {
                     const data = response.data
-                    // const data = require('./json.json')
-                    // console.log(data)
-                    commit('TITLE_POLL', data.content.name)
-                    commit('ENTITY_TYPE_ID', data.content.entity_type_id)
-                    let rows = data.content.rows.map(row =>{
-                        row['sections'] = []
-                        return row
-                    })
-
-                    data.content.sections.forEach(section => {
-                        let row = rows.find(r => r.id === section.form_row_id)
-                        const index = rows.indexOf(row)
-                        section['fields'] = []
-
-                        let field =  data.content.fields.find(f => f.form_section_id === section.id)
-                        if (field) {
-                            section.fields.push(field)
-                        }
-
-
-                        rows[index].sections.push(section)
-
-                    });
-
-                    rows.forEach(row => {
-                        row.sections.sort((a, b) => a.order > b.order ? 1 : b.order > a.order ? -1 : 0)
-                    })
-                    let active_section = ''
-                    for (let i = 0; i < rows[0].sections.length; i++) {
-                        if (rows[0].sections[i].visible_on_load === 1) {
-                            active_section = rows[0].sections[i].id
-                            break
-                        }
-                    }
-                    // console.log(active_section)
-                    commit('ACTIVE_SECTION', active_section)
+                    // commit AS
+                    commit("SECTIONS",data.content.sections);
+                    commit("QUESTIONS",data.content.fields);
                     resolve({
-                        rows: rows,
-                        // active_section: active_section,
-                        entity_id: data.content.entity_type_id
+                        title: data.content.name,
+                        sections: data.content.sections,
+                        questions: data.content.fields,
+                        entity_type_id: data.content.entity_type_id,
+                        active_section: data.content.sections.find(sec => sec.visible_on_load === 1)
                     })
                 })
                 .catch(error => {
+                    console.log(error)
                     reject(error.response)
                 })
                 .finally(() => {
-                    commit('LOADING', false)
+
                 })
             })
         },
     },
-    getters: {
-        title: state => state.titlePoll,
-        active_section: state => state.active_section,
-        loading: state => state.loading,
-        record: state => state.record,
-        entity_type_id: state => state.entity_type_id
-    }
+
 }

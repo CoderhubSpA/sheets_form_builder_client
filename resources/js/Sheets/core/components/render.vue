@@ -304,6 +304,7 @@ export default {
                     {},
                     this.$store.getters["form/fieldsvalues"]
                 );
+
                 let data = [];
                 data[this.$store.getters["form/entityid"]] = [];
                 data[this.$store.getters["form/entityid"]].push(fieldsValues);

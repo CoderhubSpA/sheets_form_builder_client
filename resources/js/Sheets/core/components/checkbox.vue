@@ -8,6 +8,7 @@
             :value="inputValue"
             :disabled="disabled"
             :checked="inputChecked"
+            :indeterminate.prop="indeterminate"
             @change="onChange"
         />
         <label class="form-check-label">
@@ -55,6 +56,9 @@ export default {
             default: false
         }
     },
+    data: () => ({
+        indeterminate: true
+    }),
     computed: {
         applyStyle() {
             return this.styles.join(" ");
@@ -65,31 +69,39 @@ export default {
                 this.$store.getters["form/fieldsvalues"]
             );
             if (allValues[this.id]) {
+                this.indeterminate = false;
                 return allValues[this.id] === 1 ? "checked" : null;
             } else {
+                this.indeterminate = true;
                 return null;
             }
         }
     },
     mounted: function() {
         if (!this.disabled) {
-            this.defaultValue(false);
+            this.indeterminate = true;
         }
         const allValues = Object.assign(
             {},
             this.$store.getters["form/fieldsvalues"]
         );
-        if (allValues[this.id]) {
+        if (allValues[this.id] !== undefined) {
             if(allValues[this.id] === 1){
               this.defaultValue(true);
+            }else{
+                this.defaultValue(false);
             }
+        }else{
+            this.indeterminate = true;
         }
     },
     methods: {
         defaultValue(value) {
+            this.indeterminate = false;
             this.$emit("sheets-checkbox-change", this.id, value);
         },
         onChange(event) {
+            this.indeterminate = false;
             this.$emit("sheets-checkbox-change", this.id, event.target.checked);
         }
     }

@@ -9,7 +9,7 @@
 /**
  * @author Jorge Peraza
  */
-import abstract from "../../mixins/mix"
+import abstract from "../mixins/mix"
 export default {
     mixins: [abstract],
     computed: {

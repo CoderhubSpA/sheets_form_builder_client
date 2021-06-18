@@ -1,184 +1,192 @@
 <template>
-    <div :id="id">
-
-        <div v-for="(field, key) in fields" :key="key">
-            <div v-for="(field, fieldKey) in fields" :key="fieldKey">
-
-                <sheet-input
-                    :form="field"
-                    :styles="parsedFieldStyles(field)"
-                    :active_section="$store.getters['poll/active_section']"
-                    v-on:question:selected="getAnswer($event)"
-                    @sheets-input-change="getAnswer($event, field.form_field_id)"
-                    :error-message="errors_messages[fieldKey].msg"
-                    ></sheet-input>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <h3>
+                    {{ title }}
+                </h3>
             </div>
-            <button
-                :class="`btn btn-info mt-4 float-right ${endForm ? 'hide' : 'show'}`"
-                @click="go_next">
-                Siguiente
-            </button>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div v-for="(question, index) in questions" :key="index">
+                    <sheet-input
+                        :form="question"
+                        :styles="parsedFieldStyles(question)"
+                        :model="model"
+                        v-on:question:selected="getAnswer($event)"
+                        @sheets-input-change="
+                            getAnswer($event, question.id, question.col_name)
+                        "
+                    />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button
+                    @click="handleNext()"
+                    :class="`btn btn-info mt-4 float-right`"
+                    v-if="can_next()"
+                >
+                    Siguiente
+                </button>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import global from '../global'
+import global from "../global";
 export default {
     components: {
-        'sheet-input' : global
+        "sheet-input": global
     },
     props: {
         section: {
             type: Object,
             require: true
         },
-        fields: {
+        questions: {
             type: Array,
+            require: true,
             default: () => []
         },
-        active_section: {
+        identificador:{
             type: String,
             default: ''
         }
     },
     data: () => ({
+        answer: {},
         responses: [],
-        errors_messages: [{
-            id: '',
-            msg: []
-        }],
-        info: {}
+        errors_messages: [],
+        model: {}
     }),
-    watch: {
-        responses() {
-            this.can_next()
-        }
-    },
     computed: {
-        id() {
-            return this.section.id
-        },
-        endForm() {
-            let hasNext = false
-            this.fields.forEach(field => {
-                if (field.alternatives) {
-                    for (const key in field.alternatives) {
-                        hasNext = !!field.alternatives[key].next_form_section
-                    }
-                }
-            })
-            return !(hasNext || !!this.section.default_next_form_section)
-        },
-    },
-    watch: {
-        active_section(val) {
-            this.fields.forEach(field => {
-                if (field.format == "INFO" && field.form_section_id == val) {
-                    let data = {
-                        question: field.id,
-                        answer: field.name, //info.form_field_id,
-                        required: field.required == 1,
-                        next_section: !!field.next_form_section ? field.next_form_section : null
-                    }
-                    this.$store.commit('poll/RECORD', data)
-                }
-            })
+        title() {
+            return this.section.name;
         }
     },
-    mounted() {
-        // limpiar errores
-        this.errors_messages = []
-        this.fields.forEach(element => {
-            const pre = {
-                question: element.form_field_id,
-                answer: null,
-                required: !!element.required
-            }
-            this.responses.push(pre)
-            let err = {
-                id: element.id,
-                msg: []
-            }
-            this.errors_messages.push(err)
-        })
-        //
+    watch: {
+        questions() {
+            this.errors_messages = [];
+
+            this.questions.forEach((element, index) => {
+                let pre = {
+                    question: element.id,
+                    answer: null,
+                    col_name: element.col_name,
+                    required: !!element.required
+                };
+                if (element.format === "INFO") {
+                    pre.answer = element.form_field_id;
+                }
+                const validation = this.responses.find(resp => {
+                    return resp.question === element.id;
+                });
+                if (!validation) {
+                    this.responses.push(pre);
+                }
+
+                let err = {
+                    id: element.id,
+                    msg: []
+                };
+                this.errors_messages.push(err);
+            });
+        },
+        responses(val) {
+            this.$store.commit("poll/RECORD", val);
+        },
+        identificador(val){
+            console.log('identificador',val);
+            this.responses = [];
+        }
     },
     methods: {
         parsedFieldStyles(field) {
-            return (field.format === "DOCUMENT") || (field.format === "DOCUMENT[IMAGE]") ? ["custom-file-input"] : ['form-control']
+            return field.format === "DOCUMENT" ||
+                field.format === "DOCUMENT[IMAGE]"
+                ? ["custom-file-input"]
+                : ["form-control"];
         },
-        getAnswer(e, id = null) {
-            let answer = {}
-            if (typeof(e) != 'object') {
+        getAnswer(e, id = null, col_name = null) {
+            let answer = {};
+            if (typeof e != "object") {
                 answer = {
+                    section_id: this.section.id,
                     question: id,
                     answer: e,
-                    next_section: null
-                }
-            }
-            else {
+                    next_section: this.section.default_next_form_section,
+                    alternative: null,
+                    col_name
+                };
+            } else {
                 answer = {
+                    section_id: this.section.id,
                     question: e.id,
-                    answer: e.selected_value.id,
+                    answer: e.alternative.id,
                     next_section: e.alternative.next_form_section
-                }
+                        ? e.alternative.next_form_section
+                        : this.section.default_next_form_section,
+                    alternative: e.alternative,
+                    col_name: e.col_name
+                };
             }
 
-            let q = this.responses.find(q => q.question === answer.question)
-
-            answer['required'] = !!q.required
-            const index = this.responses.indexOf(q)
-            q = answer
-            Vue.set(this.responses, index, q)
+            let q = this.questions.find(q => q.id === answer.question);
+            answer["required"] = !!q.required;
+            let a = this.responses
+                .filter(r => r.question == answer.question)
+                .shift();
+            const index = this.responses.indexOf(a);
+            this.model = answer;
+            Vue.set(this.responses, index, answer);
+            if (typeof e === "object" && this.can_next()) {
+                this.handleNext();
+            }
         },
         /**
          * Mostrar u ocultar
          * el btn de siguiente
          */
         can_next() {
-            return this.responses.every(el => (el.required && !!el.answer) || (!el.required) )
+            return (
+                this.responses.every(
+                    el => (el.required && !!el.answer) || !el.required
+                ) && this.section.default_next_form_section !== null
+            );
         },
-        /**
-         * Ir a la siguiente seccion
-         */
-        go_next() {
-            // limpiar posibles mensajes anteriores de error
-            this.clear_errors()
-            // validacion de todas las preguntas requeridas
-            if (this.verify_answer()) {
-                // guardar historial de preguntas
-                this.responses.forEach(r => {
-                    this.$store.commit('poll/RECORD', r)
-                })
-                // ir a la siguiente seccion
-                this.$emit('next_section', this.responses[0].next_section)
-            }
-
-        },
-        clear_errors() {
-            for (let index = 0; index < this.errors_messages.length; index++) {
-                this.errors_messages[index].msg = []
-            }
-        },
-        verify_answer() {
-            this.responses.map(r => {
-                if (r.required && !r.answer) {
-                    let err = this.errors_messages.find(error =>  error.id === r.question )
-                    if (err) {
-                        const index = this.errors_messages.indexOf(err)
-                        err.msg = ['Campo Requerido']
-                        Vue.set(this.errors_messages, index, err)
-                    }
-                }
-            })
-
-            return this.errors_messages.every(err => err.msg.length == 0 )
+        handleNext() {
+            this.$emit("next-section", this.responses, this.section.id);
+            this.model = {};
         }
     }
-}
+};
 </script>
 
-<style>
+<style lang="scss">
+.section {
+    justify-content: center;
+    align-items: center;
+    animation-name: activate_section;
+    animation-duration: 1s;
+    padding: 25px;
+}
 
+@keyframes activate_section {
+    0% {
+        background-color: rgb(255, 255, 255);
+        color: rgb(255, 255, 255);
+    }
+    50% {
+        background-color: rgb(240, 240, 238);
+        color: rgb(112, 112, 112);
+    }
+    100% {
+        background-color: rgb(226, 226, 221);
+        color: rgb(0, 0, 0);
+    }
+}
 </style>

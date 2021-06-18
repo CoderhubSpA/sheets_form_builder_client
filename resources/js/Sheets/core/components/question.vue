@@ -1,17 +1,14 @@
 <template>
     <div :class="`col col-${sm} col-${md} col-${xl}`">
-
         <label>
             {{ label }} <span v-if="required" class="question-required">*</span>
         </label>
-        <v-select
-            :options="options"
-            v-model="selected"></v-select>
+        <v-select :options="options" v-model="selected"></v-select>
     </div>
 </template>
 
 <script>
-import abstract from "../../mixins/mix"
+import abstract from "../mixins/mix";
 export default {
     mixins: [abstract],
     props: {
@@ -27,6 +24,10 @@ export default {
         errors: {
             type: Array,
             default: () => []
+        },
+        valSelected: {
+            type: String,
+            default: null
         }
     },
     data: () => ({
@@ -34,7 +35,7 @@ export default {
     }),
     computed: {
         label() {
-            return this.question.name
+            return this.question.name;
         },
         sm() {
             return this.question.col_sm;
@@ -53,6 +54,14 @@ export default {
                     label: this.question.options[key]
                 });
             });
+            if (this.selected !== null) {
+                const validationSelected = options.find(option => {
+                    return option.id === this.selected.id;
+                });
+                if (!validationSelected) {
+                    this.selected = null;
+                }
+            }
             return options;
         },
         required() {
@@ -63,42 +72,36 @@ export default {
         selected(val) {
             if (!!val) {
                 const data = {
-                    id: this.question.form_field_id,
-                    selected_value: val,
-                    alternative: !! val ? this.question.alternatives[val.id] : null,
-                    section_owner: this.question.form_section_id
-                }
-                this.optionSelected(data)
+                    id: this.question.id,
+                    selected_value: !!val ? val.label : "N/A",
+                    alternative: !!val
+                        ? this.question.alternatives[val.id]
+                        : null,
+                    section_owner: this.question.form_section_id,
+                    col_name: this.question.col_name
+                };
+                this.optionSelected(data);
+            }
+        },
+        valSelected(val) {
+            if (val) {
+                this.selected = this.options.find(opt => {
+                    return opt.id === val;
+                });
             }
         }
     },
     mounted() {},
     methods: {
         optionSelected(value) {
-            if (value){
-                this.$emit('input', value.selected_value.id)
-            }
-            else
-                this.$emit('input', null)
+            if (value) {
+                this.$emit("input", value.selected_value.id);
+            } else this.$emit("input", null);
 
-            this.$emit("optionSelected", value)
+            this.$emit("optionSelected", value);
         }
-        // next() {
-        //     const data = {
-        //         selected_value: this.selected,
-        //         alternative: !!this.selected ? this.question.alternatives[this.selected.id] : null,
-        //         section_owner: this.question.form_section_id
-        //     };
-        //     this.$emit("input", this.selected.id);
-        //     this.$emit(
-        //         "optionSelected",
-        //         this.question.id,
-        //         this.question.alternatives[this.selected.id]
-        //     );
-        //     this.$emit("next", data);
-        // }
     }
-}
+};
 </script>
 
 <style lang="scss">
