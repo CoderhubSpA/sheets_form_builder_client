@@ -83,13 +83,12 @@ export default {
         bus: new Vue(),
         windowName: `SheetsFormRendered${new Date().getTime()}`,
         parentWindow: null,
-
+        pendingFilesVal: 0
     }),
     computed: {},
     created() {
         if (this.recordid === "") {
             this.$store.commit("form/CLEARFIELDSVALUES");
-
         }
     },
     mounted() {
@@ -115,8 +114,6 @@ export default {
                 this.$store
                     .dispatch("form/get_form", this.formid)
                     .then(response => {
-
-
                         const entityname = this.$store.getters[
                             "form/entityname"
                         ];
@@ -130,7 +127,6 @@ export default {
                                 this.$store
                                     .dispatch("form/get_form", this.formid)
                                     .then(response => {
-
                                         this.title = response.title;
                                         this.rows = response.rows;
                                         this.actions = response.actions;
@@ -159,7 +155,6 @@ export default {
                                     });
                             })
                             .catch(err => {
-
                                 console.log("error", err);
                             });
                     })
@@ -286,16 +281,17 @@ export default {
         resetForm() {
             this.rows = [];
             this.$store.commit("form/CLEARFIELDSVALUES");
-            console.log('limpia')
+            console.log("limpia");
             this.getForm();
         },
         sendForm(fieldsIds) {
             const pendingFiles = this.$store.getters["form/pendingfiles"];
+            console.log('mandando form', pendingFiles);
             //---------------------------------------
             this.bus.$emit("cleanValidation", {});
             //---------------------------------------
             fieldsIds.push("action_id");
-            if (pendingFiles === 0) {
+            if (pendingFiles <= 0) {
                 if (this.recordid != "") {
                     fieldsIds.push("id");
                 }
@@ -335,6 +331,8 @@ export default {
                                     this.getForm();
                                 }, 1500);
                             } else {
+                                console.log('332')
+                                this.$store.commit("form/FAILEDFILEFORMUPLOAD");
                                 this.loading = false;
                                 this.error = true;
                                 if (response.response.data.content) {
@@ -361,18 +359,41 @@ export default {
                                     response.response.data.content
                                 );
                             }
-                            try{this.window.parent.postMessage(response.response.data, "*");}catch(e){console.warn(e);}
+                            try {
+                                this.window.parent.postMessage(
+                                    response.response.data,
+                                    "*"
+                                );
+                            } catch (e) {
+                                console.warn(e);
+                            }
                         })
                         .catch(err => {
                             this.loading = false;
                             console.log("error", err.response);
-                            if(err.response.status === 400){
-                                const failedFields = Object.keys(err.response.data.content.errors);
+                            console.log('372')
+                            this.$store.commit("form/FAILEDFILEFORMUPLOAD");
+                            if (err.response.status === 400) {
+                                const failedFields = Object.keys(
+                                    err.response.data.content.errors
+                                );
                                 this.error = true;
-                                this.backendMsg = err.response.data.content.message;
-                                this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
+                                this.backendMsg =
+                                    err.response.data.content.message;
+                                this.bus.$emit(
+                                    "requiredFailed",
+                                    failedFields,
+                                    err.response.data.content.errors
+                                );
                             }
-                            try{this.window.parent.postMessage(err.response.data, "*");}catch(e){console.warn(e);}
+                            try {
+                                this.window.parent.postMessage(
+                                    err.response.data,
+                                    "*"
+                                );
+                            } catch (e) {
+                                console.warn(e);
+                            }
                         });
                 } else {
                     this.$store
@@ -393,6 +414,8 @@ export default {
                             } else {
                                 this.loading = false;
                                 this.error = true;
+                                console.log('415')
+                                this.$store.commit("form/FAILEDFILEFORMUPLOAD");
                                 if (response.response.data.content) {
                                     if (response.response.data.content.errors) {
                                         Object.keys(
@@ -417,19 +440,38 @@ export default {
                                     response.response.data.content
                                 );
                             }
-                            try{this.window.parent.postMessage(response.response.data, "*");}catch(e){console.warn(e);}
+                            try {
+                                this.window.parent.postMessage(
+                                    response.response.data,
+                                    "*"
+                                );
+                            } catch (e) {
+                                console.warn(e);
+                            }
                         })
                         .catch(err => {
                             this.loading = false;
-                            if(err.response.status === 400){
-                                const failedFields = Object.keys(err.response.data.content.errors);
+                            console.log('452')
+                            this.$store.commit("form/FAILEDFILEFORMUPLOAD");
+                            if (err.response.status === 400) {
+                                const failedFields = Object.keys(
+                                    err.response.data.content.errors
+                                );
                                 this.error = true;
-                                this.backendMsg = err.response.data.content.message;
-                                this.bus.$emit("requiredFailed", failedFields, err.response.data.content.errors);
+                                this.backendMsg =
+                                    err.response.data.content.message;
+                                this.bus.$emit(
+                                    "requiredFailed",
+                                    failedFields,
+                                    err.response.data.content.errors
+                                );
                             }
-                            try{
-                                this.window.parent.postMessage(err.response.data, "*");
-                            }catch(e){
+                            try {
+                                this.window.parent.postMessage(
+                                    err.response.data,
+                                    "*"
+                                );
+                            } catch (e) {
                                 console.warn(e);
                             }
                         });

@@ -11,6 +11,7 @@ export default {
         files: false,
         filearray: [],
         pendingfiles: 0,
+        pendingfilesBck: 0,
         entityname: null,
         recordid: null,
         entities_fk: null,
@@ -24,6 +25,7 @@ export default {
         files: state => state.files,
         filearray: state => state.filearray,
         pendingfiles: state => state.pendingfiles,
+        pendingfilesBck: state => state.pendingfilesBck,
         entityname: state => state.entityname,
         recordid: state => state.recordid,
         entities_fk: state => state.entities_fk,
@@ -52,10 +54,14 @@ export default {
             state.files = true;
             if (!(file.id in state.filearray)) {
                 state.pendingfiles = state.pendingfiles + 1;
+                state.pendingfilesBck = state.pendingfiles;
             }
         },
         UPLOADEDFILE(state) {
             state.pendingfiles = state.pendingfiles - 1;
+        },
+        FAILEDFILEFORMUPLOAD(state){
+            state.pendingfiles = state.pendingfilesBck
         },
         PUSHFILES(state, file) {
             const data = {
