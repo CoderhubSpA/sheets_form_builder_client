@@ -14,6 +14,7 @@
                         :form="question"
                         :styles="parsedFieldStyles(question)"
                         :model="model"
+                        :responses="responses"
                         v-on:question:selected="getAnswer($event)"
                         @sheets-input-change="
                             getAnswer($event, question.id, question.col_name)
@@ -52,9 +53,14 @@ export default {
             require: true,
             default: () => []
         },
-        identificador:{
+        allquestions: {
+            type: Array,
+            require: true,
+            default: () => []
+        },
+        identificador: {
             type: String,
-            default: ''
+            default: ""
         }
     },
     data: () => ({
@@ -99,8 +105,7 @@ export default {
         responses(val) {
             this.$store.commit("poll/RECORD", val);
         },
-        identificador(val){
-            console.log('identificador',val);
+        identificador(val) {
             this.responses = [];
         }
     },
@@ -143,8 +148,45 @@ export default {
             const index = this.responses.indexOf(a);
             this.model = answer;
             Vue.set(this.responses, index, answer);
+            if (typeof e == "object") {
+                e.exam.forEach(exam => {
+                    let question = this.allquestions
+                        .filter(q => q.form_field_id == exam.form_field_id)
+                        .shift();
+                    let search = this.responses
+                        .filter(r => r.question == question.id)
+                        .shift();
+                    if (question.format !== "RESPONSE") {
+                        console.warn(
+                            "Campo de formato no válido para guardar producto"
+                        );
+                    } else {
+                        if (search === undefined) {
+                            const answerProduct = {
+                                answer: [exam.entity_id],
+                                question: question.id,
+                                required: question.required,
+                                section_id: null,
+                                col_name: question.col_name,
+                                alternative: null
+                            };
+                            this.responses.push(answerProduct);
+                        } else {
+                            const indexOfAnswer = this.responses.indexOf(
+                                search
+                            );
+                            if(search.answer.indexOf(exam.entity_id) === -1){
+                                search.answer.push(exam.entity_id);
+                            }
+                        }
+                    }
+                });
+            }
             if (typeof e === "object" && this.can_next()) {
-                this.handleNext();
+                this.$store.commit("poll/ADD_EXAM", e.exam);
+                if (e.format === "QUESTION") {
+                    this.handleNext();
+                }
             }
         },
         /**
@@ -153,9 +195,9 @@ export default {
          */
         can_next() {
             return (
-                this.responses.every(
-                    el => (el.required && !!el.answer) || !el.required
-                ) && this.section.default_next_form_section !== null
+                this.responses.every(el => {
+                    return (el.required && !!el.answer) || !el.required;
+                }) && this.section.default_next_form_section !== null
             );
         },
         handleNext() {

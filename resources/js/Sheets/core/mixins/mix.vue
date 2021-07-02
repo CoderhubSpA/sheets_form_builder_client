@@ -128,6 +128,8 @@ export default {
                     return 'file'
                 case 'QUESTION':
                     return 'question'
+                case 'RESPONSE':
+                    return 'response'
                 case 'INFO':
                     return 'info'
                 default:

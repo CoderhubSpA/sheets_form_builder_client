@@ -1,9 +1,14 @@
 <template>
-    <div :class="`col col-${sm} col-${md} col-${xl}`">
+    <div :class="getClasses()">
         <label>
             {{ label }} <span v-if="required" class="question-required">*</span>
         </label>
-        <v-select :options="options" v-model="selected"></v-select>
+        <v-select
+            :options="options"
+            v-model="selected"
+            :disabled="isResponse"
+            :multiple="isResponse"
+        ></v-select>
     </div>
 </template>
 
@@ -28,6 +33,11 @@ export default {
         valSelected: {
             type: String,
             default: null
+        },
+        optionsResponse: {
+            type: Array,
+            default: null,
+            require: false
         }
     },
     data: () => ({
@@ -48,51 +58,74 @@ export default {
         },
         options() {
             let options = [];
-            Object.keys(this.question.options).forEach(key => {
-                options.push({
-                    id: key,
-                    label: this.question.options[key]
+            if (this.question.format === "QUESTION") {
+                Object.keys(this.question.options).forEach(key => {
+                    options.push({
+                        id: key,
+                        label: this.question.options[key]
+                    });
                 });
-            });
-            if (this.selected !== null) {
-                const validationSelected = options.find(option => {
-                    return option.id === this.selected.id;
-                });
-                if (!validationSelected) {
-                    this.selected = null;
+                if (this.selected !== null) {
+                    const validationSelected = options.find(option => {
+                        return option.id === this.selected.id;
+                    });
+                    if (!validationSelected) {
+                        this.selected = null;
+                    }
                 }
+                
+            } else {
+                options = [...this.optionsResponse];
+                this.selected = [...this.optionsResponse];
+                console.warn(this.selected);
             }
             return options;
         },
         required() {
             return this.question.required == 1;
+        },
+        isResponse() {
+            return this.question.format === "RESPONSE" ? true : false;
         }
     },
     watch: {
         selected(val) {
-            if (!!val) {
-                const data = {
-                    id: this.question.id,
-                    selected_value: !!val ? val.label : "N/A",
-                    alternative: !!val
-                        ? this.question.alternatives[val.id]
-                        : null,
-                    section_owner: this.question.form_section_id,
-                    col_name: this.question.col_name
-                };
-                this.optionSelected(data);
+            if (this.question.format === "QUESTION") {
+                if (!!val) {
+                    const data = {
+                        id: this.question.id,
+                        format: this.question.format,
+                        selected_value: !!val ? val.label : "N/A",
+                        alternative: !!val
+                            ? this.question.alternatives[val.id]
+                            : null,
+                        section_owner: this.question.form_section_id,
+                        col_name: this.question.col_name,
+                        exam: !!val
+                            ? this.question.alternatives[val.id].products
+                            : null
+                    };
+                    this.optionSelected(data);
+                }
             }
         },
         valSelected(val) {
             if (val) {
-                this.selected = this.options.find(opt => {
-                    return opt.id === val;
-                });
+                    this.selected = this.options.find(opt => {
+                        return opt.id === val;
+                    });
             }
         }
     },
     mounted() {},
     methods: {
+        getClasses() {
+            let classes = `col col-${this.question.col_sm} col-${this.question.col_md} col-${this.question.col_xl}`;
+            if (this.isResponse) {
+                classes += " response-field";
+            }
+            return classes;
+        },
         optionSelected(value) {
             if (value) {
                 this.$emit("input", value.selected_value.id);
@@ -107,5 +140,16 @@ export default {
 <style lang="scss">
 .question-required {
     color: red;
+}
+.response-field .vs__selected-options {
+    flex-direction: column;
+}
+.response-field .vs__deselect,
+.response-field .vs__actions,
+.response-field .vs__search {
+    display: none;
+}
+.response-field .vs__selected{
+    border:none;
 }
 </style>

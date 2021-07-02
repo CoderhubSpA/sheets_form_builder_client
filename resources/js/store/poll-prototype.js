@@ -34,12 +34,6 @@ export default {
         active_section: state => state.active_section,
         record: state => state.record,
         exams: state => state.exams
-
-        // title: state => state.titlePoll,
-        // active_section: state => state.active_section,
-        // loading: state => state.loading,
-
-        // entity_type_id: state => state.entity_type_id
     },
     mutations: {
         SECTIONS(state, val) {
@@ -57,13 +51,12 @@ export default {
         RECORD(state, val) {
             state.record = val;
         },
-        CLEANRECORD(state){
-            state.record = [];
-        },
         ADD_EXAM(state, val) {
             val.forEach(exam => {
+                console.log(exam)
                 Vue.set(state.exams, state.exams.length, exam.entity_id)
             })
+
         }
     },
     actions: {

@@ -84,10 +84,11 @@
             <sheet-document :form="form" v-on:sheets-file-change="fileChange" />
         </div>
         <!-- PREGUNTA PARA ENCUESTA -->
-        <div v-else-if="sheetType == 'question'">
+        <div v-else-if="sheetType == 'question' || sheetType == 'response'">
             <sheet-question
                 :question="form"
                 :valSelected="value"
+                :optionsResponse="optionsResponse"
                 @optionSelected="option_selected"
             ></sheet-question>
         </div>
@@ -133,6 +134,11 @@ export default {
             default: "",
             require: false
         },
+        responses: {
+            type: Array,
+            default: null,
+            require: false
+        },
         model: {
             type: Object,
             default: () => ({})
@@ -143,7 +149,8 @@ export default {
         // selected: '',
         checkboxResponse: false,
         selectedQuestion: null,
-        value: null
+        value: null,
+        optionsResponse: null
     }),
     computed: {
         options() {
@@ -220,19 +227,38 @@ export default {
                                     section_owner: this.form.form_section_id,
                                     col_name: this.form.col_name
                                 };
-                                Object.keys(this.form.alternatives).forEach(
-                                    key => {
-                                        if (
-                                            value.alternative.name ===
-                                            this.form.alternatives[key].name
-                                        ) {
-                                            data.alternative = this.form.alternatives[
-                                                key
-                                            ];
+                                if (this.form.alternatives) {
+                                    Object.keys(this.form.alternatives).forEach(
+                                        key => {
+                                            if (
+                                                value.alternative.name ===
+                                                this.form.alternatives[key].name
+                                            ) {
+                                                data.alternative = this.form.alternatives[
+                                                    key
+                                                ];
+                                            }
                                         }
+                                    );
+                                    this.option_selected(data);
+                                }
+                            } else if (this.originalType === "RESPONSE") {
+                                const answerFromStore = this.$props.responses.find((item) => {
+                                    return item.question === this.form.id;
+                                })
+                                let objOptions = [];
+                                const contentinfo = this.$store.getters['form/contentinfo'];
+                                const formProducts = contentinfo.content.entities_fk.form_products.filter((item) => {
+                                    return answerFromStore.answer.includes(item.id);
+                                });
+                                formProducts.map((p) => {
+                                    const pushingData = {
+                                        id: p.id,
+                                        label: p.name
                                     }
-                                );
-                                this.option_selected(data);
+                                    objOptions.push(pushingData);
+                                })
+                                this.optionsResponse = objOptions;
                             } else {
                                 this.$emit(
                                     "input",

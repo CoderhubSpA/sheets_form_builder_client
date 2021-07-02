@@ -9,6 +9,7 @@
                     :section="active_section"
                     :questions="workingQuestions"
                     :identificador="identificador"
+                    :allquestions="questions"
                     @next-section="handleNextSection"
                 >
                 </poll-section>
@@ -71,7 +72,7 @@ export default {
         questions: [],
         active_section: {},
         entity_type_id: null,
-        show_guardar: false,
+        // show_guardar: false,
         identificador: null
     }),
     computed: {
@@ -79,6 +80,12 @@ export default {
             return this.questions.filter(
                 q => q.form_section_id === this.active_section.id
             );
+        },
+        show_guardar() {
+            if (this.active_section.default_next_form_section === null) {
+                return true;
+            }
+            return false;
         }
     },
     mounted() {
@@ -106,21 +113,28 @@ export default {
                 console.log(error);
             })
             .finally(() => {
-                this.loading = false;
+                this.$store
+                    .dispatch("form/get_form", this.id)
+                    .then(response => {
+                        this.loading = false;
+                    })
+                    .catch(err => {
+                        this.loading = false;
+                        console.log("error", err);
+                    });
             });
     },
     methods: {
         reloadPoll() {
             this.loading = true;
-            this.title= "";
-            this.error= false;
-            this.success= false;
-            this.backendMsg= "";
-            this.sections= [];
-            this.questions= [];
-            this.active_section= {};
-            this.entity_type_id= null;
-            this.show_guardar= false;
+            this.title = "";
+            this.error = false;
+            this.success = false;
+            this.backendMsg = "";
+            this.sections = [];
+            this.questions = [];
+            this.active_section = {};
+            this.entity_type_id = null;
             this.identificador = Date.now().toString();
             this.$store
                 .dispatch("poll/get_poll", this.id)
@@ -158,9 +172,6 @@ export default {
                 return section.id === firstAFound.next_section;
             });
             this.$store.commit("poll/RECORD", answersArray);
-            if (this.active_section.default_next_form_section === null) {
-                this.show_guardar = true;
-            }
         },
         isDisabledSave() {
             const currentValues = this.$store.getters["poll/record"];
@@ -197,7 +208,7 @@ export default {
                         this.success = true;
                         this.backendMsg = "Encuesta guardada con exito";
                         setTimeout(() => {
-                            this.$store.commit('poll/CLEANRECORD');
+                            this.$store.commit("poll/CLEANRECORD");
                             this.reloadPoll();
                         }, 1500);
                     } else {
