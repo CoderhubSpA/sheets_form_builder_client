@@ -281,12 +281,10 @@ export default {
         resetForm() {
             this.rows = [];
             this.$store.commit("form/CLEARFIELDSVALUES");
-            console.log("limpia");
             this.getForm();
         },
         sendForm(fieldsIds) {
             const pendingFiles = this.$store.getters["form/pendingfiles"];
-            console.log('mandando form', pendingFiles);
             //---------------------------------------
             this.bus.$emit("cleanValidation", {});
             //---------------------------------------
@@ -331,7 +329,6 @@ export default {
                                     this.getForm();
                                 }, 1500);
                             } else {
-                                console.log('332')
                                 this.$store.commit("form/FAILEDFILEFORMUPLOAD");
                                 this.loading = false;
                                 this.error = true;
@@ -371,7 +368,6 @@ export default {
                         .catch(err => {
                             this.loading = false;
                             console.log("error", err.response);
-                            console.log('372')
                             this.$store.commit("form/FAILEDFILEFORMUPLOAD");
                             if (err.response.status === 400) {
                                 const failedFields = Object.keys(
@@ -414,7 +410,6 @@ export default {
                             } else {
                                 this.loading = false;
                                 this.error = true;
-                                console.log('415')
                                 this.$store.commit("form/FAILEDFILEFORMUPLOAD");
                                 if (response.response.data.content) {
                                     if (response.response.data.content.errors) {
@@ -451,7 +446,6 @@ export default {
                         })
                         .catch(err => {
                             this.loading = false;
-                            console.log('452')
                             this.$store.commit("form/FAILEDFILEFORMUPLOAD");
                             if (err.response.status === 400) {
                                 const failedFields = Object.keys(

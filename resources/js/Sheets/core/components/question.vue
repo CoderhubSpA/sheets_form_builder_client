@@ -3,12 +3,13 @@
         <label>
             {{ label }} <span v-if="required" class="question-required">*</span>
         </label>
-        <v-select
+        <v-select v-if="options.length > 0"
             :options="options"
             v-model="selected"
             :disabled="isResponse"
             :multiple="isResponse"
         ></v-select>
+        <p v-if="options.length === 0"><b>Esta lista está vacía</b></p>
     </div>
 </template>
 
@@ -73,11 +74,12 @@ export default {
                         this.selected = null;
                     }
                 }
-                
             } else {
-                options = [...this.optionsResponse];
-                this.selected = [...this.optionsResponse];
-                console.warn(this.selected);
+                if (this.optionsResponse) {
+                    options = [...this.optionsResponse];
+                    this.selected = [...this.optionsResponse];
+                    console.warn(this.selected);
+                }
             }
             return options;
         },
@@ -111,9 +113,9 @@ export default {
         },
         valSelected(val) {
             if (val) {
-                    this.selected = this.options.find(opt => {
-                        return opt.id === val;
-                    });
+                this.selected = this.options.find(opt => {
+                    return opt.id === val;
+                });
             }
         }
     },
@@ -149,7 +151,7 @@ export default {
 .response-field .vs__search {
     display: none;
 }
-.response-field .vs__selected{
-    border:none;
+.response-field .vs__selected {
+    border: none;
 }
 </style>

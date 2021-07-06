@@ -248,15 +248,23 @@ export default {
                                 })
                                 let objOptions = [];
                                 const contentinfo = this.$store.getters['form/contentinfo'];
-                                const formProducts = contentinfo.content.entities_fk.form_products.filter((item) => {
-                                    return answerFromStore.answer.includes(item.id);
-                                });
+                                let formProducts = [];
+                                contentinfo.content.entities_fk.form_products.map((item) => {
+                                    if(answerFromStore.answer.includes(item.id)){
+                                        const pos = formProducts.map((ele) => {return ele.id}).indexOf(item.id);
+                                        if(pos === -1){
+                                            formProducts.push(item);
+                                        }
+                                    }
+                                })
                                 formProducts.map((p) => {
                                     const pushingData = {
                                         id: p.id,
                                         label: p.name
                                     }
-                                    objOptions.push(pushingData);
+                                    if(!objOptions.includes(pushingData)){
+                                        objOptions.push(pushingData);
+                                    }
                                 })
                                 this.optionsResponse = objOptions;
                             } else {

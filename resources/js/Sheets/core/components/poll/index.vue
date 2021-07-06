@@ -217,11 +217,24 @@ export default {
                         this.backendMsg =
                             "Ocurrió un error al guardar la encuesta";
                     }
+                    try {
+                        this.window.parent.postMessage(
+                            response.response.data,
+                            "*"
+                        );
+                    } catch (e) {
+                        console.warn(e);
+                    }
                 })
                 .catch(err => {
                     this.loading = false;
                     this.error = true;
                     this.backendMsg = "Ocurrió un error al guardar la encuesta";
+                    try {
+                        this.window.parent.postMessage(err.response.data, "*");
+                    } catch (e) {
+                        console.warn(e);
+                    }
                 });
         }
     }

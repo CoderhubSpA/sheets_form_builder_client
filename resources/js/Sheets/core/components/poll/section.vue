@@ -163,7 +163,7 @@ export default {
                     } else {
                         if (search === undefined) {
                             const answerProduct = {
-                                answer: [exam.entity_id],
+                                answer: [exam.entity_id.toString()],
                                 question: question.id,
                                 required: question.required,
                                 section_id: null,
@@ -175,8 +175,8 @@ export default {
                             const indexOfAnswer = this.responses.indexOf(
                                 search
                             );
-                            if(search.answer.indexOf(exam.entity_id) === -1){
-                                search.answer.push(exam.entity_id);
+                            if(search.answer.indexOf(exam.entity_id.toString()) === -1){
+                                search.answer.push(exam.entity_id.toString());
                             }
                         }
                     }
