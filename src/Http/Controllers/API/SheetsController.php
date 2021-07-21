@@ -1,30 +1,33 @@
 <?php
 
-namespace paupololi\sheetsformbuilder\Http\Controllers\API;
+namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client as GuzzleClient;
 use Auth;
 use Validator;
+use Config;
 
 
 class SheetsController extends Controller
 {
 
     public function init(Request $request){
-
-        if (env('SHEETS_EXTERNAL') || !Auth::user()) {
+        $bearer = config('formbuilder.bearer');
+        $external = config('formbuilder.external');
+        $base_uri = config('formbuilder.api_url');
+        if ($external || !Auth::user()) {
 
             $this->clientBuilder = [
                 'http_errors' => false,
                 'verify' => false,
-                'base_uri' => env('SHEETS_API_URL'),
+                'base_uri' => $base_uri,
             ];
             $this->clientBuilder['headers'] = [
                 'Content-Type' => 'application/json',
                 'AccessToken' => 'key',
-                'Authorization' => env('SECURITY_BEARER'),
+                'Authorization' => $bearer,
             ];
 
         }else{
@@ -32,7 +35,7 @@ class SheetsController extends Controller
             $this->clientBuilder = [
                 'http_errors' => false,
                 'verify' => false,
-                'base_uri' => env('APP_URL'),
+                'base_uri' => url(''),
             ];
             $this->clientBuilder['headers'] = collect($request->header())->transform(function ($item) {
                 return $item[0];
@@ -40,14 +43,14 @@ class SheetsController extends Controller
         }
 
     }
-    
+
     public function index($id,Request $request)
     {
         $this->init($request);
 
         $endpoint = "form/{$id}";
         $response = null;
-        
+
         $client = new GuzzleClient($this->clientBuilder);
         $response = $client->request('GET', $endpoint);
 
@@ -59,7 +62,7 @@ class SheetsController extends Controller
         $this->init($request);
 
         $endpoint =  'entity/data/' . $entityname . '/' . $recordid;
-        
+
         $client = new GuzzleClient($this->clientBuilder);
         $response = $client->request('GET', $endpoint);
 
@@ -112,13 +115,14 @@ class SheetsController extends Controller
             $entity = new \stdClass();
             $entity_key = $request->entityKey;
             $entity->$entity_key = \json_decode($request->$entity_key);
-            
+
             $endpoint = 'entity';
             $this->clientBuilder[\GuzzleHttp\RequestOptions::JSON] = $entity;
+
             $client   = new GuzzleClient($this->clientBuilder);
 
             $r = $client->request('post', $endpoint);
-            
+
             $res          = new \stdClass();
             $res->success = $r->getStatusCode() === 200;
             $res->content = json_decode($r->getBody()->getContents());
@@ -167,7 +171,7 @@ class SheetsController extends Controller
 
             $endpoint = "entity/info/{$id}";
             $client   = new GuzzleClient($this->clientBuilder);
-            
+
             $res = $client->request('GET', $endpoint);
 
             $response          = new \stdClass();

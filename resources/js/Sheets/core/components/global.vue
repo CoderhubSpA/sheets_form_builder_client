@@ -170,6 +170,9 @@ export default {
             }
         },
         model(val) {
+            if (val.answer === undefined) {
+                this.value = null;
+            }
             if (typeof val.answer === "string") {
                 this.value = val.answer;
             } else {
@@ -243,29 +246,43 @@ export default {
                                     this.option_selected(data);
                                 }
                             } else if (this.originalType === "RESPONSE") {
-                                const answerFromStore = this.$props.responses.find((item) => {
-                                    return item.question === this.form.id;
-                                })
+                                const answerFromStore = this.$props.responses.find(
+                                    item => {
+                                        return item.question === this.form.id;
+                                    }
+                                );
                                 let objOptions = [];
-                                const contentinfo = this.$store.getters['form/contentinfo'];
+                                const contentinfo = this.$store.getters[
+                                    "form/contentinfo"
+                                ];
                                 let formProducts = [];
-                                contentinfo.content.entities_fk.form_products.map((item) => {
-                                    if(answerFromStore.answer.includes(item.id)){
-                                        const pos = formProducts.map((ele) => {return ele.id}).indexOf(item.id);
-                                        if(pos === -1){
-                                            formProducts.push(item);
+                                contentinfo.content.entities_fk.form_products.map(
+                                    item => {
+                                        if (
+                                            answerFromStore.answer.includes(
+                                                item.id
+                                            )
+                                        ) {
+                                            const pos = formProducts
+                                                .map(ele => {
+                                                    return ele.id;
+                                                })
+                                                .indexOf(item.id);
+                                            if (pos === -1) {
+                                                formProducts.push(item);
+                                            }
                                         }
                                     }
-                                })
-                                formProducts.map((p) => {
+                                );
+                                formProducts.map(p => {
                                     const pushingData = {
                                         id: p.id,
                                         label: p.name
-                                    }
-                                    if(!objOptions.includes(pushingData)){
+                                    };
+                                    if (!objOptions.includes(pushingData)) {
                                         objOptions.push(pushingData);
                                     }
-                                })
+                                });
                                 this.optionsResponse = objOptions;
                             } else {
                                 this.$emit(

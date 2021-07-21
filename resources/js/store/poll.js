@@ -1,12 +1,17 @@
-import axios from 'axios'
-import Vue from 'vue'
+import Vue from "vue";
 
 export default {
     namespaced: true,
     state: {
+        poll: {
+            title: null,
+            sections: null,
+            questions: null,
+            entity_type_id: null,
+            active_section: null
+        },
         sections: [],
         questions: [],
-        // title: '',
         active_section: {
             id: "",
             order: null,
@@ -25,73 +30,67 @@ export default {
             default_next_form_section: ""
         },
         record: [],
-        exams: []
-        // entity_type_id: ''
+        history: [],
     },
     getters: {
+        poll: state => state.poll,
         sections: state => state.sections,
         questions: state => state.questions,
         active_section: state => state.active_section,
         record: state => state.record,
-        exams: state => state.exams
-
-        // title: state => state.titlePoll,
-        // active_section: state => state.active_section,
-        // loading: state => state.loading,
-
-        // entity_type_id: state => state.entity_type_id
+        history: state => state.history
     },
     mutations: {
+        POLL(state, val) {
+            state.poll = val;
+        },
         SECTIONS(state, val) {
-            state.sections = val
+            state.sections = val;
         },
         QUESTIONS(state, val) {
-            state.questions = val
+            state.questions = val;
         },
         ACTIVE_SECTION(state, val) {
             Object.keys(val).forEach(key => {
-                Vue.set(state.active_section, key, val[key])
-            })
-            console.log(state.active_section)
+                Vue.set(state.active_section, key, val[key]);
+            });
         },
         RECORD(state, val) {
             state.record = val;
         },
-        CLEANRECORD(state){
+        CLEANRECORD(state) {
             state.record = [];
         },
-        ADD_EXAM(state, val) {
-            val.forEach(exam => {
-                Vue.set(state.exams, state.exams.length, exam.entity_id)
-            })
-        }
+        HISTORY(state, val) {
+            state.history = val;
+        },
     },
     actions: {
-        get_poll({ commit }, id) {
+        load_poll({ commit }, data) {
             return new Promise((resolve, reject) => {
-                axios.get(`/api/sheets/form/${id}`)
-                .then(response => {
-                    const data = response.data
-                    // commit AS
-                    commit("SECTIONS",data.content.sections);
-                    commit("QUESTIONS",data.content.fields);
-                    resolve({
+                try {
+                    commit("SECTIONS", data.content.sections);
+                    commit("QUESTIONS", data.content.fields);
+                    const loadedPoll = {
                         title: data.content.name,
                         sections: data.content.sections,
                         questions: data.content.fields,
                         entity_type_id: data.content.entity_type_id,
-                        active_section: data.content.sections.find(sec => sec.visible_on_load === 1)
-                    })
-                })
-                .catch(error => {
-                    console.log(error)
-                    reject(error.response)
-                })
-                .finally(() => {
-
-                })
-            })
+                        active_section: data.content.sections.find(
+                            sec => sec.visible_on_load === 1
+                        )
+                    };
+                    commit("POLL", loadedPoll);
+                    resolve({ success: true, error: null });
+                } catch (error) {
+                    reject({ success: false, error });
+                }
+            });
         },
-    },
-
-}
+        get_poll({ commit }) {
+            return new Promise((resolve, reject) => {
+                resolve(this.state.poll.poll);
+            });
+        }
+    }
+};

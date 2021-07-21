@@ -104,10 +104,9 @@ export default {
                     }
                     let optionArray = [];
                     Object.keys(optionsTest).forEach(key => {
-                        let newOption = {
-                            id: key,
-                            name: optionsTest[key]
-                        };
+
+                        let newOption = { id: key, name: optionsTest[key] };
+
                         optionArray.push(newOption);
                     });
                     this.options = optionArray;
@@ -129,8 +128,7 @@ export default {
                 this.loading = true;
                 const data = this.$store.getters["form/contentinfo"];
                 this.loading = false;
-                this.options =
-                    data.content.entities_fk[this.field.entity_type_fk];
+                this.options = data.content.entities_fk[this.field.entity_type_fk];
                 const allValues = Object.assign(
                     {},
                     this.$store.getters["form/fieldsvalues"]

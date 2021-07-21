@@ -3,7 +3,8 @@
         <label>
             {{ label }} <span v-if="required" class="question-required">*</span>
         </label>
-        <v-select v-if="options.length > 0"
+        <v-select
+            v-if="options.length > 0"
             :options="options"
             v-model="selected"
             :disabled="isResponse"
@@ -59,6 +60,7 @@ export default {
         },
         options() {
             let options = [];
+            let rOptions = [];
             if (this.question.format === "QUESTION") {
                 Object.keys(this.question.options).forEach(key => {
                     options.push({
@@ -81,7 +83,11 @@ export default {
                     console.warn(this.selected);
                 }
             }
-            return options;
+            options.sort((a, b) => {
+                return a.label > b.label ? 1 : -1;
+            })
+            rOptions = [...options];
+            return rOptions;
         },
         required() {
             return this.question.required == 1;
