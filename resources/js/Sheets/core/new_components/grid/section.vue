@@ -3,13 +3,11 @@
         <h5 class="sheets-section-title">
             {{ name }}
         </h5>
-        <div class="container">
-            <div class="row">
-                <sheets-field v-for="(field, key) in fields" :field="field"
-                    :key="key"
-                    v-model="sectionModel[key]">
-                </sheets-field>
-            </div>
+        <div class="sheets-section-wrapper d-flex flex-wrap">
+            <sheets-field v-for="(field, key) in fields" :field="field"
+                :key="key"
+                v-model="sectionModel[key]">
+            </sheets-field>
         </div>
 
     </div>

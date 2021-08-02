@@ -8,38 +8,9 @@
 </template>
 
 <script>
+import mixTemplate from '../mixs/template.vue'
 export default {
-    props: {
-        label: {
-            type: String,
-            default: ''
-        },
-        id: {
-            type: String,
-            default: ''
-        },
-        required: {
-            type: Boolean,
-            default: false
-        },
-        xs: {
-            type: String,
-            default: ''
-        },
-        sm: {
-            type: String,
-            default: ''
-        },
-        md: {
-            type: String,
-            default: ''
-        }
-    },
-    computed: {
-        cols() {
-            return `col-xs-${xs} col-sm-${sm} col-md-${md}`
-        }
-    }
+    mixins: [mixTemplate]
 }
 </script>
 

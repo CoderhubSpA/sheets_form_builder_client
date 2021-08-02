@@ -18,10 +18,21 @@ export default {
         },
         styles() {
             const styles = [
-                'btn',
-                'btn-block',
-                this.action.cancel_process == 0 ? 'btn-warning' : 'btn-success'
+                'btn'
             ]
+            let btnStyle = ''
+
+            if (this.action.save_form === 1) {
+                btnStyle = 'btn-success'
+            }
+            if (this.action.cancel_form === 1) {
+                btnStyle = 'btn-warning'
+            }
+            if (this.action.cancel_process === 1 || (this.action.cancel_process === 1 && this.action.save_form === 1)) {
+                btnStyle = 'btn-danger'
+            }
+            styles.push(btnStyle)
+            // this.action.cancel_process == 0 ? 'btn-warning' : 'btn-success'
             return styles.join(' ')
         }
     },

@@ -8,7 +8,7 @@
             lang="es"
             @input="onInput"
             @change="onChange">
-            <div class="row " >
+            <div class="row ">
                 <div class="col">
                     <div class="preview-container hide" id="preview-image-container">
                         <img :src="preview" alt="preview-image">
@@ -37,6 +37,20 @@ export default {
         },
         previewId() {
             return `id-${this.id}`
+        },
+        previewLink() {
+            return this.$store.getters['formBuilder/fields']
+        }
+    },
+    watch: {
+        previewLink(val) {
+            const fields = this.$store.getters['formBuilder/fields']
+            if (fields.length > 0) {
+                const value = fields.filter(f => Object.keys(f)[0] === this.id)[0]
+                if (!!value) {
+                    // console.log(val, value)
+                }
+            }
         }
     },
     methods: {

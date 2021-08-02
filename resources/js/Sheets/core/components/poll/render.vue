@@ -33,6 +33,7 @@
                 <div class="row">
                     <div class="col">
                         <poll-section
+                            :modelretrive="modelretrive"
                             :section="active_section"
                             :questions="workingQuestions"
                             :identificador="identificador"
@@ -47,14 +48,16 @@
                     </div>
                 </div>
                 <div class="row" v-if="show_guardar">
-                    <div class="col text-right" style="padding-right: 40px;">
-                        <button
-                            :disabled="isDisabledSave()"
-                            @click="savePoll()"
-                            :class="`btn btn-success`"
-                        >
-                            GUARDAR
-                        </button>
+                    <div
+                        class="col text-center"
+                        style="padding: 40px;"
+                        v-for="(action, key) in actions"
+                        :key="key"
+                    >
+                        <sheets-action
+                            :action="action"
+                            v-on:sheets-action-trigger="actionHandler"
+                        ></sheets-action>
                     </div>
                 </div>
                 <div class="row" v-if="error">
@@ -81,6 +84,7 @@
 
 <script>
 import LoadingMessage from "../loading-message";
+import SheetsAction from "../button";
 import PollSection from "./section.vue";
 import PollHistory from "./history.vue";
 
@@ -88,6 +92,7 @@ export default {
     components: {
         "poll-section": PollSection,
         "poll-history": PollHistory,
+        "sheets-action": SheetsAction,
         LoadingMessage
     },
     props: {
@@ -102,8 +107,11 @@ export default {
         success: false,
         backendMsg: "",
         loading: false,
+        refresh: false,
         sections: [],
         questions: [],
+        actions: [],
+        actionSend: null,
         active_section: {},
         entity_type_id: null,
         identificador: null,
@@ -111,17 +119,30 @@ export default {
         sidebarOn: false,
         historyItems: [],
         requiredError: false,
-        fieldsError: []
+        fieldsError: [],
+        modelretrive: [],
+        inicioForm: {
+            name: "Inicio",
+            timestamp: Date.now()
+        }
     }),
     computed: {
         workingQuestions() {
-            return this.questions.filter(
-                q => q.form_section_id === this.active_section.id
-            );
+            if (this.active_section) {
+                return this.questions.filter(
+                    q => q.form_section_id === this.active_section.id
+                );
+            } else {
+                this.error = true;
+                this.backendMsg =
+                    "Ocurrió un error con la siguiente sección, por favor verifique los campos.";
+            }
         },
         show_guardar() {
-            if (this.active_section.default_next_form_section === null) {
-                return true;
+            if (this.active_section) {
+                if (this.active_section.default_next_form_section === null) {
+                    return true;
+                }
             }
             return false;
         }
@@ -146,26 +167,54 @@ export default {
             this.active_section = {};
             this.entity_type_id = null;
             this.identificador = Date.now().toString();
+            this.actionSend = null;
             this.$store.dispatch("poll/get_poll").then(poll => {
                 this.title = poll.title;
                 this.sections = poll.sections;
                 this.questions = poll.questions;
                 this.active_section = poll.active_section;
                 this.entity_type_id = poll.entity_type_id;
-                this.questions.map(
-                    q =>
-                        (q.answer = {
-                            question: q.id,
-                            answer: null,
-                            next_section: null,
-                            alternative: null
-                        })
-                );
+                this.questions.map(q => {
+                    q.answer = {
+                        question: q.id,
+                        answer: null,
+                        next_section: null,
+                        alternative: null
+                    };
+                    q.order = q.order === null ? 0 : q.order;
+                });
+                this.questions.sort((a, b) => {
+                    return a.order > b.order ? 1 : -1;
+                });
+                this.$store.dispatch("form/get_loaded_form").then(form => {
+                    this.actions = form.actions;
+                    let defaultAction = {
+                        area_id: "DEFAULT",
+                        cancel_form: null,
+                        cancel_process: null,
+                        color: null,
+                        created_by: "DEFAULT",
+                        id: "DEFAULT-ACTION",
+                        name: "Guardar",
+                        owner_id: "DEFAULT",
+                        process_id: null,
+                        save_form: 1,
+                        refresh_form: 1,
+                        text_color: null,
+                        valid: 1
+                    };
+
+                    if (this.actions.length === 0) {
+                        this.actions.push(defaultAction);
+                    }
+                });
             });
         },
         handleNextSection(answersArray, sectionId) {
             this.requiredError = false;
             this.fieldsError = [];
+            this.error = false;
+            this.backendMsg = "";
             answersArray.map(answer => {
                 if (
                     answer.required === true &&
@@ -185,11 +234,20 @@ export default {
                         answer.section_id === sectionId
                     );
                 });
-                this.active_section = this.sections.find(section => {
+                const valSection = this.sections.find(section => {
                     return section.id === firstAFound.next_section;
                 });
-                this.$store.commit("poll/RECORD", answersArray);
-                this.historyItems = this.$store.getters["poll/history"];
+                if (valSection !== undefined) {
+                    this.active_section = valSection;
+                    this.identificador = Date.now().toString();
+                    this.$store.commit("poll/RECORD", answersArray);
+                    this.historyItems = this.$store.getters["poll/history"];
+                } else {
+                    this.error = true;
+                    this.backendMsg =
+                        "Ocurrió un error con la siguiente sección, por favor verifique los campos.";
+                    return;
+                }
             }
         },
         handlePreviousSection() {
@@ -200,6 +258,24 @@ export default {
                 );
             });
             this.historyItems.pop();
+        },
+        actionHandler(mustSaveForm, action) {
+            if (action.refresh_form === 1) {
+                this.refresh = true;
+            } else {
+                this.refresh = false;
+            }
+            if (action.id !== "DEFAULT-ACTION") {
+                this.actionSend = {
+                    key: "action_id",
+                    value: action.id
+                };
+            }
+            if (mustSaveForm) {
+                this.savePoll();
+            } else {
+                this.reloadPoll();
+            }
         },
         isDisabledSave() {
             const currentValues = this.$store.getters["poll/record"];
@@ -222,29 +298,52 @@ export default {
             const currentValues = this.$store.getters["poll/record"];
             let field = {};
             currentValues.map(val => {
-                field[val.question] =
-                    val.alternative === null
-                        ? val.answer
-                        : val.alternative.to_string;
-            });
-            field['form_id'] = this.id;
-            let formHistoryParsed = "";
-            this.historyItems.map((item, index) => {
-                if(item.alternative !== null){
-                    formHistoryParsed = formHistoryParsed + `${index + 1}.- ${item.questiondesc} - R: ${item.alternative.name} \n `;
-                }else{
-                    formHistoryParsed = formHistoryParsed + `${index + 1}.- ${item.questiondesc} - R: ${item.answer} \n `;
+                if (!(val.answer === null || val.answer === undefined)) {
+                    field[val.question] =
+                        val.alternative === null ||
+                        val.alternative === undefined
+                            ? val.answer
+                            : val.alternative.to_string;
                 }
-            })
-            field['form_history'] = formHistoryParsed;
+            });
+            field["form_id"] = this.id;
+            if (this.actionSend !== null) {
+                field["action_id"] = this.actionSend.value;
+            }
+            let formHistoryParsed = [this.inicioForm];
+            this.historyItems.map((item, index) => {
+                let newItem = {
+                    name: "",
+                    timestamp: 0
+                };
+                if (item.alternative !== null) {
+                    newItem.name = `${index + 1}.- ${item.questiondesc} - R: ${
+                        item.alternative.name
+                    }`;
+                    newItem.timestamp = item.timestamp;
+                } else {
+                    newItem.name = `${index + 1}.- ${item.questiondesc} - R: ${
+                        item.answer
+                    }`;
+                    newItem.timestamp = item.timestamp;
+                }
+                formHistoryParsed.push(newItem);
+            });
+            formHistoryParsed.push({
+                name: "Guardar",
+                timestamp: Date.now()
+            });
+            field["form_interactions"] = formHistoryParsed;
             let formFields = {};
             Object.keys(field).forEach(key => {
-                let q = this.questions.find((item) => {return item.id === key})
-                if(q !== undefined){
-                    formFields[key] = q.form_field_id
+                let q = this.questions.find(item => {
+                    return item.id === key;
+                });
+                if (q !== undefined) {
+                    formFields[key] = q.form_field_id;
                 }
             });
-            field['form_fields'] = formFields;
+            field["form_fields"] = formFields;
             data[this.entity_type_id].push(field);
             Object.keys(data).forEach(key => {
                 formData.append(key, JSON.stringify(data[key]));
@@ -256,11 +355,16 @@ export default {
                         this.loading = false;
                         this.success = true;
                         this.backendMsg = "Encuesta guardada con exito";
+                        this.handleResponseActions(
+                            response.response.data.content
+                        );
                         setTimeout(() => {
-                            this.$store.commit("poll/HISTORY", []);
-                            this.historyItems = [];
-                            this.$store.commit("poll/CLEANRECORD");
-                            this.reloadPoll();
+                            if (this.refresh === true) {
+                                this.$store.commit("poll/HISTORY", []);
+                                this.historyItems = [];
+                                this.$store.commit("poll/CLEANRECORD");
+                                this.reloadPoll();
+                            }
                         }, 1500);
                     } else {
                         this.loading = false;
@@ -287,6 +391,26 @@ export default {
                         console.warn(e);
                     }
                 });
+        },
+        handleResponseActions(response) {
+            for (const script in response.scripts) {
+                for (const action in script.actions) {
+                    switch (action.type) {
+                        case "update_column":
+                            for (const param in action.params) {
+                                this.modelretrive.push({
+                                    id: param.key,
+                                    value: param.value
+                                });
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+            return;
         }
     }
 };

@@ -1,6 +1,5 @@
 <template>
     <div class="container-fluid">
-        <br />
         <div class="row">
             <div class="col text-center">
                 <h3>{{ this.form.label }}</h3>

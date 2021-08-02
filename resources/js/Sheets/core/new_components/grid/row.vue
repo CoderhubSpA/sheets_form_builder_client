@@ -3,7 +3,7 @@
         <h3 class="sheets-row-title">
             {{ name }}
         </h3>
-        <div class="row">
+        <div class="sheets-row-wrapper row">
             <seets-section
                 v-for="(sect, key) in sections"
                 :key="key"
@@ -31,7 +31,11 @@ export default {
     }),
     watch: {
         rowModel() {
-            this.$emit('input', this.rowModel)
+            let model = []
+            this.rowModel.forEach(section => {
+                model = model.concat(section)
+            })
+            this.$emit('input', model)
         }
     },
     computed: {

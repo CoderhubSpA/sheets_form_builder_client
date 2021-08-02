@@ -6,6 +6,7 @@
             :placeholder="placeholder"
             aria-label="Username"
             aria-describedby="basic-addon1"
+            :value="inputValue"
             @input="onInput"
             @paste="onPaste">
     </input-group>

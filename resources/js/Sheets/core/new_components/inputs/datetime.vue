@@ -21,9 +21,6 @@ export default {
     components: {
         'form-group': FormGroup,
         'date-picker': DatePicker
-    },
-    created() {
-        console.log('component', this.dateFormat)
     }
 }
 </script>

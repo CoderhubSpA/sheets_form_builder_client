@@ -8,23 +8,24 @@
             </div>
         </div>
         <div class="row SheetsPollRender__field">
-            <div class="col">
-                <div
-                    v-for="(question, index) in questions"
-                    :key="index"
-                    :class="getFieldContainerClass(question.id)"
-                >
-                    <sheet-input
-                        :form="question"
-                        :styles="parsedFieldStyles(question)"
-                        :model="model"
-                        :responses="responses"
-                        v-on:question:selected="getAnswer($event)"
-                        @sheets-input-change="
-                            getAnswer($event, question.id, question.col_name)
-                        "
-                    />
-                </div>
+            <div
+                v-for="(question, index) in questions"
+                :key="index"
+                :class="getFieldContainerClass(question.id, question)"
+                style="margin-bottom: 20px;"
+            >
+                <sheet-input
+                    :identificador="identificador"
+                    :modelretrive="modelretrive"
+                    :form="question"
+                    :styles="parsedFieldStyles(question)"
+                    :model="model"
+                    :responses="responses"
+                    v-on:question:selected="getAnswer($event)"
+                    @sheets-input-change="
+                        getAnswer($event, question.id, question.col_name)
+                    "
+                />
             </div>
         </div>
         <div class="row" v-if="requirederror === true">
@@ -94,6 +95,10 @@ export default {
             type: Number,
             require: false,
             default: 0
+        },
+        modelretrive: {
+            type: Array,
+            require: true
         }
     },
     data: () => ({
@@ -150,7 +155,10 @@ export default {
             this.$store.commit("poll/RECORD", val);
         },
         identificador(val) {
-            this.responses = [];
+            // this.responses = [];
+        },
+        modelretrive(val) {
+            console.log("new model", val);
         }
     },
     methods: {
@@ -160,12 +168,12 @@ export default {
                 ? ["custom-file-input"]
                 : ["form-control"];
         },
-        getFieldContainerClass(questionId) {
+        getFieldContainerClass(questionId, field) {
+            let classes = `col col-${field.col_sm} col-${field.col_md} col-${field.col_xl}`;
             if (this.fieldserror.indexOf(questionId) !== -1) {
-                return "SheetsPollRender__field-error";
-            } else {
-                return "";
+                classes += " SheetsPollRender__field-error";
             }
+            return classes;
         },
         getAnswer(e, id = null, col_name = null) {
             let answer = {};
@@ -182,7 +190,8 @@ export default {
                     next_section: this.section.default_next_form_section,
                     alternative: null,
                     col_name,
-                    response: false
+                    response: false,
+                    timestamp: Date.now()
                 };
             } else {
                 const eventQuestion = this.allquestions.find(q => {
@@ -199,7 +208,8 @@ export default {
                         : this.section.default_next_form_section,
                     alternative: e.alternative,
                     col_name: e.col_name,
-                    response: false
+                    response: false,
+                    timestamp: Date.now()
                 };
             }
             let q = this.questions.find(q => q.id === answer.question);
@@ -265,11 +275,14 @@ export default {
         load_results() {
             const historyItems = this.$store.getters["poll/history"];
             let historyQuestions = [];
-            historyItems.forEach((item) => {
+            historyItems.forEach(item => {
                 historyQuestions.push(item.question);
-            })
+            });
             const responsesNew = this.responses.filter(response => {
-                return response.response === false && historyQuestions.indexOf(response.question) > -1;
+                return (
+                    response.response === false &&
+                    historyQuestions.indexOf(response.question) > -1
+                );
             });
             this.responses = responsesNew;
             this.responses.map(response => {
@@ -278,7 +291,8 @@ export default {
                         response.alternative.products.forEach(product => {
                             let question = this.allquestions
                                 .filter(
-                                    q => q.form_field_id == product.form_field_id
+                                    q =>
+                                        q.form_field_id == product.form_field_id
                                 )
                                 .shift();
                             let search = this.responses
@@ -325,11 +339,17 @@ export default {
             const responsesVal = this.responses.filter(item => {
                 return item.section_id === this.section.id;
             });
-            return (
+            let valReturn =
                 responsesVal.every(el => {
                     return (el.required && !!el.answer) || !el.required;
-                }) && this.section.default_next_form_section !== null
-            );
+                }) && this.section.default_next_form_section !== null;
+            let allNull = true;
+            responsesVal.map(res => {
+                if (res.answer !== null) {
+                    allNull = false;
+                }
+            });
+            return valReturn && !allNull;
         },
         handleNext() {
             let history = this.responses.filter(response => {

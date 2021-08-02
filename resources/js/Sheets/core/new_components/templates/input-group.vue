@@ -9,16 +9,14 @@
     </div>
 </template>
 <script>
+import mixTemplate from '../mixs/template.vue'
 export default {
+    mixins: [mixTemplate],
     props: {
         character: {
             type: String,
             default: ''
         },
-        label: {
-            type: String,
-            default: ''
-        }
     }
 }
 </script>

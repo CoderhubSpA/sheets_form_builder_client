@@ -1,5 +1,5 @@
 <template>
-    <div :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl}`">
+    <div class="sheets-field-wrapper" :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl}`">
         <component
             :is="fieldInput"
             :input="field"
@@ -19,7 +19,7 @@ export default {
         }
     },
     data: () => ({
-        data: null
+        data: {}
     }),
     computed: {
         fieldInput() {

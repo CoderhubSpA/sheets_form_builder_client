@@ -74,6 +74,7 @@ export default {
     data: () => ({
         rows: [],
         loading: false,
+        refresh: false,
         title: "RENDERIZADO DE FORMULARIO",
         result: [],
         error: false,
@@ -141,6 +142,7 @@ export default {
                                             owner_id: "DEFAULT",
                                             process_id: null,
                                             save_form: 1,
+                                            refresh_form: 1,
                                             text_color: null,
                                             valid: 1
                                         };
@@ -196,6 +198,11 @@ export default {
             }
         },
         actionHandler(mustSaveForm, action) {
+            if (action.refresh_form === 1) {
+                this.refresh = true;
+            } else {
+                this.refresh = false;
+            }
             if (action.id !== "DEFAULT-ACTION") {
                 const action_id = {
                     key: "action_id",
@@ -332,7 +339,7 @@ export default {
                         formFields[key] = q.form_field_id;
                     }
                 });
-                fieldsValues['form_fields'] = formFields;
+                fieldsValues["form_fields"] = formFields;
                 data[this.$store.getters["form/entityid"]] = [];
                 data[this.$store.getters["form/entityid"]].push(fieldsValues);
 
@@ -354,15 +361,17 @@ export default {
                                 this.backendMsg =
                                     "Formulario enviado con exito";
                                 setTimeout(() => {
-                                    this.rows = [];
-                                    this.$store.commit(
-                                        "form/CLEARFIELDSVALUES"
-                                    );
-                                    this.loading = true;
-                                    setTimeout(() => {
-                                        this.loading = false;
-                                        this.getForm();
-                                    }, 1500);
+                                    if (this.refresh === true) {
+                                        this.rows = [];
+                                        this.$store.commit(
+                                            "form/CLEARFIELDSVALUES"
+                                        );
+                                        this.loading = true;
+                                        setTimeout(() => {
+                                            this.loading = false;
+                                            this.getForm();
+                                        }, 1500);
+                                    }
                                 }, 1500);
                             } else {
                                 this.$store.commit("form/FAILEDFILEFORMUPLOAD");
@@ -437,15 +446,17 @@ export default {
                                 this.backendMsg =
                                     "Formulario enviado con exito";
                                 setTimeout(() => {
-                                    this.rows = [];
-                                    this.$store.commit(
-                                        "form/CLEARFIELDSVALUES"
-                                    );
-                                    this.loading = true;
-                                    setTimeout(() => {
-                                        this.loading = false;
-                                        this.getForm();
-                                    }, 1500);
+                                    if (this.refresh === true) {
+                                        this.rows = [];
+                                        this.$store.commit(
+                                            "form/CLEARFIELDSVALUES"
+                                        );
+                                        this.loading = true;
+                                        setTimeout(() => {
+                                            this.loading = false;
+                                            this.getForm();
+                                        }, 1500);
+                                    }
                                 }, 1500);
                             } else {
                                 this.loading = false;

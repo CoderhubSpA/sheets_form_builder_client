@@ -16,6 +16,15 @@ export default {
     mixins: [mix],
     components: {
         'form-group': FormGroup
+    },
+    watch: {
+        inputValue(val) {
+            let data = {
+                col_name: this.input.col_name,
+                text: val
+            }
+            this.$store.commit('formBuilder/SEARCH_MAP', data)
+        }
     }
 }
 </script>

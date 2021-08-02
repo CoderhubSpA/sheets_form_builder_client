@@ -142,7 +142,16 @@ export default {
         model: {
             type: Object,
             default: () => ({})
-        }
+        },
+        identificador: {
+            type: String,
+            default: ""
+        },
+        modelretrive: {
+            type: Array,
+            default: () => {[]},
+            require: false
+        },
     },
     data: () => ({
         types: ["text", "email", "number", "password", "datetime-local", "url"],
@@ -180,10 +189,21 @@ export default {
                     this.validValuePoll();
                 }
             }
+        },
+        identificador(val){
+            this.validValuePoll();
+        },
+        modelretrive(val){
+            this.modelretrive.map(model => {
+                if(model.id === this.id){
+                    this.value = model.value
+                }
+            })
         }
     },
     mounted() {
         this.getValue();
+        this.validValuePoll();
     },
     methods: {
         getValue() {
@@ -246,6 +266,7 @@ export default {
                                     this.option_selected(data);
                                 }
                             } else if (this.originalType === "RESPONSE") {
+                                
                                 const answerFromStore = this.$props.responses.find(
                                     item => {
                                         return item.question === this.form.id;
@@ -339,7 +360,7 @@ export default {
         },
         pasteInput(event) {
             const regex = /^-?(0|[1-9]\d*)(\.\d+)?$/;
-            const pasted = (
+            let pasted = (
                 event.clipboardData || window.clipboardData
             ).getData("text");
             if (
@@ -348,6 +369,16 @@ export default {
                 this.originalType === "PERCENTAGE"
             ) {
                 event.preventDefault();
+                // reemplazamos coma por punto
+                pasted = pasted.replace(/,/g, ".");
+                if(pasted.indexOf('.') > -1){
+                    const pastedArray = pasted.split('.');
+                    pasted = `${pastedArray[0]}.`;
+                    for (let i = 1; i < pastedArray.length; i++) {
+                        pasted += pastedArray[i];
+                        
+                    }
+                }
                 if (regex.test(pasted)) {
                     event.target.value = pasted;
                 }
