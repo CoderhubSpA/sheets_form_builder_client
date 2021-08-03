@@ -19,7 +19,7 @@
                     :modelretrive="modelretrive"
                     :form="question"
                     :styles="parsedFieldStyles(question)"
-                    :model="model"
+                    :model="model[question.id]"
                     :responses="responses"
                     v-on:question:selected="getAnswer($event)"
                     @sheets-input-change="
@@ -105,7 +105,7 @@ export default {
         answer: {},
         responses: [],
         errors_messages: [],
-        model: {}
+        model: []
     }),
     computed: {
         title() {
@@ -118,7 +118,7 @@ export default {
                 return item.section_id === val.id;
             });
             answeredQuestions.map(item => {
-                this.model = {};
+                this.model = [];
                 const index = this.responses.indexOf(item);
                 this.responses.splice(index, 1);
             });
@@ -193,6 +193,7 @@ export default {
                     response: false,
                     timestamp: Date.now()
                 };
+                this.model[id] = answer;
             } else {
                 const eventQuestion = this.allquestions.find(q => {
                     return q.id === e.id;
@@ -211,6 +212,7 @@ export default {
                     response: false,
                     timestamp: Date.now()
                 };
+                this.model[e.id] = answer;
             }
             let q = this.questions.find(q => q.id === answer.question);
             answer["required"] = !!q.required;
@@ -218,7 +220,6 @@ export default {
                 .filter(r => r.question == answer.question)
                 .shift();
             const index = this.responses.indexOf(a);
-            this.model = answer;
             Vue.set(this.responses, index, answer);
             if (typeof e == "object") {
                 if (e.exam !== undefined) {
@@ -357,7 +358,7 @@ export default {
             });
             this.$store.commit("poll/HISTORY", history);
             this.$emit("next-section", this.responses, this.section.id);
-            this.model = {};
+            this.model = [];
         },
         can_previous() {
             return this.historylength > 0 ? true : false;

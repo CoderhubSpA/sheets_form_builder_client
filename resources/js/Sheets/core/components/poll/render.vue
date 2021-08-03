@@ -258,6 +258,9 @@ export default {
                 );
             });
             this.historyItems.pop();
+            this.historyItems = this.historyItems.filter((item) => {
+                return item.section_id !== this.active_section.id
+            });
         },
         actionHandler(mustSaveForm, action) {
             if (action.refresh_form === 1) {
