@@ -62,12 +62,15 @@ export default {
             let options = [];
             let rOptions = [];
             if (this.question.format === "QUESTION") {
-                Object.keys(this.question.options).forEach(key => {
-                    options.push({
-                        id: key,
-                        label: this.question.options[key]
+                if (this.question.options) {
+                    Object.keys(this.question.options).forEach(key => {
+                        options.push({
+                            id: key,
+                            label: this.question.options[key]
+                        });
                     });
-                });
+                }
+
                 if (this.selected !== null) {
                     const validationSelected = options.find(option => {
                         return option.id === this.selected.id;
@@ -85,7 +88,7 @@ export default {
             }
             options.sort((a, b) => {
                 return a.label > b.label ? 1 : -1;
-            })
+            });
             rOptions = [...options];
             return rOptions;
         },
@@ -108,6 +111,7 @@ export default {
                             ? this.question.alternatives[val.id]
                             : null,
                         section_owner: this.question.form_section_id,
+                        form_field_id: this.question.form_field_id,
                         col_name: this.question.col_name,
                         exam: !!val
                             ? this.question.alternatives[val.id].products

@@ -50,7 +50,6 @@
                 <div class="row" v-if="show_guardar">
                     <div
                         class="col text-center"
-                        style="padding: 40px;"
                         v-for="(action, key) in actions"
                         :key="key"
                     >
@@ -231,7 +230,8 @@ export default {
                 const firstAFound = answersArray.find(answer => {
                     return (
                         answer.next_section !== null &&
-                        answer.section_id === sectionId
+                        answer.section_id === sectionId &&
+                        answer.answer !== null
                     );
                 });
                 const valSection = this.sections.find(section => {
@@ -258,8 +258,8 @@ export default {
                 );
             });
             this.historyItems.pop();
-            this.historyItems = this.historyItems.filter((item) => {
-                return item.section_id !== this.active_section.id
+            this.historyItems = this.historyItems.filter(item => {
+                return item.section_id !== this.active_section.id;
             });
         },
         actionHandler(mustSaveForm, action) {

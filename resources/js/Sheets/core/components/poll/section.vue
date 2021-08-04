@@ -196,7 +196,7 @@ export default {
                 this.model[id] = answer;
             } else {
                 const eventQuestion = this.allquestions.find(q => {
-                    return q.id === e.id;
+                    return q.form_field_id === e.form_field_id;
                 });
                 shouldAutoPass = e.alternative.next_form_section ? true : false;
                 answer = {
