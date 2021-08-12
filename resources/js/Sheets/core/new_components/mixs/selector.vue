@@ -62,8 +62,11 @@ export default {
         },
         multiple() {
             const isMultiple = this.input.format === 'SELECTOR[MULTIPLE]'
+
             const is1xnAll = this.input.format === 'SELECTOR[1XN][ALL]'
+
             const isMultipleAdvanced = this.input.format === 'SELECTOR[MULTIPLE][ADVANCED]'
+
             return (isMultiple || is1xnAll || isMultipleAdvanced)
         }
     },
@@ -71,13 +74,9 @@ export default {
         selected(val) {
             if (!!val) {
                 let data = {}
-                console.log(this.multiple, this.input.name)
-                if (this.multiple) {
 
-                    data[this.id] = val.map(v => {
-                        return v.id
-                    })
-                }
+                if (this.multiple)
+                    data[this.id] = val.map(v => { return v.id })
                 else
                     data[this.id] = val.id
 

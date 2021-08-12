@@ -376,7 +376,7 @@ export default {
                     pasted = `${pastedArray[0]}.`;
                     for (let i = 1; i < pastedArray.length; i++) {
                         pasted += pastedArray[i];
-                        
+
                     }
                 }
                 if (regex.test(pasted)) {

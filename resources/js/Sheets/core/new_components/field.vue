@@ -5,6 +5,13 @@
             :input="field"
             v-model="data">
         </component>
+        <div class="row">
+            <div class="col">
+                <span class="float-right text-danger sheets-required-answer">
+                    {{ error_messages }}
+                </span>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -24,18 +31,24 @@ export default {
     computed: {
         fieldInput() {
             const chars = { "[" : '-', "]": ''}
-            const format = this.field.format.toLowerCase().replace(/\[|\]/g,m => chars[m])
+            const format = this.field.format.toLowerCase().replace(/\[|\]/g, m => chars[m])
             return () => import(`./inputs/${format}`)
         },
         xl() {
-            return this.field.col_xl
+            return this.field.col_xl || 12
         },
         sm() {
-            return this.field.col_sm
+            return this.field.col_sm || 12
         },
         md() {
-            return this.field.col_md
+            return this.field.col_md || 12
         },
+        error_messages() {
+            if (this.$attrs['error-messages']) {
+                return this.$attrs['error-messages']
+            }
+            return;
+        }
     },
     watch: {
         data() {
@@ -52,5 +65,8 @@ export default {
     border: 1px solid green;
     margin-bottom: 2px;
     padding: 2px;
+}
+.sheets-required-answer {
+    font-weight: 700;
 }
 </style>

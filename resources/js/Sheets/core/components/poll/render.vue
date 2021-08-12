@@ -41,6 +41,7 @@
                             :requirederror="requiredError"
                             :fieldserror="fieldsError"
                             :historylength="historyItems.length"
+                            :bus="bus"
                             @next-section="handleNextSection"
                             @previous-section="handlePreviousSection"
                         >
@@ -56,6 +57,7 @@
                         <sheets-action
                             :action="action"
                             v-on:sheets-action-trigger="actionHandler"
+                            :disabled="actionDisabled"
                         ></sheets-action>
                     </div>
                 </div>
@@ -101,6 +103,7 @@ export default {
         }
     },
     data: () => ({
+        bus: new Vue(),
         title: "",
         error: false,
         success: false,
@@ -123,7 +126,9 @@ export default {
         inicioForm: {
             name: "Inicio",
             timestamp: Date.now()
-        }
+        },
+        //
+        actionDisabled: false
     }),
     computed: {
         workingQuestions() {
@@ -153,6 +158,7 @@ export default {
     },
     methods: {
         reloadPoll() {
+            this.actionDisabled = true
             this.loading = true;
             setTimeout(() => {
                 this.loading = false;
@@ -168,6 +174,7 @@ export default {
             this.identificador = Date.now().toString();
             this.actionSend = null;
             this.$store.dispatch("poll/get_poll").then(poll => {
+                this.actionDisabled = false
                 this.title = poll.title;
                 this.sections = poll.sections;
                 this.questions = poll.questions;
@@ -291,6 +298,8 @@ export default {
             return disabled;
         },
         savePoll() {
+            // deshabilitar acciones durante el guardado
+            this.actionDisabled = true
             this.loading = true;
             this.error = false;
             this.success = false;
@@ -354,6 +363,7 @@ export default {
             this.$store
                 .dispatch("form/save_form", formData)
                 .then(response => {
+                    this.actionDisabled = false
                     if (response.response.data.success === true) {
                         this.loading = false;
                         this.success = true;
@@ -366,6 +376,7 @@ export default {
                                 this.$store.commit("poll/HISTORY", []);
                                 this.historyItems = [];
                                 this.$store.commit("poll/CLEANRECORD");
+                                this.bus.$emit("reloadedPoll", {});
                                 this.reloadPoll();
                             }
                         }, 1500);
@@ -385,6 +396,7 @@ export default {
                     }
                 })
                 .catch(err => {
+                    this.actionDisabled = false
                     this.loading = false;
                     this.error = true;
                     this.backendMsg = "Ocurrió un error al guardar la encuesta";

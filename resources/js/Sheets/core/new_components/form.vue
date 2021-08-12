@@ -20,6 +20,7 @@ import Action from './actions/button.vue'
 import Loading from './utils/loading.vue'
 import Snackbar from './utils/snackbar.vue'
 export default {
+    name: 'sheets-form',
     props: {
         // ID de la entidad
         entityId: {
@@ -124,12 +125,11 @@ export default {
                 form.append(key, JSON.stringify(data[key]))
             })
 
-            const action = !!this.record_id ? 'formBuilder/save' : 'formBuilder/update'
-
+            const action = this.record_id != '' ?  'formBuilder/update' : 'formBuilder/save'
+            console.log('guardado de form', action)
             this.$store.dispatch(action, form)
             .then(response => {
-                // reset form
-                this.formAnswer = []
+                this.resetForm()
             })
         },
         async sendFiles() {
@@ -139,11 +139,11 @@ export default {
                 const form = new FormData()
                 form.append("file", file[1].file)
                 form.append("fileid", file[1].id)
-
                 this.$store.dispatch('formBuilder/upload_files', form)
                 .then(id => {
                     let f ={}
                     f[file[1].id] = id
+                    console.log(id)
                     this.formAnswer.push(f)
                 })
             })
@@ -157,12 +157,13 @@ export default {
             if (saveForm){
                 if (this.filesInForm) {
                     await this.sendFiles()
+
                 }
                 this.save()
             }
         },
         resetForm() {
-
+            this.formAnswer = []
         }
     }
 }

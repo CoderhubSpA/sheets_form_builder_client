@@ -99,6 +99,10 @@ export default {
         modelretrive: {
             type: Array,
             require: true
+        },
+        bus: {
+            type: Object,
+            default: () => ({})
         }
     },
     data: () => ({
@@ -160,6 +164,11 @@ export default {
         modelretrive(val) {
             console.log("new model", val);
         }
+    },
+    mounted() {
+        this.bus.$on("reloadedPoll", args => {
+            this.responses = [];
+        });
     },
     methods: {
         parsedFieldStyles(field) {

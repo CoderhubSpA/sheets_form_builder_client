@@ -4,12 +4,12 @@
             {{ name }}
         </h3>
         <div class="sheets-row-wrapper row">
-            <seets-section
+            <sheets-section
                 v-for="(sect, key) in sections"
                 :key="key"
                 :section="sect"
                 v-model="rowModel[key]">
-            </seets-section>
+            </sheets-section>
         </div>
     </div>
 </template>
@@ -18,7 +18,7 @@
 import section from './section.vue'
 export default {
     components: {
-        'seets-section': section
+        'sheets-section': section
     },
     props: {
         row: {
@@ -56,8 +56,15 @@ export default {
 .sheets-row {
     border: 1px solid blue;
     padding: 2px;
+
+    .sheets-row-title {
+        color: rgb(10, 10, 94);
+    }
+
+    .sheets-row-wrapper {
+        //
+    }
 }
-.sheets-row-title {
-    color: rgb(10, 10, 94);
-}
+
+
 </style>

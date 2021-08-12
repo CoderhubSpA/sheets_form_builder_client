@@ -2,7 +2,8 @@
 export default {
     props: {
         input: {
-            type: Object
+            type: Object,
+            required: true
         },
         value: {
             type: Object,
@@ -49,6 +50,7 @@ export default {
     },
     methods: {
         onInput(e) {
+
             let data = {}
             data[this.id] = e.target.value
             this.$emit('input', data)

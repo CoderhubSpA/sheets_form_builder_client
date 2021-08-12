@@ -1,5 +1,5 @@
 <template>
-    <input-group>
+    <input-group :label="label">
         <input
             type="number"
             class="form-control"
@@ -14,7 +14,9 @@
 
 <script>
 import InputGroup from '../templates/input-group.vue'
+import mixInput from '../mixs/input.vue'
 export default {
+    mixins: [mixInput],
     components: {
         'input-group': InputGroup
     }

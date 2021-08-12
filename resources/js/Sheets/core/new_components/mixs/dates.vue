@@ -14,7 +14,7 @@ export default {
     }),
     computed: {
         dateFormat() {
-            return this.input.format === 'DATE' ? 'MM/DD/YYYY' : 'MM/DD/YYYY HH:mm'
+            return this.input.format === 'DATE' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm'
         },
         /**
          * interval between hours in time picker

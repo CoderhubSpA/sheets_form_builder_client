@@ -37,9 +37,9 @@ export default {
     computed: {
         dateFormat() {
             if(this.form.format === 'DATE'){
-                return 'MM/DD/YYYY';
+                return 'YYYY-MM-DD';
             }else{
-                return 'MM/DD/YYYY HH:mm';
+                return 'YYYY-MM-DD HH:mm';
             }
         },
         /**

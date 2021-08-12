@@ -12,7 +12,11 @@ export default {
         contentInfo: null,
         hasFiles: false,
         fields: [],
-        searchMap: {}
+        searchMap: {},
+        poll_sections: [],
+        poll_questions: [],
+        poll_active_section: {},
+        history: []
     },
     getters: {
         loading: state => state.loading,
@@ -22,7 +26,19 @@ export default {
         hasFiles: state => state.hasFiles,
         files: state => state.files,
         fields: state => state.fields,
-        searchMap: state => state.searchMap
+        searchMap: state => state.searchMap,
+        history: state => state.history,
+        poll_sections: state => state.poll_sections,
+        poll_questions: state => state.poll_questions,
+        poll_active_section: state => state.poll_active_section,
+        last_section: (state) => {
+            const index = state.history.length -1
+
+            const section = state.poll_sections.find(s => s.id === state.history[index].section_id)
+
+            return section
+        }
+
 
     },
     mutations: {
@@ -47,6 +63,21 @@ export default {
         },
         SEARCH_MAP(state, val) {
             Vue.set(state.searchMap, val.col_name, val.text)
+        },
+        POLL_SECTIONS(state, val) {
+            state.poll_sections = val
+        },
+        POLL_QUESTIONS(state, val) {
+            state.poll_questions = val
+        },
+        POLL_ACTIVE_SECTION(state, val) {
+            state.poll_active_section = val
+        },
+        HISTORY(state, val) {
+            state.history.push(val)
+        },
+        DELETE_LAST_HISTORY(state) {
+            state.history.pop()
         }
     },
     actions: {
@@ -74,7 +105,7 @@ export default {
                                 return f.form_section_id === section.id && f.permission !== 0
                             })
                             fields.sort((a, b) => {
-                                return a.order > b.order ? 1 : -1;
+                                return a.order > b.order ? 1 : -1
                             })
                             section.fields = fields
                         })
@@ -108,7 +139,6 @@ export default {
                 .finally(() => {
                     commit('LOADING', false)
                 })
-
             })
         },
         update({ commit }, data) {
@@ -199,6 +229,37 @@ export default {
                     commit('LOADING', false)
                 })
             });
+        },
+        get_poll({ commit, dispatch }, id) {
+            commit('LOADING', true)
+            return new Promise((resolve, reject) => {
+                axios.get(`/api/sheets/form/${id}`)
+                .then(response => {
+                    const data = response.data.content
+
+                    commit('POLL_SECTIONS', data.sections)
+
+                    const active_section = data.sections.find(sec => sec.visible_on_load === 1)
+                    commit('POLL_ACTIVE_SECTION', active_section)
+
+                    commit('POLL_QUESTIONS', data.fields)
+
+                    const actions = data.actions.sort((a, b) => { return a.save_form > b.save_form ? 1 : -1})
+                    // commit('POLL_ACTIONS', actions)
+                    return data.entity_type_id
+                })
+                .then(entity_type_id => {
+                    if (!!entity_type_id) {
+                        dispatch('info', entity_type_id)
+                    }
+                })
+                .catch(error => {
+                    reject(error)
+                })
+                .finally(() => {
+                    commit('LOADING', false)
+                })
+            })
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <button :class="styles" @click="triggerAction">
+    <button :class="styles" @click="triggerAction" :disabled="disabled">
         {{ name }}
     </button>
 </template>
@@ -10,6 +10,10 @@ export default {
         action: {
             type: Object,
             default: () => {}
+        },
+        disabled: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {

@@ -19,7 +19,7 @@ export default {
     },
     computed: {
         inputValue() {
-            if (!!this.value) {
+            if (this.value) {
                 let actual = this.value[this.id].replace(/^0+/, "");
                 if (actual != "" && actual.length > 1) {
                     let sinPuntos = actual.replace(/\./g, "");
