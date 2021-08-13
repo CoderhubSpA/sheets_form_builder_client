@@ -244,13 +244,15 @@ export default {
                     if (value.col_name === this.form.col_name) {
                         if (value.answer !== null) {
                             if (this.originalType === "QUESTION") {
+
                                 const data = {
                                     id: this.form.id,
                                     alternative: null,
+                                    form_field_id: this.form.form_field_id,
                                     section_owner: this.form.form_section_id,
                                     col_name: this.form.col_name
                                 };
-                                if (this.form.alternatives) {
+                                if (this.form.alternatives && value.alternative) {
                                     Object.keys(this.form.alternatives).forEach(
                                         key => {
                                             if (

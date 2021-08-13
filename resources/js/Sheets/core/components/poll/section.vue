@@ -21,10 +21,8 @@
                     :styles="parsedFieldStyles(question)"
                     :model="model[question.id]"
                     :responses="responses"
-                    v-on:question:selected="getAnswer($event)"
-                    @sheets-input-change="
-                        getAnswer($event, question.id, question.col_name)
-                    "
+                    v-on:question:selected="getAnswerFromQuestionSelected($event)"
+                    @sheets-input-change="getAnswerFromInputChange($event, question.id, question.col_name)"
                 />
             </div>
         </div>
@@ -184,103 +182,103 @@ export default {
             }
             return classes;
         },
-        getAnswer(e, id = null, col_name = null) {
-            let answer = {};
-            let shouldAutoPass = true;
-            if (typeof e != "object") {
-                const eventQuestion = this.allquestions.find(q => {
-                    return q.id === id;
-                });
-                answer = {
-                    section_id: this.section.id,
-                    question: id,
-                    questiondesc: eventQuestion.name,
-                    answer: e,
-                    next_section: this.section.default_next_form_section,
-                    alternative: null,
-                    col_name,
-                    response: false,
-                    timestamp: Date.now()
-                };
-                this.model[id] = answer;
-            } else {
-                const eventQuestion = this.allquestions.find(q => {
-                    return q.form_field_id === e.form_field_id;
-                });
-                shouldAutoPass = e.alternative.next_form_section ? true : false;
-                answer = {
-                    section_id: this.section.id,
-                    question: e.id,
-                    questiondesc: eventQuestion.name,
-                    answer: e.alternative.id,
-                    next_section: e.alternative.next_form_section
-                        ? e.alternative.next_form_section
-                        : this.section.default_next_form_section,
-                    alternative: e.alternative,
-                    col_name: e.col_name,
-                    response: false,
-                    timestamp: Date.now()
-                };
-                this.model[e.id] = answer;
+        getAnswerFromQuestionSelected(e){
+            let eventQuestion = this.allquestions.find(q => q.form_field_id === e.form_field_id );
+
+            let answer = {
+                section_id   : this.section.id,
+                question     : e.id,
+                questiondesc : eventQuestion.name,
+                answer       : e.alternative ? e.alternative.id : undefined,
+                next_section : (e.alternative && e.alternative.next_form_section) ? e.alternative.next_form_section : this.section.default_next_form_section,
+                alternative  : e.alternative,
+                col_name     : e.col_name,
+                response     : false,
+                timestamp    : Date.now()
+            };
+
+            this.getAnswer(e.id, answer)
+            this.getProduct(e.exam);
+
+            let shouldAutoPass = (e.alternative && e.alternative.next_form_section) ? true : false;
+            if (shouldAutoPass  && this.can_next() && e.format === "QUESTION") {
+                this.handleNext();
             }
-            let q = this.questions.find(q => q.id === answer.question);
+
+        },
+        getAnswerFromInputChange(e, id = null, col_name = null){
+            let eventQuestion = this.allquestions.find(q => q.id === id);
+
+            let answer = {
+                section_id   : this.section.id,
+                question     : id,
+                questiondesc : eventQuestion.name,
+                answer       : e,
+                next_section : this.section.default_next_form_section,
+                alternative  : null,
+                col_name     : col_name,
+                response     : false,
+                timestamp    : Date.now()
+            };
+
+            this.getAnswer(id, answer)
+
+        },
+        getAnswer(id, answer) {
+            this.model[id] = answer;
+
+            let q = this.questions.find(q => q.id === answer.question) || {};
             answer["required"] = !!q.required;
-            let a = this.responses
-                .filter(r => r.question == answer.question)
-                .shift();
-            const index = this.responses.indexOf(a);
+
+            let a = this.responses.filter(r => r.question == answer.question).shift();
+            let index = this.responses.indexOf(a);
+
             Vue.set(this.responses, index, answer);
-            if (typeof e == "object") {
-                if (e.exam !== undefined) {
-                    e.exam.forEach(exam => {
-                        let question = this.allquestions
-                            .filter(q => q.form_field_id == exam.form_field_id)
-                            .shift();
-                        let search = this.responses
-                            .filter(r => r.question == question.id)
-                            .shift();
-                        if (question.format !== "RESPONSE") {
-                            console.warn(
-                                "Campo de formato no válido para guardar producto"
+
+        },
+        getProduct(products) {
+            if (!products) return;
+
+            products.forEach(product => {
+                let question = this.allquestions
+                    .filter(q => q.form_field_id == product.form_field_id)
+                    .shift();
+                let search = this.responses
+                    .filter(r => r.question == question.id)
+                    .shift();
+                if (question.format !== "RESPONSE") {
+                    console.warn(
+                        "Campo de formato no válido para guardar producto"
+                    );
+                } else {
+                    if (search === undefined) {
+                        const answerProduct = {
+                            answer: [product.entity_id.toString()],
+                            question: question.id,
+                            questiondesc: question.name,
+                            required: question.required,
+                            section_id: null,
+                            col_name: question.col_name,
+                            alternative: null,
+                            response: true
+                        };
+                        this.responses.push(answerProduct);
+                    } else {
+                        const indexOfAnswer = this.responses.indexOf(
+                            search
+                        );
+                        if (
+                            search.answer.indexOf(
+                                product.entity_id.toString()
+                            ) === -1
+                        ) {
+                            search.answer.push(
+                                product.entity_id.toString()
                             );
-                        } else {
-                            if (search === undefined) {
-                                const answerProduct = {
-                                    answer: [exam.entity_id.toString()],
-                                    question: question.id,
-                                    questiondesc: question.name,
-                                    required: question.required,
-                                    section_id: null,
-                                    col_name: question.col_name,
-                                    alternative: null,
-                                    response: true
-                                };
-                                this.responses.push(answerProduct);
-                            } else {
-                                const indexOfAnswer = this.responses.indexOf(
-                                    search
-                                );
-                                if (
-                                    search.answer.indexOf(
-                                        exam.entity_id.toString()
-                                    ) === -1
-                                ) {
-                                    search.answer.push(
-                                        exam.entity_id.toString()
-                                    );
-                                }
-                            }
                         }
-                    });
-                }
-            }
-            if (shouldAutoPass) {
-                if (typeof e === "object" && this.can_next()) {
-                    if (e.format === "QUESTION") {
-                        this.handleNext();
                     }
                 }
-            }
+            });
         },
         load_results() {
             const historyItems = this.$store.getters["poll/history"];
