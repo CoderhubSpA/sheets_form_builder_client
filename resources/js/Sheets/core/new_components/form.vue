@@ -109,28 +109,41 @@ export default {
             data[entityId] = []
 
             let body = {}
-            this.result.map(r => {
-                if (!!r) {
-                    let obj = Object.assign({}, r)
+
+
+            this.formAnswer.map(fa => {
+                if (fa) {
+                    console.log(fa)
+                    let obj = Object.assign({}, fa)
                     let key = Object.keys(obj)[0]
                     body[key] = obj[key]
                 }
             })
 
-            data[entityId].push(body)
-            let form = new FormData()
-            form.append('entityKey', entityId)
+            console.log(body)
 
-            Object.keys(data).forEach(key => {
-                form.append(key, JSON.stringify(data[key]))
-            })
+            // this.result.map(r => {
+            //     if (!!r) {
+            //         let obj = Object.assign({}, r)
+            //         let key = Object.keys(obj)[0]
+            //         body[key] = obj[key]
+            //     }
+            // })
 
-            const action = this.record_id != '' ?  'formBuilder/update' : 'formBuilder/save'
-            console.log('guardado de form', action)
-            this.$store.dispatch(action, form)
-            .then(response => {
-                this.resetForm()
-            })
+            // data[entityId].push(body)
+            // let form = new FormData()
+            // form.append('entityKey', entityId)
+
+            // Object.keys(data).forEach(key => {
+            //     form.append(key, JSON.stringify(data[key]))
+            // })
+
+            // const action = this.record_id != '' ?  'formBuilder/update' : 'formBuilder/save'
+            // console.log('guardado de form', action)
+            // this.$store.dispatch(action, form)
+            // .then(response => {
+            //     this.resetForm()
+            // })
         },
         async sendFiles() {
             const files = this.$store.getters['formBuilder/files']
@@ -151,13 +164,12 @@ export default {
         async handlerAction(saveForm, action) {
 
             if (action.id !== "DEFAULT-ACTION") {
-                this.formAnswer.push({'action_id': action.id})
+                this.formAnswer[0].push({'action_id': action.id})
             }
 
             if (saveForm){
                 if (this.filesInForm) {
-                    await this.sendFiles()
-
+                    // await this.sendFiles()
                 }
                 this.save()
             }

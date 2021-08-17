@@ -44,6 +44,7 @@
                             :bus="bus"
                             @next-section="handleNextSection"
                             @previous-section="handlePreviousSection"
+                            :disablePrevious="actionDisabled"
                         >
                         </poll-section>
                     </div>
@@ -213,6 +214,8 @@ export default {
                     if (this.actions.length === 0) {
                         this.actions.push(defaultAction);
                     }
+
+                    this.actionDisabled = false
                 });
             });
         },
@@ -363,7 +366,7 @@ export default {
             this.$store
                 .dispatch("form/save_form", formData)
                 .then(response => {
-                    this.actionDisabled = false
+
                     if (response.response.data.success === true) {
                         this.loading = false;
                         this.success = true;

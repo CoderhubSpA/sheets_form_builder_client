@@ -39,6 +39,7 @@
                     @click="handlePrevious()"
                     :class="`btn btn-warning mt-4 float-left`"
                     v-if="can_previous()"
+                    :disabled="disablePreviousBtn"
                 >
                     Anterior
                 </button>
@@ -101,6 +102,10 @@ export default {
         bus: {
             type: Object,
             default: () => ({})
+        },
+        disablePrevious: {
+            type: Boolean,
+            default: false
         }
     },
     data: () => ({
@@ -112,6 +117,9 @@ export default {
     computed: {
         title() {
             return this.section.name;
+        },
+        disablePreviousBtn() {
+            return this.disablePrevious
         }
     },
     watch: {
