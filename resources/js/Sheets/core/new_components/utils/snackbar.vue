@@ -1,5 +1,5 @@
 <template>
-    <div :class="`${success_error} ${dialog ? 'show': ''}`" id="snackbar" v-if="dialog">
+    <div :class="`${success_error} ${dialog ? 'show': ''}`" id="snackbar">
         {{ message }}
     </div>
 </template>
@@ -11,7 +11,7 @@
  */
 export default {
     props: {
-        show: {
+        value: {
             type: Boolean,
             default: false
         },
@@ -33,18 +33,22 @@ export default {
             return this.type ? 'success' : 'error'
         },
         dialog() {
-            return this.show
+            return this.value
         }
     },
-    mounted() {
-        this.close()
+    watch: {
+        value(val) {
+            if (val) {
+                this.close()
+            }
+        }
     },
     methods: {
         close() {
             let snackbar = document.getElementById("snackbar")
             setTimeout(() => {
                 snackbar.className = snackbar.className.replace("show", "")
-                this.$emit('close', false)
+                this.$emit('input', false)
             }, this.timeout)
         }
     }
@@ -70,7 +74,7 @@ export default {
   border-radius: 2px;
   padding: 16px;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   left: 50%;
   bottom: 30px;
   font-size: 17px;

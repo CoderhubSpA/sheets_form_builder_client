@@ -50,7 +50,6 @@ export default {
     },
     methods: {
         onInput(e) {
-
             let data = {}
             data[this.id] = e.target.value
             this.$emit('input', data)

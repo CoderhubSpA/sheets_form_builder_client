@@ -48,11 +48,20 @@ export default {
                 return this.$attrs['error-messages']
             }
             return;
+        },
+        clear() {
+            return this.$store.getters['formBuilder/clearfields']
         }
     },
     watch: {
         data() {
             this.$emit('input', this.data)
+        },
+        clear(val) {
+            if (val) {
+                this.data = {}
+                this.$store.commit('formBuilder/CLEARFIELDS', false)
+            }
         }
     }
 

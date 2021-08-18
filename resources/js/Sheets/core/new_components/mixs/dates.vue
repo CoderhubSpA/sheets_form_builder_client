@@ -14,7 +14,7 @@ export default {
     }),
     computed: {
         dateFormat() {
-            return this.input.format === 'DATE' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm'
+            return this.input.format === 'DATE' ? 'DD-MM-YYYY' : 'DD-MM-YYYY HH:mm'
         },
         /**
          * interval between hours in time picker
@@ -43,14 +43,9 @@ export default {
     },
     methods: {
         onInput(val) {
-            const searchRegExp = /\//gi
-            const replaceWith = '-'
-
-            let parseFormat = this.dateFormat.replace(searchRegExp, replaceWith)
-            let value = new moment(val).format(parseFormat)
-
+            const format = this.input.format === 'DATE' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm'
             let data = {}
-            data[this.id] = value
+            data[this.id] = new moment(val).format(format)
 
             this.$emit('input', data)
         }

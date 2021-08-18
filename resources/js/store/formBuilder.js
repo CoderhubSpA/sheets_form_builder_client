@@ -16,7 +16,8 @@ export default {
         poll_sections: [],
         poll_questions: [],
         poll_active_section: {},
-        history: []
+        history: [],
+        clearfields: false
     },
     getters: {
         loading: state => state.loading,
@@ -31,6 +32,7 @@ export default {
         poll_sections: state => state.poll_sections,
         poll_questions: state => state.poll_questions,
         poll_active_section: state => state.poll_active_section,
+        clearfields: state => state.clearfields,
         last_section: (state) => {
             const index = state.history.length -1
 
@@ -78,6 +80,9 @@ export default {
         },
         DELETE_LAST_HISTORY(state) {
             state.history.pop()
+        },
+        CLEARFIELDS(state, val) {
+            state.clearfields = val
         }
     },
     actions: {
@@ -146,8 +151,7 @@ export default {
             return new Promise((resolve, reject) => {
                 axios.post(`/api/sheets/save/form/update`, data, {})
                 .then(response => {
-                    const data = response
-                    resolve(data);
+                    resolve(response.data)
                 }).catch(error => {
                     reject(error);
                 }).finally(() => {
@@ -209,7 +213,7 @@ export default {
                 })
             })
         },
-        upload_files({ commit }, data) {
+        async upload_files({ commit }, data) {
             commit('LOADING', true)
             return new Promise((resolve, reject) => {
                 const headers = {

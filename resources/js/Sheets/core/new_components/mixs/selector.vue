@@ -68,6 +68,12 @@ export default {
             const isMultipleAdvanced = this.input.format === 'SELECTOR[MULTIPLE][ADVANCED]'
 
             return (isMultiple || is1xnAll || isMultipleAdvanced)
+        },
+        clear() {
+            return this.$store.getters['formBuilder/clearfields']
+        },
+        autocomplete() {
+            return window.innerHeight <= 1024 ? 'off' : 'on'
         }
     },
     watch: {
@@ -86,6 +92,12 @@ export default {
         },
         selectedValue(val) {
             this.selected = val
+        },
+        clear(val) {
+            if (val) {
+                this.selected = null
+                this.$store.commit('formBuilder/CLEARFIELDS', false)
+            }
         }
     },
 }

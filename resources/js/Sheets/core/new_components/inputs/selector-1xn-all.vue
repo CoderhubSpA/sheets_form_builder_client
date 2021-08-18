@@ -6,7 +6,8 @@
             :options="options"
             :disabled="disabled"
             :multiple="multiple"
-            v-model="selected">
+            v-model="selected"
+            :autocomplete="autocomplete">
         </v-select>
     </form-group>
 </template>

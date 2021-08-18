@@ -5,7 +5,8 @@
             :id="id"
             :options="options"
             :disabled="disabled"
-            v-model="selected">
+            v-model="selected"
+            :autocomplete="autocomplete">
         </v-select>
     </form-group>
 </template>
