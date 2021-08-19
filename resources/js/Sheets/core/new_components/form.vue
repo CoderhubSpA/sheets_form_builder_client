@@ -9,7 +9,7 @@
                 <sheets-action :action="action" @trigger="handlerAction"></sheets-action>
             </div>
         </div>
-        <!-- <sheets-loading :status="loading" /> -->
+        <sheets-loading :status="loading" />
         <sheets-snackbar :message="snackbar.message" v-model="snackbar.show" :type="snackbar.success"/>
     </div>
 </template>
@@ -71,21 +71,27 @@ export default {
         }
     },
     mounted() {
+
         this.initForm()
+
     },
     methods: {
         initForm() {
             this.$store.dispatch('formBuilder/get', this.entityId)
             .then(form => {
-
-                this.formRows = form.rows
-                this.formActions = form.actions
-
-                this.snackbar = {
-                    message: form.message,
-                    success: form.success,
-                    show: true
+                if (form.success) {
+                    this.formRows = form.rows
+                    this.formActions = form.actions
                 }
+                else {
+                    this.snackbar = {
+                        message: form.message,
+                        success: form.success,
+                        show: true
+                    }
+                }
+
+
             })
             .then(() => {
                 this.get_record()
@@ -125,7 +131,7 @@ export default {
                 form.append(key, JSON.stringify(data[key]))
             })
             const action = !this.record_id ? 'formBuilder/save' : 'formBuilder/update'
-            // console.log(action)
+            console.log(action)
             this.$store.dispatch(action, form)
             .then(response => {
                 this.snackbar = {

@@ -6,7 +6,7 @@
             :options="options"
             :disabled="disabled"
             v-model="selected"
-            :autocomplete="autocomplete">
+            :filterable="filterable">
         </v-select>
     </form-group>
 </template>

@@ -72,8 +72,8 @@ export default {
         clear() {
             return this.$store.getters['formBuilder/clearfields']
         },
-        autocomplete() {
-            return window.innerHeight <= 1024 ? 'off' : 'on'
+        filterable() {
+            return window.innerHeight > 1024
         }
     },
     watch: {

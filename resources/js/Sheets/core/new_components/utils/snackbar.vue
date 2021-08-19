@@ -1,14 +1,12 @@
 <template>
-    <div :class="`${success_error} ${dialog ? 'show': ''}`" id="snackbar">
-        {{ message }}
-    </div>
+    <transition name="fade" :duration="timeout">
+        <div :class="`snackbar ${success_error}`" v-if="show">
+            {{ text }}
+        </div>
+    </transition>
 </template>
 
 <script>
-/**
- * @author Jorge Peraza
- * @version 0.0.1
- */
 export default {
     props: {
         value: {
@@ -29,11 +27,14 @@ export default {
         }
     },
     computed: {
+        text() {
+            return this.message
+        },
+        show() {
+            return this.value
+        },
         success_error() {
             return this.type ? 'success' : 'error'
-        },
-        dialog() {
-            return this.value
         }
     },
     watch: {
@@ -45,9 +46,7 @@ export default {
     },
     methods: {
         close() {
-            let snackbar = document.getElementById("snackbar")
             setTimeout(() => {
-                snackbar.className = snackbar.className.replace("show", "")
                 this.$emit('input', false)
             }, this.timeout)
         }
@@ -56,18 +55,7 @@ export default {
 </script>
 
 <style lang="scss">
-.success {
-    color: #0f5132;
-    background-color: #d1e7dd;
-    border-color: #badbcc;
-}
-.error {
-    color: #842029;
-    background-color: #f8d7da;
-    border-color: #f5c2c7;
-}
-#snackbar {
-  visibility: hidden;
+.snackbar {
   min-width: 250px;
   margin-left: -125px;
   text-align: center;
@@ -78,31 +66,25 @@ export default {
   left: 50%;
   bottom: 30px;
   font-size: 17px;
+
+
+}
+.success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
 }
 
-#snackbar.show {
-  visibility: visible;
-  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+.error {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
 }
 
-@-webkit-keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 30px; opacity: 1;}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
 }
-
-@keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 30px; opacity: 1;}
-}
-
-@-webkit-keyframes fadeout {
-  from {bottom: 30px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
-}
-
-@keyframes fadeout {
-  from {bottom: 30px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
