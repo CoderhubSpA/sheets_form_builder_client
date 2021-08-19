@@ -9,6 +9,7 @@
             v-model="selected"
             :disabled="isResponse"
             :multiple="isResponse"
+            :searchable="searchable"
         ></v-select>
         <p v-if="options.length === 0"><b>Esta lista está vacía</b></p>
     </div>
@@ -91,6 +92,9 @@ export default {
             });
             rOptions = [...options];
             return rOptions;
+        },
+        searchable() {
+            return window.outerWidth > 1024
         },
         required() {
             return this.question.required == 1;

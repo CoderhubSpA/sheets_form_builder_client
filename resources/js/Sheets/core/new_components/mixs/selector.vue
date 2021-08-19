@@ -72,8 +72,9 @@ export default {
         clear() {
             return this.$store.getters['formBuilder/clearfields']
         },
-        filterable() {
-            return window.innerHeight > 1024
+        searchable() {
+            console.log(window.outerWidth, 1024)
+            return window.outerWidth > 1024
         }
     },
     watch: {

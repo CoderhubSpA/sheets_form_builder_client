@@ -4,7 +4,8 @@
             label="name"
             :id="id"
             :options="options"
-            v-model="selected">
+            v-model="selected"
+            :searchable="searchable">
         </v-select>
         <div v-if="options.length === 0">
             <b>Esta lista está vacía</b>

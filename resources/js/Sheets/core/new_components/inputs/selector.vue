@@ -6,7 +6,7 @@
             :options="options"
             :disabled="disabled"
             v-model="selected"
-            :filterable="filterable">
+            :searchable="searchable">
         </v-select>
     </form-group>
 </template>
