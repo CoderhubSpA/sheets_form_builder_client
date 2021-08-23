@@ -71,14 +71,13 @@ export default {
         }
     },
     mounted() {
-
         this.initForm()
-
     },
     methods: {
         initForm() {
             this.$store.dispatch('formBuilder/get', this.entityId)
             .then(form => {
+                this.$store.commit('formBuilder/CLEARFIELDS', false)
                 if (form.success) {
                     this.formRows = form.rows
                     this.formActions = form.actions
@@ -131,7 +130,7 @@ export default {
                 form.append(key, JSON.stringify(data[key]))
             })
             const action = !this.record_id ? 'formBuilder/save' : 'formBuilder/update'
-            console.log(action)
+
             this.$store.dispatch(action, form)
             .then(response => {
                 this.snackbar = {
@@ -139,7 +138,7 @@ export default {
                     show: true,
                     message: response.content.message
                 }
-                this.resetForm()
+                // this.resetForm()
             })
             .catch(error => {
                 console.log(error)
@@ -169,7 +168,7 @@ export default {
             })
         },
         async handlerAction(saveForm, action) {
-            // console.log(saveForm, action)
+            console.log(saveForm, action)
             if (action.id !== "DEFAULT-ACTION") {
                 this.formAnswer.push({'action_id': action.id})
             }
@@ -185,6 +184,7 @@ export default {
             }
         },
         resetForm() {
+            console.log('reset form')
             this.formAnswer = []
             this.$store.commit('formBuilder/CLEARFIELDS', true)
         }

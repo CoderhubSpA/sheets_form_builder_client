@@ -46,7 +46,7 @@ export default {
         },
         col_name() {
             return this.input.col_name
-        }
+        },
     },
     methods: {
         onInput(e) {

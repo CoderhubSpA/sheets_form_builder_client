@@ -3,7 +3,8 @@
         <component
             :is="fieldInput"
             :input="field"
-            v-model="data">
+            v-model="data"
+            disabled>
         </component>
         <div class="row">
             <div class="col">
@@ -60,7 +61,7 @@ export default {
         clear(val) {
             if (val) {
                 this.data = {}
-                this.$store.commit('formBuilder/CLEARFIELDS', false)
+                // this.$store.commit('formBuilder/CLEARFIELDS', false)
             }
         }
     }
