@@ -75,9 +75,9 @@ export default {
     },
     methods: {
         initForm() {
+            this.$store.commit('formBuilder/CLEARFIELDS', false)
             this.$store.dispatch('formBuilder/get', this.entityId)
             .then(form => {
-                this.$store.commit('formBuilder/CLEARFIELDS', false)
                 if (form.success) {
                     this.formRows = form.rows
                     this.formActions = form.actions
@@ -89,8 +89,6 @@ export default {
                         show: true
                     }
                 }
-
-
             })
             .then(() => {
                 this.get_record()
@@ -113,9 +111,22 @@ export default {
         },
         save() {
             const entityId = this.$store.getters['formBuilder/entity_id']
+
             let data = {}
             data[entityId] = []
+            // form fields
+            let form_fields = {}
+            this.formRows.map(row => {
+                row.sections.map(section => {
+                    section.fields.map(field => {
+                        form_fields[field.id] = field.form_field_id
+                    })
+                })
+            })
+            this.formAnswer.push({ 'form_fields': form_fields})
+            //
             let body = {}
+
             this.result.map(r => {
                 if (!!r) {
                     let obj = Object.assign({}, r)
@@ -123,9 +134,13 @@ export default {
                     body[key] = obj[key]
                 }
             })
+
             data[entityId].push(body)
+
             let form = new FormData()
+
             form.append('entityKey', entityId)
+
             Object.keys(data).forEach(key => {
                 form.append(key, JSON.stringify(data[key]))
             })
@@ -138,7 +153,7 @@ export default {
                     show: true,
                     message: response.content.message
                 }
-                // this.resetForm()
+                this.resetForm()
             })
             .catch(error => {
                 console.log(error)

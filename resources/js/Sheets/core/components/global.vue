@@ -2,7 +2,7 @@
     <div>
         <div class="form-group" v-if="types.includes(sheetType)">
             <label :for="name">
-                {{ label }} <span v-if="required" class="text-danger">*</span>
+                {{ label }}<span v-if="required" class="text-danger">*</span>
             </label>
             <!-- INPUTS TIPO TEXT -->
             <div :class="originalType == 'CLP' ? 'input-group-prepend' : ''">
@@ -13,13 +13,13 @@
                     >$</span
                 >
                 <input
-                    :autocomplete="autocomplete"
+                    autocomplete="new-password"
                     :autofocus="autofocus"
                     :disabled="disabled"
                     :max="maximun"
                     :min="minimun"
                     :multiple="multiple"
-                    :name="name"
+                    :name="`${name}-${id}-${Date.now().toString()}`"
                     :placeholder="placeholder"
                     :readonly="readonly"
                     :required="required"
@@ -42,7 +42,7 @@
             <div>
                 <textarea
                     :disabled="disabled"
-                    :name="name"
+                    :name="`${name}-${id}-${Date.now().toString()}`"
                     :readonly="readonly"
                     :required="required"
                     :id="id"
@@ -71,7 +71,7 @@
         <div v-else-if="sheetType == 'checkbox'">
             <sheet-checkbox
                 :label="label"
-                :name="name"
+                :name="`${name}-${id}-${Date.now().toString()}`"
                 :id="id"
                 :disabled="disabled"
                 :required="required"
