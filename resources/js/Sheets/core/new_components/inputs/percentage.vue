@@ -1,5 +1,5 @@
 <template>
-    <input-group :character="'%'">
+    <input-group :character="'%'" :required="required">
         <input
             type="number"
             class="form-control"

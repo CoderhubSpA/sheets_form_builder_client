@@ -1,5 +1,5 @@
 <template>
-    <form-group :label="label" :id="id">
+    <form-group :label="label" :id="id" :required="required">
         <date-picker
             type="date"
             :format="dateFormat"

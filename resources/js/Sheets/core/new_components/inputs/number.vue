@@ -1,5 +1,5 @@
 <template>
-    <input-group :label="label">
+    <input-group :label="label" :required="required">
         <input
             type="number"
             class="form-control"

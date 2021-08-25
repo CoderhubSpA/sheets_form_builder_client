@@ -119,12 +119,16 @@ export default {
             this.formRows.map(row => {
                 row.sections.map(section => {
                     section.fields.map(field => {
-                        form_fields[field.id] = field.form_field_id
+                        this.result.map(r => {
+                            if(Object.keys(r)[0] == field.id)
+                                form_fields[field.id] = field.form_field_id
+                        })
                     })
                 })
             })
-            this.formAnswer.push({ 'form_fields': form_fields})
-            //
+
+            this.formAnswer.push({'form_fields': form_fields})
+
             let body = {}
 
             this.result.map(r => {
@@ -157,6 +161,11 @@ export default {
             })
             .catch(error => {
                 console.log(error)
+                this.snackbar ={
+                    message: !!error.data.content ? error.data.content.message : error.statusText,
+                    success: false,
+                    show: true
+                }
             })
         },
         async sendFiles() {
@@ -195,7 +204,7 @@ export default {
 
             if (action.refresh_form === 1) {
                 this.resetForm()
-                this.initForm()
+                // this.initForm()
             }
         },
         resetForm() {

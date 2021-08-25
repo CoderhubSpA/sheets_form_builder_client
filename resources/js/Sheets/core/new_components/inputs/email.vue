@@ -1,5 +1,5 @@
 <template>
-    <form-group :id="id" :label="label">
+    <form-group :id="id" :label="label" :required="required">
         <input
             type="email"
             :id="id"

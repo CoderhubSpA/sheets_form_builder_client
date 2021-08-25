@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h3 class="text-center">
-          {{ label }}
+          {{ label }} <span v-if="required" class="text-danger">*</span>
         </h3>
         <p class="text-center">
             Haga click sobre el mapa para posicionar el marcador y
