@@ -159,7 +159,7 @@ export default {
     },
     methods: {
         reloadPoll() {
-            this.actionDisabled = true
+            this.actionDisabled = true;
             this.loading = true;
             setTimeout(() => {
                 this.loading = false;
@@ -175,7 +175,7 @@ export default {
             this.identificador = Date.now().toString();
             this.actionSend = null;
             this.$store.dispatch("poll/get_poll").then(poll => {
-                this.actionDisabled = false
+                this.actionDisabled = false;
                 this.title = poll.title;
                 this.sections = poll.sections;
                 this.questions = poll.questions;
@@ -186,7 +186,8 @@ export default {
                         question: q.id,
                         answer: null,
                         next_section: null,
-                        alternative: null
+                        alternative: null,
+                        automatic: null
                     };
                     q.order = q.order === null ? 0 : q.order;
                 });
@@ -215,7 +216,7 @@ export default {
                         this.actions.push(defaultAction);
                     }
 
-                    this.actionDisabled = false
+                    this.actionDisabled = false;
                 });
             });
         },
@@ -267,10 +268,10 @@ export default {
                     this.historyItems[this.historyItems.length - 1].section_id
                 );
             });
-            this.historyItems.pop();
             this.historyItems = this.historyItems.filter(item => {
                 return item.section_id !== this.active_section.id;
             });
+            this.$store.commit("poll/SETHISTORY", this.historyItems);
         },
         actionHandler(mustSaveForm, action) {
             if (action.refresh_form === 1) {
@@ -302,7 +303,7 @@ export default {
         },
         savePoll() {
             // deshabilitar acciones durante el guardado
-            this.actionDisabled = true
+            this.actionDisabled = true;
             this.loading = true;
             this.error = false;
             this.success = false;
@@ -366,7 +367,6 @@ export default {
             this.$store
                 .dispatch("form/save_form", formData)
                 .then(response => {
-
                     if (response.response.data.success === true) {
                         this.loading = false;
                         this.success = true;
@@ -376,7 +376,7 @@ export default {
                         );
                         setTimeout(() => {
                             if (this.refresh === true) {
-                                this.$store.commit("poll/HISTORY", []);
+                                this.$store.commit("poll/CLEANHISTORY", []);
                                 this.historyItems = [];
                                 this.$store.commit("poll/CLEANRECORD");
                                 this.bus.$emit("reloadedPoll", {});
@@ -399,7 +399,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    this.actionDisabled = false
+                    this.actionDisabled = false;
                     this.loading = false;
                     this.error = true;
                     this.backendMsg = "Ocurrió un error al guardar la encuesta";

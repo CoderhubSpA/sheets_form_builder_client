@@ -56,7 +56,7 @@ export default {
 
 <style lang="scss">
 .SheetsPollHistory__history {
-    max-height: 300px;
+    /* max-height: 300px; */
     background: #dddddd;
     border: 1px solid #999999;
     overflow: hidden;

@@ -21,8 +21,16 @@
                     :styles="parsedFieldStyles(question)"
                     :model="model[question.id]"
                     :responses="responses"
-                    v-on:question:selected="getAnswerFromQuestionSelected($event)"
-                    @sheets-input-change="getAnswerFromInputChange($event, question.id, question.col_name)"
+                    v-on:question:selected="
+                        getAnswerFromQuestionSelected($event)
+                    "
+                    @sheets-input-change="
+                        getAnswerFromInputChange(
+                            $event,
+                            question.id,
+                            question.col_name
+                        )
+                    "
                 />
             </div>
         </div>
@@ -119,7 +127,7 @@ export default {
             return this.section.name;
         },
         disablePreviousBtn() {
-            return this.disablePrevious
+            return this.disablePrevious;
         }
     },
     watch: {
@@ -129,8 +137,10 @@ export default {
             });
             answeredQuestions.map(item => {
                 this.model = [];
-                const index = this.responses.indexOf(item);
-                this.responses.splice(index, 1);
+                const indexOf = this.responses.indexOf(item);
+                if (item.automatic === null) {
+                    this.responses.splice(indexOf, 1);
+                }
             });
         },
         questions() {
@@ -142,7 +152,8 @@ export default {
                         answer: null,
                         col_name: element.col_name,
                         required: !!element.required,
-                        section_id: this.section.id
+                        section_id: this.section.id,
+                        automatic: null
                     };
                     if (element.format === "INFO") {
                         pre.answer = element.form_field_id;
@@ -161,14 +172,14 @@ export default {
                 });
             }
         },
-        responses(val) {
-            this.$store.commit("poll/RECORD", val);
+        responses(newVal, oldVal) {
+            this.$store.commit("poll/RECORD", newVal);
         },
         identificador(val) {
-            // this.responses = [];
+            console.warn("new identificator", val);
         },
         modelretrive(val) {
-            console.log("new model", val);
+            console.warn("new model", val);
         }
     },
     mounted() {
@@ -190,70 +201,75 @@ export default {
             }
             return classes;
         },
-        getAnswerFromQuestionSelected(e){
-            let eventQuestion = this.allquestions.find(q => q.form_field_id === e.form_field_id );
-
+        async getAnswerFromQuestionSelected(e) {
+            let eventQuestion = this.allquestions.find(
+                q => q.form_field_id === e.form_field_id
+            );
             let answer = {
-                section_id   : this.section.id,
-                question     : e.id,
-                questiondesc : eventQuestion.name,
-                answer       : e.alternative ? e.alternative.id : undefined,
-                next_section : (e.alternative && e.alternative.next_form_section) ? e.alternative.next_form_section : this.section.default_next_form_section,
-                alternative  : e.alternative,
-                col_name     : e.col_name,
-                response     : false,
-                timestamp    : Date.now()
+                section_id: this.section.id,
+                question: e.id,
+                questiondesc: eventQuestion.name,
+                answer: e.alternative ? e.alternative.id : undefined,
+                next_section:
+                    e.alternative && e.alternative.next_form_section
+                        ? e.alternative.next_form_section
+                        : this.section.default_next_form_section,
+                alternative: e.alternative,
+                col_name: e.col_name,
+                response: false,
+                automatic: e.automatic ? true : null,
+                timestamp: Date.now()
             };
 
-            this.getAnswer(e.id, answer)
-            this.getProduct(e.exam);
+            await this.getAnswer(e.id, answer);
+            await this.getProduct(e.exam);
 
-            let shouldAutoPass = (e.alternative && e.alternative.next_form_section) ? true : false;
-            if (shouldAutoPass  && this.can_next() && e.format === "QUESTION") {
+            let shouldAutoPass =
+                e.alternative && e.alternative.next_form_section ? true : false;
+            if (shouldAutoPass && this.can_next() && e.format === "QUESTION") {
                 this.handleNext();
             }
-
         },
-        getAnswerFromInputChange(e, id = null, col_name = null){
+        getAnswerFromInputChange(e, id = null, col_name = null) {
             let eventQuestion = this.allquestions.find(q => q.id === id);
 
             let answer = {
-                section_id   : this.section.id,
-                question     : id,
-                questiondesc : eventQuestion.name,
-                answer       : e,
-                next_section : this.section.default_next_form_section,
-                alternative  : null,
-                col_name     : col_name,
-                response     : false,
-                timestamp    : Date.now()
+                section_id: this.section.id,
+                question: id,
+                questiondesc: eventQuestion.name,
+                answer: e,
+                next_section: this.section.default_next_form_section,
+                alternative: null,
+                col_name: col_name,
+                response: false,
+                automatic: null,
+                timestamp: Date.now()
             };
 
-            this.getAnswer(id, answer)
-
+            this.getAnswer(id, answer);
         },
         getAnswer(id, answer) {
+            const safeResponses = [...this.responses];
             this.model[id] = answer;
-
             let q = this.questions.find(q => q.id === answer.question) || {};
             answer["required"] = !!q.required;
-
-            let a = this.responses.filter(r => r.question == answer.question).shift();
-            let index = this.responses.indexOf(a);
-
-            Vue.set(this.responses, index, answer);
-
+            let a = safeResponses.find(r => r.question == answer.question);
+            if (a) {
+                let index = safeResponses.indexOf(a);
+                Vue.set(this.responses, index, answer);
+            }
+            return;
         },
         getProduct(products) {
             if (!products) return;
 
             products.forEach(product => {
-                let question = this.allquestions
-                    .filter(q => q.form_field_id == product.form_field_id)
-                    .shift();
-                let search = this.responses
-                    .filter(r => r.question == question.id)
-                    .shift();
+                let question = this.allquestions.find(
+                    q => q.form_field_id == product.form_field_id
+                );
+                let search = this.responses.find(
+                    r => r.question == question.id
+                );
                 if (question.format !== "RESPONSE") {
                     console.warn(
                         "Campo de formato no válido para guardar producto"
@@ -272,21 +288,18 @@ export default {
                         };
                         this.responses.push(answerProduct);
                     } else {
-                        const indexOfAnswer = this.responses.indexOf(
-                            search
-                        );
+                        const indexOfAnswer = this.responses.indexOf(search);
                         if (
                             search.answer.indexOf(
                                 product.entity_id.toString()
                             ) === -1
                         ) {
-                            search.answer.push(
-                                product.entity_id.toString()
-                            );
+                            search.answer.push(product.entity_id.toString());
                         }
                     }
                 }
             });
+            return;
         },
         load_results() {
             const historyItems = this.$store.getters["poll/history"];
@@ -296,24 +309,22 @@ export default {
             });
             const responsesNew = this.responses.filter(response => {
                 return (
-                    response.response === false &&
-                    historyQuestions.indexOf(response.question) > -1
+                    (response.response === false &&
+                        historyQuestions.indexOf(response.question) > -1) ||
+                    response.automatic === true
                 );
             });
-            this.responses = responsesNew;
+            this.responses = [...responsesNew];
             this.responses.map(response => {
                 if (response.response === false) {
                     if (response.alternative !== null) {
                         response.alternative.products.forEach(product => {
-                            let question = this.allquestions
-                                .filter(
-                                    q =>
-                                        q.form_field_id == product.form_field_id
-                                )
-                                .shift();
-                            let search = this.responses
-                                .filter(r => r.question == question.id)
-                                .shift();
+                            let question = this.allquestions.find(
+                                q => q.form_field_id == product.form_field_id
+                            );
+                            let search = this.responses.find(
+                                r => r.question == question.id
+                            );
                             if (question.format !== "RESPONSE") {
                                 console.warn(
                                     "Campo de formato no válido para guardar producto"
@@ -368,11 +379,18 @@ export default {
             return valReturn && !allNull;
         },
         handleNext() {
-            let history = this.responses.filter(response => {
-                return response.response === false;
+            let historyNewItem = this.responses.filter(response => {
+                return (
+                    response.response === false &&
+                    response.automatic === null &&
+                    response.section_id === this.section.id
+                );
             });
-            this.$store.commit("poll/HISTORY", history);
-            this.$emit("next-section", this.responses, this.section.id);
+            this.$store.commit("poll/HISTORY", historyNewItem);
+            let validationResponses;
+            validationResponses = [...this.responses];
+            this.$emit("next-section", validationResponses, this.section.id);
+            this.responses = [...validationResponses];
             this.model = [];
         },
         can_previous() {
@@ -382,7 +400,7 @@ export default {
             const newresponses = this.responses.filter(item => {
                 return item.section_id !== this.section.id;
             });
-            this.responses = newresponses;
+            this.responses = [...newresponses];
             this.$emit("previous-section");
             this.load_results();
         }

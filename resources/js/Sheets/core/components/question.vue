@@ -44,7 +44,8 @@ export default {
         }
     },
     data: () => ({
-        selected: null
+        selected: null,
+        automatic: false
     }),
     computed: {
         label() {
@@ -94,7 +95,7 @@ export default {
             return rOptions;
         },
         searchable() {
-            return window.outerWidth > 1024
+            return window.outerWidth > 1024;
         },
         required() {
             return this.question.required == 1;
@@ -119,17 +120,27 @@ export default {
                         col_name: this.question.col_name,
                         exam: !!val
                             ? this.question.alternatives[val.id].products
-                            : null
+                            : null,
+                        automatic: this.automatic === true ? true : null
                     };
                     this.optionSelected(data);
                 }
             }
+            this.automatic = false;
         },
         valSelected(val) {
             if (val) {
-                this.selected = this.options.find(opt => {
+                this.automatic = true;
+                const validationSelected = this.options.find(opt => {
                     return opt.id === val;
                 });
+                if (this.selected !== null) {
+                    if (this.selected.id !== validationSelected.id) {
+                        this.selected = validationSelected;
+                    }
+                } else {
+                    this.selected = validationSelected;
+                }
             }
         }
     },
@@ -143,10 +154,6 @@ export default {
             return classes;
         },
         optionSelected(value) {
-            if (value) {
-                this.$emit("input", value.selected_value.id);
-            } else this.$emit("input", null);
-
             this.$emit("optionSelected", value);
         }
     }

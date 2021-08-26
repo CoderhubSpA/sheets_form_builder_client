@@ -128,7 +128,7 @@ export default {
             })
 
             this.formAnswer.push({'form_fields': form_fields})
-
+            this.formAnswer.push({'form_id': this.$store.getters['formBuilder/form_id']})
             let body = {}
 
             this.result.map(r => {
@@ -192,7 +192,6 @@ export default {
             })
         },
         async handlerAction(saveForm, action) {
-            console.log(saveForm, action)
             if (action.id !== "DEFAULT-ACTION") {
                 this.formAnswer.push({'action_id': action.id})
             }

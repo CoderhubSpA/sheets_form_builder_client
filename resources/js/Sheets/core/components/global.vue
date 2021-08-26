@@ -149,9 +149,11 @@ export default {
         },
         modelretrive: {
             type: Array,
-            default: () => {[]},
+            default: () => {
+                [];
+            },
             require: false
-        },
+        }
     },
     data: () => ({
         types: ["text", "email", "number", "password", "datetime-local", "url"],
@@ -190,15 +192,15 @@ export default {
                 }
             }
         },
-        identificador(val){
+        identificador(val) {
             this.validValuePoll();
         },
-        modelretrive(val){
+        modelretrive(val) {
             this.modelretrive.map(model => {
-                if(model.id === this.id){
-                    this.value = model.value
+                if (model.id === this.id) {
+                    this.value = model.value;
                 }
-            })
+            });
         }
     },
     mounted() {
@@ -244,15 +246,18 @@ export default {
                     if (value.col_name === this.form.col_name) {
                         if (value.answer !== null) {
                             if (this.originalType === "QUESTION") {
-
                                 const data = {
                                     id: this.form.id,
                                     alternative: null,
                                     form_field_id: this.form.form_field_id,
                                     section_owner: this.form.form_section_id,
-                                    col_name: this.form.col_name
+                                    col_name: this.form.col_name,
+                                    automatic: true
                                 };
-                                if (this.form.alternatives && value.alternative) {
+                                if (
+                                    this.form.alternatives &&
+                                    value.alternative
+                                ) {
                                     Object.keys(this.form.alternatives).forEach(
                                         key => {
                                             if (
@@ -268,7 +273,6 @@ export default {
                                     this.option_selected(data);
                                 }
                             } else if (this.originalType === "RESPONSE") {
-                                
                                 const answerFromStore = this.$props.responses.find(
                                     item => {
                                         return item.question === this.form.id;
@@ -362,9 +366,9 @@ export default {
         },
         pasteInput(event) {
             const regex = /^-?(0|[1-9]\d*)(\.\d+)?$/;
-            let pasted = (
-                event.clipboardData || window.clipboardData
-            ).getData("text");
+            let pasted = (event.clipboardData || window.clipboardData).getData(
+                "text"
+            );
             if (
                 this.originalType === "NUMBER" ||
                 this.originalType === "CLP" ||
@@ -373,12 +377,11 @@ export default {
                 event.preventDefault();
                 // reemplazamos coma por punto
                 pasted = pasted.replace(/,/g, ".");
-                if(pasted.indexOf('.') > -1){
-                    const pastedArray = pasted.split('.');
+                if (pasted.indexOf(".") > -1) {
+                    const pastedArray = pasted.split(".");
                     pasted = `${pastedArray[0]}.`;
                     for (let i = 1; i < pastedArray.length; i++) {
                         pasted += pastedArray[i];
-
                     }
                 }
                 if (regex.test(pasted)) {

@@ -45,10 +45,9 @@ export default {
             return this.field.col_md || 12
         },
         error_messages() {
-            if (this.$attrs['error-messages']) {
-                return this.$attrs['error-messages']
-            }
-            return;
+            const errors = this.$store.getters['formBuilder/errors_fields']
+
+            return errors[this.field.id]
         },
         clear() {
             return this.$store.getters['formBuilder/clearfields']
@@ -56,12 +55,14 @@ export default {
     },
     watch: {
         data() {
+            if (this.error_messages) {
+                this.$store.commit('formBuilder/CLEAR_ERROR_FIELD', this.field.id)
+            }
             this.$emit('input', this.data)
         },
         clear(val) {
             if (val) {
                 this.data = {}
-                // this.$store.commit('formBuilder/CLEARFIELDS', false)
             }
         }
     }

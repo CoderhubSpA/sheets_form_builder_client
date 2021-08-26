@@ -16,7 +16,10 @@ export default {
         poll_questions: [],
         poll_active_section: {},
         history: [],
-        clearfields: false
+        clearfields: false,
+        form_id: '',
+        errors_fields: {}
+
     },
     getters: {
         loading: state => state.loading,
@@ -38,7 +41,9 @@ export default {
             const section = state.poll_sections.find(s => s.id === state.history[index].section_id)
 
             return section
-        }
+        },
+        form_id: state => state.form_id,
+        errors_fields: state => state.errors_fields
 
 
     },
@@ -82,6 +87,15 @@ export default {
         },
         CLEARFIELDS(state, val) {
             state.clearfields = val
+        },
+        FORM_ID(state, val) {
+            state.form_id = val
+        },
+        ERRORS_FIELD(state, val) {
+            Vue.set(state.errors_fields, val.key, val.value)
+        },
+        CLEAR_ERROR_FIELD(state, keyfield) {
+            state.errors_fields[keyfield] = ''
         }
     },
     actions: {
@@ -91,7 +105,7 @@ export default {
                 axios.get(`/api/sheets/form/${id}`)
                 .then(response => {
                     const data = response.data.content
-
+                    commit('FORM_ID', data.id)
                     commit('ENTITY_ID', data.entity_type_id)
                     commit('ENTITY_NAME', data.entity_type_name)
 
@@ -205,6 +219,17 @@ export default {
                     resolve(response.data)
                 })
                 .catch(error => {
+                    if (error.response.data.content) {
+                        const content = error.response.data.content
+                        Object.keys(content.errors).map(key => {
+                            let value = {
+                                key: key,
+                                value: content.errors[key]
+                            }
+
+                            commit('ERRORS_FIELD', value)
+                        })
+                    }
                     reject(error.response)
                 })
                 .finally(() => {

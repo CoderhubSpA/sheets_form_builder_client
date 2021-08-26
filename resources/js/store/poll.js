@@ -30,7 +30,7 @@ export default {
             default_next_form_section: ""
         },
         record: [],
-        history: [],
+        history: []
     },
     getters: {
         poll: state => state.poll,
@@ -62,8 +62,16 @@ export default {
             state.record = [];
         },
         HISTORY(state, val) {
+            val.map((item) => {
+                state.history.push(item);
+            })
+        },
+        SETHISTORY(state, val){
             state.history = val;
         },
+        CLEANHISTORY(state,val){
+            state.history = [];
+        }
     },
     actions: {
         load_poll({ commit }, data) {
