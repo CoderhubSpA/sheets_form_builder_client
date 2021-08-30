@@ -4,7 +4,7 @@
 
         </sheets-row>
 
-        <div class="row text-center">
+        <div class="row text-center sheets-actions-container">
             <div class="col" v-for="(action, key) in formActions" :key="key">
                 <sheets-action :action="action" @trigger="handlerAction"></sheets-action>
             </div>
@@ -49,11 +49,9 @@ export default {
         formAnswer: [],
         // archivos cargados en el form
         files: [],
-        snackbar: {
-            message: '',
-            success: false,
-            show: false
-        }
+        // snackbar para recepcion de mensajes desde el server
+        snackbar: { message: '', success: false, show: false },
+        //
     }),
     computed: {
         loading() {
@@ -71,11 +69,21 @@ export default {
         }
     },
     mounted() {
+        window.name = this.windowName;
+        this.window = window;
+        console.log(this.window)
         this.initForm()
     },
     methods: {
+        postMessage(data) {
+            try {
+                this.window.parent.postMessage(data)
+            } catch (error) {
+                console.warn(error)
+            }
+
+        },
         initForm() {
-            this.$store.commit('formBuilder/CLEARFIELDS', false)
             this.$store.dispatch('formBuilder/get', this.entityId)
             .then(form => {
                 if (form.success) {
@@ -157,15 +165,20 @@ export default {
                     show: true,
                     message: response.content.message
                 }
-                this.resetForm()
+                if (response.success) {
+                    this.resetForm()
+                    this.$store.commit('formBuilder/CLEARFIELDS', false)
+                    this.postMessage(response)
+                }
             })
             .catch(error => {
-                console.log(error)
+                this.$store.commit('formBuilder/CLEARFIELDS', false)
                 this.snackbar ={
-                    message: !!error.data.content ? error.data.content.message : error.statusText,
+                    message: error.data.content.message || error.statusText,
                     success: false,
                     show: true
                 }
+                this.postMessage(error.data)
             })
         },
         async sendFiles() {
@@ -192,6 +205,7 @@ export default {
             })
         },
         async handlerAction(saveForm, action) {
+            this.$store.commit('formBuilder/CLEARFIELDS', false)
             if (action.id !== "DEFAULT-ACTION") {
                 this.formAnswer.push({'action_id': action.id})
             }
@@ -203,13 +217,12 @@ export default {
 
             if (action.refresh_form === 1) {
                 this.resetForm()
-                // this.initForm()
             }
         },
         resetForm() {
-            console.log('reset form')
-            this.formAnswer = []
             this.$store.commit('formBuilder/CLEARFIELDS', true)
+            this.formAnswer = []
+            console.log("this.$store.commit('formBuilder/CLEARFIELDS', true)")
         }
     }
 }

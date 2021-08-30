@@ -60,10 +60,6 @@ export default {
     .sheets-row-title {
         color: rgb(10, 10, 94);
     }
-
-    .sheets-row-wrapper {
-        //
-    }
 }
 
 

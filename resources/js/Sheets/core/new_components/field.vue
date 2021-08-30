@@ -32,7 +32,7 @@ export default {
     computed: {
         fieldInput() {
             const chars = { "[" : '-', "]": ''}
-            const format = this.field.format.toLowerCase().replace(/\[|\]/g, m => chars[m])
+            const format = this.field.format.toLowerCase().replace(/\[|\]/g, m => chars[m]);
             return () => import(`./inputs/${format}`)
         },
         xl() {
