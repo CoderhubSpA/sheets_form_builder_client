@@ -77,7 +77,7 @@ export default {
     methods: {
         postMessage(data) {
             try {
-                this.window.parent.postMessage(data)
+                this.window.parent.postMessage(data, '*')
             } catch (error) {
                 console.warn(error)
             }
@@ -168,6 +168,7 @@ export default {
                 if (response.success) {
                     this.resetForm()
                     this.$store.commit('formBuilder/CLEARFIELDS', false)
+                    // console.log("this.$store.commit('formBuilder/CLEARFIELDS', false)")
                     this.postMessage(response)
                 }
             })
@@ -222,7 +223,7 @@ export default {
         resetForm() {
             this.$store.commit('formBuilder/CLEARFIELDS', true)
             this.formAnswer = []
-            console.log("this.$store.commit('formBuilder/CLEARFIELDS', true)")
+            // console.log("this.$store.commit('formBuilder/CLEARFIELDS', true)")
         }
     }
 }

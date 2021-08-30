@@ -13,46 +13,47 @@ export default {
     }),
     computed: {
         options() {
-            const contentInfo = this.$store.getters['formBuilder/content_info']
+            const contentInfo = this.$store.getters["formBuilder/content_info"];
 
             if (!!contentInfo) {
-                const entities = contentInfo.content.entities_fk[this.input.entity_type_fk]
+                const entities =
+                    contentInfo.content.entities_fk[this.input.entity_type_fk];
 
                 if (entities)
                     return entities.map(e => {
-                        return { id: e.id, name: e.name }
-                    })
+                        return { id: e.id, name: e.name };
+                    });
                 else {
-                    let opt = JSON.parse(this.input.options)
+                    let opt = JSON.parse(this.input.options);
 
-                    let options  = []
+                    let options = [];
 
                     Object.keys(opt).forEach(key => {
-                        options.push({ id: key, name: opt[key] })
-                    })
+                        options.push({ id: key, name: opt[key] });
+                    });
 
-                    return options
+                    return options;
                 }
             }
-            return []
+            return [];
+        },
+        clear() {
+            return this.$store.getters['formBuilder/clearfields']
         }
     },
     watch: {
         picked(val) {
-            let data = {};
-            data[this.input.id] = val;
-            this.$emit('input', data)
+            let pickedValue = {};
+            pickedValue[this.input.id] = val;
+            this.$emit("input", pickedValue);
         },
         clear(val) {
             if (val) {
-                this.picked = null
-                this.$store.commit('formBuilder/CLEARFIELDS', false)
+                this.picked = null;
             }
         }
-    },
-}
+    }
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

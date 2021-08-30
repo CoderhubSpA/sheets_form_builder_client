@@ -12,6 +12,7 @@
                 :value="option.id"
                 v-model="picked"
                 :disabled="disabled"
+                :checked="picked === option.id"
                 class="custom-control-input"
             />
             <label
