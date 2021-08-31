@@ -9,7 +9,7 @@ export default {
         }
     },
     data: () => ({
-        picked: null
+        pickedModel: null
     }),
     computed: {
         options() {
@@ -37,19 +37,39 @@ export default {
             }
             return [];
         },
+        picked() {
+            const fields = this.$store.getters["formBuilder/fields"];
+            if (fields.length > 0) {
+                const val = fields.filter(
+                    f => Object.keys(f)[0] === this.id
+                )[0];
+                if (val !== null) {
+                    return val[this.id];
+                }
+            }
+            return null;
+        },
         clear() {
-            return this.$store.getters['formBuilder/clearfields']
+            return this.$store.getters["formBuilder/clearfields"];
         }
     },
     watch: {
         picked(val) {
-            let pickedValue = {};
-            pickedValue[this.input.id] = val;
-            this.$emit("input", pickedValue);
+            if (val !== null) {
+                this.pickedModel = val;
+            }
+        },
+        pickedModel(val) {
+            if (val !== null) {
+                let pickedValue = {};
+                pickedValue[this.input.id] = val;
+                this.$emit("input", pickedValue);
+            }
         },
         clear(val) {
-            if (val) {
-                this.picked = null;
+            const recordId = this.$store.getters["formBuilder/record_id"];
+            if (val && !recordId) {
+                this.pickedModel = null;
             }
         }
     }

@@ -1,26 +1,37 @@
 <template>
     <div class="">
-        <sheets-row v-for="(row, key) in formRows" :key="key" :row="row" v-model="formAnswer[key]">
-
+        <sheets-row
+            v-for="(row, key) in formRows"
+            :key="key"
+            :row="row"
+            v-model="formAnswer[key]"
+        >
         </sheets-row>
 
         <div class="row text-center sheets-actions-container">
             <div class="col" v-for="(action, key) in formActions" :key="key">
-                <sheets-action :action="action" @trigger="handlerAction"></sheets-action>
+                <sheets-action
+                    :action="action"
+                    @trigger="handlerAction"
+                ></sheets-action>
             </div>
         </div>
         <sheets-loading :status="loading" />
-        <sheets-snackbar :message="snackbar.message" v-model="snackbar.show" :type="snackbar.success"/>
+        <sheets-snackbar
+            :message="snackbar.message"
+            v-model="snackbar.show"
+            :type="snackbar.success"
+        />
     </div>
 </template>
 
 <script>
-import Row from './grid/row.vue'
-import Action from './actions/button.vue'
-import Loading from './utils/loading.vue'
-import Snackbar from './utils/snackbar.vue'
+import Row from "./grid/row.vue";
+import Action from "./actions/button.vue";
+import Loading from "./utils/loading.vue";
+import Snackbar from "./utils/snackbar.vue";
 export default {
-    name: 'sheets-form',
+    name: "sheets-form",
     props: {
         // ID de la entidad
         entityId: {
@@ -35,12 +46,12 @@ export default {
         }
     },
     components: {
-        'sheets-loading': Loading,
-        'sheets-row': Row,
-        'sheets-action': Action,
-        'sheets-snackbar': Snackbar
+        "sheets-loading": Loading,
+        "sheets-row": Row,
+        "sheets-action": Action,
+        "sheets-snackbar": Snackbar
     },
-    data: () =>({
+    data: () => ({
         // filas de form
         formRows: [],
         // botones del formulario
@@ -50,186 +61,189 @@ export default {
         // archivos cargados en el form
         files: [],
         // snackbar para recepcion de mensajes desde el server
-        snackbar: { message: '', success: false, show: false },
+        snackbar: { message: "", success: false, show: false },
         //
+        action: {}
     }),
     computed: {
         loading() {
-            return this.$store.getters['formBuilder/loading']
+            return this.$store.getters["formBuilder/loading"];
         },
         result() {
-            let arr = []
+            let arr = [];
             this.formAnswer.forEach(row => {
-                arr = arr.concat(row)
-            })
-            return arr
+                arr = arr.concat(row);
+            });
+            return arr;
         },
         filesInForm() {
-            return this.$store.getters['formBuilder/hasFiles']
+            return this.$store.getters["formBuilder/hasFiles"];
         }
     },
     mounted() {
         window.name = this.windowName;
         this.window = window;
-        console.log(this.window)
-        this.initForm()
+        this.initForm();
     },
     methods: {
         postMessage(data) {
             try {
-                this.window.parent.postMessage(data, '*')
+                this.window.parent.postMessage(data, "*");
             } catch (error) {
-                console.warn(error)
+                console.warn(error);
             }
-
         },
         initForm() {
-            this.$store.dispatch('formBuilder/get', this.entityId)
-            .then(form => {
-                if (form.success) {
-                    this.formRows = form.rows
-                    this.formActions = form.actions
-                }
-                else {
-                    this.snackbar = {
-                        message: form.message,
-                        success: form.success,
-                        show: true
+            this.$store
+                .dispatch("formBuilder/get", this.entityId)
+                .then(form => {
+                    if (form.success) {
+                        this.formRows = form.rows;
+                        this.formActions = form.actions;
+                    } else {
+                        this.snackbar = {
+                            message: form.message,
+                            success: form.success,
+                            show: true
+                        };
                     }
-                }
-            })
-            .then(() => {
-                this.get_record()
-            }).catch(error => {
-                this.snackbar ={
-                    message: error.message,
-                    success: false,
-                    show: true
-                }
-            })
+                })
+                .then(() => {
+                    this.get_record();
+                })
+                .catch(error => {
+                    this.snackbar = {
+                        message: error.message,
+                        success: false,
+                        show: true
+                    };
+                });
         },
         async get_record() {
             if (!!this.record_id) {
                 const data = {
-                    entity_name: this.$store.getters['formBuilder/entity_name'],
+                    entity_name: this.$store.getters["formBuilder/entity_name"],
                     id: this.record_id
-                }
-                await this.$store.dispatch('formBuilder/get_record', data)
+                };
+                await this.$store.dispatch("formBuilder/get_record", data);
             }
         },
         save() {
-            const entityId = this.$store.getters['formBuilder/entity_id']
+            const entityId = this.$store.getters["formBuilder/entity_id"];
 
-            let data = {}
-            data[entityId] = []
+            let data = {};
+            data[entityId] = [];
             // form fields
-            let form_fields = {}
+            let form_fields = {};
             this.formRows.map(row => {
                 row.sections.map(section => {
                     section.fields.map(field => {
                         this.result.map(r => {
-                            if(Object.keys(r)[0] == field.id)
-                                form_fields[field.id] = field.form_field_id
-                        })
-                    })
-                })
-            })
+                            if (Object.keys(r)[0] == field.id)
+                                form_fields[field.id] = field.form_field_id;
+                        });
+                    });
+                });
+            });
 
-            this.formAnswer.push({'form_fields': form_fields})
-            this.formAnswer.push({'form_id': this.$store.getters['formBuilder/form_id']})
-            let body = {}
+            this.formAnswer.push({ form_fields: form_fields });
+            this.formAnswer.push({
+                form_id: this.$store.getters["formBuilder/form_id"]
+            });
+            let body = {};
 
             this.result.map(r => {
                 if (!!r) {
-                    let obj = Object.assign({}, r)
-                    let key = Object.keys(obj)[0]
-                    body[key] = obj[key]
+                    let obj = Object.assign({}, r);
+                    let key = Object.keys(obj)[0];
+                    body[key] = obj[key];
                 }
-            })
+            });
 
-            data[entityId].push(body)
+            if (!!this.record_id) {
+                body["id"] = this.record_id;
+            }
 
-            let form = new FormData()
+            data[entityId].push(body);
 
-            form.append('entityKey', entityId)
+            let form = new FormData();
+
+            form.append("entityKey", entityId);
 
             Object.keys(data).forEach(key => {
-                form.append(key, JSON.stringify(data[key]))
-            })
-            const action = !this.record_id ? 'formBuilder/save' : 'formBuilder/update'
-
-            this.$store.dispatch(action, form)
-            .then(response => {
-                this.snackbar = {
-                    success: response.success,
-                    show: true,
-                    message: response.content.message
-                }
-                if (response.success) {
-                    this.resetForm()
-                    this.$store.commit('formBuilder/CLEARFIELDS', false)
-                    // console.log("this.$store.commit('formBuilder/CLEARFIELDS', false)")
-                    this.postMessage(response)
-                }
-            })
-            .catch(error => {
-                this.$store.commit('formBuilder/CLEARFIELDS', false)
-                this.snackbar ={
-                    message: error.data.content.message || error.statusText,
-                    success: false,
-                    show: true
-                }
-                this.postMessage(error.data)
-            })
+                form.append(key, JSON.stringify(data[key]));
+            });
+            const action = !this.record_id
+                ? "formBuilder/save"
+                : "formBuilder/update";
+            this.$store
+                .dispatch(action, form)
+                .then(response => {
+                    this.snackbar = {
+                        success: response.success,
+                        show: true,
+                        message: response.content.message
+                    };
+                    if (response.success) {
+                        // if (this.action.refresh_form === 1) {
+                            this.resetForm();
+                        // }
+                        // this.$store.commit("formBuilder/CLEARFIELDS", false);
+                        this.action = {};
+                        this.postMessage(response);
+                    }
+                })
+                .catch(error => {
+                    this.$store.commit("formBuilder/CLEARFIELDS", false);
+                    this.snackbar = {
+                        message: error.data.content.message || error.statusText,
+                        success: false,
+                        show: true
+                    };
+                    this.postMessage(error.data);
+                });
         },
         async sendFiles() {
-            const files = this.$store.getters['formBuilder/files']
+            const files = this.$store.getters["formBuilder/files"];
 
-            let promises = []
-            let req = []
-            Object.entries(files).map( (file) => {
-                req.push(file[1].id)
-                const form = new FormData()
+            let promises = [];
+            let req = [];
+            Object.entries(files).map(file => {
+                req.push(file[1].id);
+                const form = new FormData();
 
-                form.append("file", file[1].file)
-                form.append("fileid", file[1].id)
+                form.append("file", file[1].file);
+                form.append("fileid", file[1].id);
 
-                promises.push(this.$store.dispatch('formBuilder/upload_files', form))
-
-            })
+                promises.push(
+                    this.$store.dispatch("formBuilder/upload_files", form)
+                );
+            });
             await Promise.all(promises).then(resp => {
                 for (let index = 0; index < resp.length; index++) {
-                    let obj = {}
-                    obj[req[index]] = resp[index]
-                    this.formAnswer[0].push(obj)
+                    let obj = {};
+                    obj[req[index]] = resp[index];
+                    this.formAnswer[0].push(obj);
                 }
-            })
+            });
         },
         async handlerAction(saveForm, action) {
-            this.$store.commit('formBuilder/CLEARFIELDS', false)
+            this.$store.commit("formBuilder/CLEARFIELDS", false);
             if (action.id !== "DEFAULT-ACTION") {
-                this.formAnswer.push({'action_id': action.id})
+                this.formAnswer.push({ action_id: action.id });
             }
-            if (saveForm){
-                if (this.filesInForm)
-                    await this.sendFiles()
-                this.save()
+            if (saveForm) {
+                if (this.filesInForm) await this.sendFiles();
+                this.save();
             }
-
-            if (action.refresh_form === 1) {
-                this.resetForm()
-            }
+            this.action = action;
         },
         resetForm() {
-            this.$store.commit('formBuilder/CLEARFIELDS', true)
-            this.formAnswer = []
-            // console.log("this.$store.commit('formBuilder/CLEARFIELDS', true)")
+            this.$store.commit("formBuilder/CLEARFIELDS", true);
+            this.formAnswer = [];
         }
     }
-}
+};
 </script>
 
-<style>
-
-</style>
-
+<style></style>

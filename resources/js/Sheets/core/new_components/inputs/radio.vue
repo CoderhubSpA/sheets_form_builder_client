@@ -10,9 +10,9 @@
                 :id="`${input.col_name}-${option.id}`"
                 :name="input.col_name"
                 :value="option.id"
-                v-model="picked"
+                v-model="pickedModel"
                 :disabled="disabled"
-                :checked="picked === option.id"
+                :checked="pickedModel === option.id"
                 class="custom-control-input"
             />
             <label

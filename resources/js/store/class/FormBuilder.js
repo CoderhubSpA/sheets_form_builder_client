@@ -20,6 +20,7 @@ export class FormBuilder {
                 }
                 else {
                     this.isPoll = false
+                    this.parseForm()
                 }
             })
             .catch(error => {
@@ -34,6 +35,7 @@ export class FormBuilder {
 
     parsePoll(data) {
         this.sections = data.sections
+        this.questions = data.fields
     }
 
 

@@ -1,6 +1,18 @@
 import axios from 'axios'
 import Vue from 'vue'
 
+const DEFAULT_ACTION = {
+    cancel_form: 0,
+    cancel_process: 0,
+    color: null,
+    id: "DEFAULT-ACTION",
+    name: "Guardar",
+    process_id: null,
+    refresh_form: 1,
+    save_form: 1,
+    text_color: null,
+}
+
 export default {
     namespaced: true,
     state: {
@@ -18,6 +30,7 @@ export default {
         history: [],
         clearfields: false,
         form_id: '',
+        record_id: null,
         errors_fields: {}
 
     },
@@ -43,6 +56,7 @@ export default {
             return section
         },
         form_id: state => state.form_id,
+        record_id: state => state.record_id,
         errors_fields: state => state.errors_fields
 
 
@@ -56,6 +70,9 @@ export default {
         },
         ENTITY_NAME(state, val) {
             state.entityName = val
+        },
+        RECORD_ID(state, val) {
+            state.record_id = val
         },
         CONTENT_INFO(state, val) {
             state.contentInfo = val
@@ -105,6 +122,9 @@ export default {
                 axios.get(`/api/sheets/form/${id}`)
                 .then(response => {
                     const data = response.data.content
+
+                    const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION]
+
                     commit('FORM_ID', data.id)
                     commit('ENTITY_ID', data.entity_type_id)
                     commit('ENTITY_NAME', data.entity_type_name)
@@ -135,7 +155,7 @@ export default {
                     })
                     let form = {
                         rows: rows,
-                        actions: data.actions.sort((a, b) => {
+                        actions: actions.sort((a, b) => {
                                 return a.save_form > b.save_form ? 1 : -1
                             }),
                         success: response.data.success,
@@ -174,7 +194,7 @@ export default {
         },
         get_record({ commit}, data) {
             commit('LOADING', true)
-
+            commit('RECORD_ID', data.id);
             return new Promise((resolve, reject) => {
                 axios.get(`/api/sheets/getrecord/${data.entity_name}/${data.id}`)
                 .then(response => {

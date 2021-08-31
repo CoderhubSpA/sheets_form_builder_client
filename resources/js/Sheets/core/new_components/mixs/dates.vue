@@ -39,6 +39,26 @@ export default {
          */
         secondStep() {
             return this.input.sec_step || 1
+        },
+        fieldValue() {
+            const fields = this.$store.getters['formBuilder/fields']
+
+            if (fields.length > 0) {
+                const val = fields.filter(f => Object.keys(f)[0] === this.id)[0]
+                if (!!val) {
+                    return val[this.id]
+                }
+            }
+            return
+        }
+    },
+    watch: {
+        fieldValue(val) {
+            if (val) {
+                this.picker = new Date(val)
+                this.onInput(val)
+            }
+
         }
     },
     methods: {
