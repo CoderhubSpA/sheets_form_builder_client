@@ -14,6 +14,7 @@
                 :class="getFieldContainerClass(question.id, question)"
                 style="margin-bottom: 20px;"
             >
+                <!-- CLASSIC FIELDS -->
                 <sheet-input
                     :identificador="identificador"
                     :modelretrive="modelretrive"
@@ -21,6 +22,7 @@
                     :styles="parsedFieldStyles(question)"
                     :model="model[question.id]"
                     :responses="responses"
+                    v-if="!activeNewFields.includes(question.format)"
                     v-on:question:selected="
                         getAnswerFromQuestionSelected($event)
                     "
@@ -32,6 +34,21 @@
                         )
                     "
                 />
+                <!-- NEW FIELDS -->
+                <sheets-field
+                    v-if="activeNewFields.includes(question.format)"
+                    :field="question"
+                    :key="index"
+                    v-model="sectionModel[index]"
+                    @sheets-input-change="
+                        getAnswerFromInputChange(
+                            $event,
+                            question.id,
+                            question.col_name
+                        )
+                    "
+                >
+                </sheets-field>
             </div>
         </div>
         <div class="row" v-if="requirederror === true">
@@ -65,9 +82,11 @@
 
 <script>
 import global from "../global";
+import SheetsField from "../../new_components/field.vue";
 export default {
     components: {
-        "sheet-input": global
+        "sheet-input": global,
+        "sheets-field": SheetsField
     },
     props: {
         section: {
@@ -120,7 +139,9 @@ export default {
         answer: {},
         responses: [],
         errors_messages: [],
-        model: []
+        model: [],
+        activeNewFields: ["RADIO"],
+        sectionModel: []
     }),
     computed: {
         title() {

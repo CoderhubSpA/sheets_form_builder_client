@@ -13,7 +13,10 @@ export default {
     }),
     computed: {
         options() {
-            const contentInfo = this.$store.getters["formBuilder/content_info"];
+            let contentInfo = this.$store.getters["formBuilder/content_info"];
+            if (!contentInfo) {
+                contentInfo = this.$store.getters["form/contentinfo"];
+            }
 
             if (!!contentInfo) {
                 const entities =
@@ -63,6 +66,12 @@ export default {
             if (val !== null) {
                 let pickedValue = {};
                 pickedValue[this.input.id] = val;
+                this.$emit(
+                    "poll-entry",
+                    val,
+                    this.input.id,
+                    this.input.col_name
+                );
                 this.$emit("input", pickedValue);
             }
         },

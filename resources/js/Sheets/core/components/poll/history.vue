@@ -14,16 +14,18 @@
                         class="list-group-item SheetsPollHistory__history-item"
                     >
                         {{ index + 1 }}.- {{ item.questiondesc }} - <b>R:</b>
-                        <span v-if="item.alternative === null"> {{item.answer}} </span>
-                        <span v-if="item.alternative !== null"> {{item.alternative.name}} </span>
+                        <span v-if="item.alternative === null">
+                            {{ capitalizeFirstLetter(item.answer) }}
+                        </span>
+                        <span v-if="item.alternative !== null">
+                            {{ capitalizeFirstLetter(item.alternative.name) }}
+                        </span>
                     </li>
                 </ul>
             </div>
             <div class="col" v-if="items.length === 0">
                 <ul class="list-group list-group-flush">
-                    <li
-                        class="list-group-item SheetsPollHistory__history-item"
-                    >
+                    <li class="list-group-item SheetsPollHistory__history-item">
                         Historial vacío
                     </li>
                 </ul>
@@ -50,7 +52,14 @@ export default {
     }),
     computed: {},
     watch: {},
-    methods: {}
+    methods: {
+        capitalizeFirstLetter(string) {
+            const stringCapitalized = `${string
+                .charAt(0)
+                .toUpperCase()}${string.slice(1)}`;
+            return stringCapitalized;
+        }
+    }
 };
 </script>
 
@@ -64,7 +73,7 @@ export default {
     margin: 15px;
     padding: 20px;
 }
-.SheetsPollHistory__history-item{
+.SheetsPollHistory__history-item {
     background-color: transparent;
 }
 </style>

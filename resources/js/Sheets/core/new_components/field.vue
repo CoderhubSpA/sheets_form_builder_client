@@ -1,10 +1,15 @@
 <template>
-    <div class="sheets-field-wrapper" :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl}`">
+    <div
+        class="sheets-field-wrapper"
+        :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl}`"
+    >
         <component
             :is="fieldInput"
             :input="field"
             v-model="data"
-            disabled>
+            @poll-entry="handlePollEntry($event, field.id, field.col_name)"
+            disabled
+        >
         </component>
         <div class="row">
             <div class="col">
@@ -31,44 +36,52 @@ export default {
     }),
     computed: {
         fieldInput() {
-            const chars = { "[" : '-', "]": ''}
-            const format = this.field.format.toLowerCase().replace(/\[|\]/g, m => chars[m]);
-            return () => import(`./inputs/${format}`)
+            const chars = { "[": "-", "]": "" };
+            const format = this.field.format
+                .toLowerCase()
+                .replace(/\[|\]/g, m => chars[m]);
+            return () => import(`./inputs/${format}`);
         },
         xl() {
-            return this.field.col_xl || 12
+            return this.field.col_xl || 12;
         },
         sm() {
-            return this.field.col_sm || 12
+            return this.field.col_sm || 12;
         },
         md() {
-            return this.field.col_md || 12
+            return this.field.col_md || 12;
         },
         error_messages() {
-            const errors = this.$store.getters['formBuilder/errors_fields']
+            const errors = this.$store.getters["formBuilder/errors_fields"];
 
-            return errors[this.field.id]
+            return errors[this.field.id];
         },
         clear() {
-            return this.$store.getters['formBuilder/clearfields']
+            return this.$store.getters["formBuilder/clearfields"];
         }
     },
     watch: {
         data() {
             if (this.error_messages) {
-                this.$store.commit('formBuilder/CLEAR_ERROR_FIELD', this.field.id)
+                this.$store.commit(
+                    "formBuilder/CLEAR_ERROR_FIELD",
+                    this.field.id
+                );
             }
-            this.$emit('input', this.data)
+            this.$emit("input", this.data);
         },
         clear(val) {
             if (val) {
-                this.data = {}
+                this.data = {};
             }
         }
+    },
+    methods: {
+        handlePollEntry(val, id, col_name) {
+            this.$emit("sheets-input-change", val, id, col_name);
+        }
     }
-
-}
-
+};
 </script>
 
 <style lang="scss">
