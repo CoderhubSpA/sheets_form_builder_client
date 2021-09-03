@@ -185,11 +185,11 @@ export default {
                         message: response.content.message
                     };
                     if (response.success) {
-                        // if (this.action.refresh_form === 1) {
+                        if (this.action.refresh_form === 1) {
                             this.resetForm();
-                        // }
-                        // this.$store.commit("formBuilder/CLEARFIELDS", false);
-                        this.action = {};
+                        }
+                        // this.$store.commit("formBuilder/CLEARFIELDS", false)
+                        this.action = {}
                         this.postMessage(response);
                     }
                 })
@@ -199,7 +199,8 @@ export default {
                         message: error.data.content.message || error.statusText,
                         success: false,
                         show: true
-                    };
+                    }
+                    this.action = {}
                     this.postMessage(error.data);
                 });
         },

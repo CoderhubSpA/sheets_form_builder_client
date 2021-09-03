@@ -63,10 +63,7 @@ export default {
     watch: {
         data() {
             if (this.error_messages) {
-                this.$store.commit(
-                    "formBuilder/CLEAR_ERROR_FIELD",
-                    this.field.id
-                );
+                this.$store.commit("formBuilder/CLEAR_ERROR_FIELD", this.field.id);
             }
             this.$emit("input", this.data);
         },

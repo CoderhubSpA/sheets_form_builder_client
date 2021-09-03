@@ -42,8 +42,8 @@ export default {
                     return val[this.id]
                 }
             }
-            return this.value[this.id] == '' || this.$store.getters['formBuilder/clearfields'] ? '' : this.value[this.id]
-            // return this.value ? this.value[this.id] : ''
+            // return this.value[this.id] == '' || this.$store.getters['formBuilder/clearfields'] ? '' : this.value[this.id]
+            return this.value ? this.value[this.id] : ''
         },
         col_name() {
             return this.input.col_name
