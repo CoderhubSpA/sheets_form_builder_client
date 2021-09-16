@@ -23,7 +23,7 @@ export default {
                 col_name: this.input.col_name,
                 text: val
             }
-            this.$store.commit('formBuilder/SEARCH_MAP', data)
+            this.$store.commit(`${this.state}/SEARCH_MAP`, data)
         }
     }
 }

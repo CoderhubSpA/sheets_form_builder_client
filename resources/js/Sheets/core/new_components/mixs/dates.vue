@@ -7,7 +7,11 @@ export default {
         },
         value: {
             required: true
-        }
+        },
+        state: {
+            type: String,
+            default: 'formBuilder',
+        },
     },
     data: () => ({
         picker: null
@@ -41,7 +45,7 @@ export default {
             return this.input.sec_step || 1
         },
         fieldValue() {
-            const fields = this.$store.getters['formBuilder/fields']
+            const fields = this.$store.getters[`${this.state}/fields`]
 
             if (fields.length > 0) {
                 const val = fields.filter(f => Object.keys(f)[0] === this.id)[0]

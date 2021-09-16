@@ -2,26 +2,23 @@
 export default {
     props: {
         input: {
-            type: Object
+            type: Object,
         },
         value: {
-            required: true
-        }
+            required: true,
+        },
     },
     computed: {
 
     },
     methods: {
         onChange(event) {
-            const file = event.target.files[0]
-            const data = {
-                id: this.id,
-                file: file
-            }
+            const f = event.target.files[0];
+            const data = { id: this.id, file: f };
             if (this.input.permission === 2) {
-                this.$store.commit('formBuilder/FILES', data)
+                this.$store.commit(`${this.state}/FILES`, data);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>

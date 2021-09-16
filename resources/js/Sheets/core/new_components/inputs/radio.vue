@@ -25,14 +25,14 @@
 </template>
 
 <script>
-import mix from "../mixs/input.vue";
-import mixRadio from "../mixs/radio.vue";
-import FormGroup from "../templates/form-group.vue";
+import mix from'../mixs/input.vue';
+import mixRadio from'../mixs/radio.vue';
+import FormGroup from'../templates/form-group.vue';
 export default {
     mixins: [mix, mixRadio],
     components: {
-        "form-group": FormGroup
-    }
+       'form-group': FormGroup,
+    },
 };
 </script>
 

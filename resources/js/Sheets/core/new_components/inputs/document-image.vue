@@ -19,60 +19,63 @@
 </template>
 
 <script>
-import FileTemplate from '../templates/file.vue'
-import mix from '../mixs/input.vue'
-import mixFile from '../mixs/files'
+import FileTemplate from '../templates/file.vue';
+import mix from '../mixs/input.vue';
+import mixFile from '../mixs/files';
+
 export default {
     mixins: [mix, mixFile],
     components: {
-        'file-template': FileTemplate
+        'file-template': FileTemplate,
     },
     data: () => ({
-        preview: null
+        preview: null,
     }),
     computed: {
         accept() {
-            return 'image/*'
+            return 'image/*';
         },
         previewId() {
-            return `id-${this.id}`
+            return `id-${this.id}`;
         },
         previewLink() {
-            return this.$store.getters['formBuilder/fields']
-        }
+            return this.$store.getters[`${this.state}/fields`];
+        },
     },
     watch: {
-        previewLink(val) {
-            const fields = this.$store.getters['formBuilder/fields']
+        previewLink() {
+            const fields = this.$store.getters[`${this.state}/fields`];
+
             if (fields.length > 0) {
-                const value = fields.filter(f => Object.keys(f)[0] === this.id)[0]
-                if (!!value) {
+                const value = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (value) {
                     // console.log(val, value)
                 }
             }
-        }
+        },
     },
     methods: {
         onChange(event) {
-            const file = event.target.files[0]
-            let container = document.getElementById('preview-image-container')
-            this.preview = URL.createObjectURL(file)
-            container.classList.remove('hide')
-            container.classList.add('show')
+            const f = event.target.files[0];
+            const container = document.getElementById('preview-image-container');
+            this.preview = URL.createObjectURL(f);
+            container.classList.remove('hide');
+            container.classList.add('show');
             //
             const data = {
                 id: this.id,
-                file: file
-            }
+                file: f,
+            };
+
             if (this.input.permission === 2) {
-                this.$store.commit('formBuilder/FILES', data)
+                this.$store.commit(`${this.state}/FILES`, data);
             }
         },
         onInput(event) {
             // console.log(event)
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <style lang="scss">
 .preview-container {

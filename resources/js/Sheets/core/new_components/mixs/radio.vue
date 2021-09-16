@@ -6,14 +6,18 @@ export default {
         },
         value: {
             required: true
+        },
+        state: {
+            type: String,
+            required: true,
         }
     },
     data: () => ({
-        pickedModel: null
+        pickedModel: null,
     }),
     computed: {
         options() {
-            let contentInfo = this.$store.getters["formBuilder/content_info"];
+            let contentInfo = this.$store.getters[`${this.state}/content_info`];
             if (!contentInfo) {
                 contentInfo = this.$store.getters["form/contentinfo"];
             }
@@ -41,8 +45,8 @@ export default {
             return [];
         },
         picked() {
-            const fields = this.$store.getters["formBuilder/fields"];
-            if (fields.length > 0) {
+            const fields = this.$store.getters[`${this.state}/fields`];
+            if (fields && fields.length > 0) {
                 const val = fields.filter(
                     f => Object.keys(f)[0] === this.id
                 )[0];
@@ -53,7 +57,7 @@ export default {
             return null;
         },
         clear() {
-            return this.$store.getters["formBuilder/clearfields"];
+            return this.$store.getters[`${this.state}/clearfields`];
         }
     },
     watch: {
@@ -76,7 +80,7 @@ export default {
             }
         },
         clear(val) {
-            const recordId = this.$store.getters["formBuilder/record_id"];
+            const recordId = this.$store.getters[`${this.state}/record_id`];
             if (val && !recordId) {
                 this.pickedModel = null;
             }

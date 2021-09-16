@@ -25,8 +25,8 @@ export default {
     }),
     computed: {
         inputValue() {
-            const fields = this.$store.getters['formBuilder/fields']
-            if (fields.length > 0) {
+            const fields = this.$store.getters[`${this.state}/fields`]
+            if (fields && fields.length > 0) {
                 const val = fields.filter(f => Object.keys(f)[0] === this.id)[0]
                 if (!!val) {
                     return val[this.id]

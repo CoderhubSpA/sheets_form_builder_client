@@ -13,14 +13,15 @@
 </template>
 
 <script>
-import mix from '../mixs/input.vue'
-import InputGroup from '../templates/input-group.vue'
+import mix from '../mixs/input.vue';
+import InputGroup from '../templates/input-group.vue';
+
 export default {
     mixins: [mix],
     components: {
-        'input-group': InputGroup
-    }
-}
+        'input-group': InputGroup,
+    },
+};
 </script>
 
 <style>

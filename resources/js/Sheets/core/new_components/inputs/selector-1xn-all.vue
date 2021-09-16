@@ -8,20 +8,25 @@
             :multiple="multiple"
             v-model="selected"
             :searchable="searchable">
+            <nested-form v-if="has_entity_type_permission_fk"
+                :entity_type_permission_fk="entity_type_permission_fk"/>
         </v-select>
     </form-group>
 </template>
 
 <script>
-import mix from '../mixs/input.vue'
-import mixSelector from '../mixs/selector.vue'
-import FormGroup from '../templates/form-group.vue'
+import mix from '../mixs/input.vue';
+import mixSelector from '../mixs/selector.vue';
+import FormGroup from '../templates/form-group.vue';
+import NestedForm from '../nested.vue';
+
 export default {
-    mixins:[mix, mixSelector],
+    mixins: [mix, mixSelector],
     components: {
-        'form-group': FormGroup
-    }
-}
+        'form-group': FormGroup,
+        'nested-form': NestedForm,
+    },
+};
 </script>
 
 <style>

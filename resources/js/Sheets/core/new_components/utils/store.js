@@ -1,21 +1,20 @@
-import axios from 'axios';
-import Vue from 'vue';
+import axios from 'axios'
 
 const DEFAULT_ACTION = {
     cancel_form: 0,
     cancel_process: 0,
     color: null,
-    id: 'DEFAULT-ACTION',
-    name: 'Guardar',
+    id: "DEFAULT-ACTION",
+    name: "Guardar",
     process_id: null,
     refresh_form: 1,
     save_form: 1,
     text_color: null,
-};
+}
 
 export default {
     namespaced: true,
-    state: () => ({
+    state: {
         loading: false,
         entityId: '',
         entityName: '',
@@ -23,7 +22,6 @@ export default {
         contentInfo: null,
         hasFiles: false,
         fields: [],
-        pivots: null,
         searchMap: {},
         poll_sections: [],
         poll_questions: [],
@@ -32,16 +30,9 @@ export default {
         clearfields: false,
         form_id: '',
         record_id: null,
-        errors_fields: {},
-        /**
-         * Si “default:1”, el Form Builder no debe enviar al backend:
-         * form_id
-         * form_fields
-         * action_id
-         */
-        default_form: false,
+        errors_fields: {}
 
-    }),
+    },
     getters: {
         loading: state => state.loading,
         entity_id: state => state.entityId,
@@ -50,7 +41,6 @@ export default {
         hasFiles: state => state.hasFiles,
         files: state => state.files,
         fields: state => state.fields,
-        pivots: state => state.pivots,
         searchMap: state => state.searchMap,
         history: state => state.history,
         poll_sections: state => state.poll_sections,
@@ -66,8 +56,8 @@ export default {
         },
         form_id: state => state.form_id,
         record_id: state => state.record_id,
-        errors_fields: state => state.errors_fields,
-        default_form: state => state.default_form,
+        errors_fields: state => state.errors_fields
+
 
     },
     mutations: {
@@ -102,9 +92,6 @@ export default {
         POLL_QUESTIONS(state, val) {
             state.poll_questions = val
         },
-        PIVOTS(state, val) {
-            state.pivots = val
-        },
         POLL_ACTIVE_SECTION(state, val) {
             state.poll_active_section = val
         },
@@ -118,79 +105,71 @@ export default {
             state.clearfields = val
         },
         FORM_ID(state, val) {
+            debugger;
             state.form_id = val
+            debugger;
         },
         ERRORS_FIELD(state, val) {
             Vue.set(state.errors_fields, val.key, val.value)
         },
         CLEAR_ERROR_FIELD(state, keyfield) {
             state.errors_fields[keyfield] = ''
-        },
-        DEFAULT_FORM(state, val) {
-            state.default_form = val
         }
     },
     actions: {
         async get({ commit, dispatch }, id) {
             commit('LOADING', true)
-
+            debugger;
             return new Promise((resolve, reject) => {
                 axios.get(`/api/sheets/form/${id}`)
-                    .then((response) => {
-                        const data = response.data.content;
+                .then(response => {
+                    const data = response.data.content
 
-                        const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
+                    const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION]
+                    debugger;
+                    commit('FORM_ID', data.id)
 
-                        commit('FORM_ID', data.id);
+                    commit('ENTITY_ID', data.entity_type_id)
 
-                        commit('ENTITY_ID', data.entity_type_id);
+                    commit('ENTITY_NAME', data.entity_type_name)
 
-                        commit('ENTITY_NAME', data.entity_type_name);
+                    let rows = data.rows.map(row => {
+                        let sections = data.sections.filter(sect => {
+                            return sect.form_row_id === row.id
+                        })
 
-                        commit('DEFAULT_FORM', data.default === 1);
+                        sections.sort((a, b) => {
+                            return a.order > b.order ? 1 : -1;
+                        })
 
-                        let rows = data.rows.map((row) => {
-                            let sections = data.sections.filter(sect => {
-                                return sect.form_row_id === row.id
+                        sections.map(section => {
+                            let fields = data.fields.filter(f => {
+                                return f.form_section_id === section.id && f.permission !== 0
                             })
-
-                            sections.sort((a, b) => {
-                                return a.order > b.order ? 1 : -1;
+                            fields.sort((a, b) => {
+                                return a.order > b.order ? 1 : -1
                             })
-
-                            sections.map(section => {
-                                let fields = [];
-                                if (Array.isArray(data.fields)) {
-                                    fields = data.fields.filter((f) => {
-                                        return f.form_section_id === section.id && f.permission !== 0
-                                    })
-                                } else {
-                                    Object.keys(data.fields).forEach((key) => {
-                                        fields.push(data.fields[key]);
-                                    });
-                                }
-                                fields.sort((a, b) => {
-                                    return a.order > b.order ? 1 : -1
-                                })
-                                section.fields = fields
-                            })
-                            row.sections = sections
-                            return row
-                        });
-                        rows.sort((a, b) => {
-                            return a.order > b.order ? 1 : -1
-                        });
-                        let form = {
-                            rows: rows,
-                            actions: actions.sort((a, b) => {
+                            section.fields = fields
+                        })
+                        row.sections = sections
+                        return row
+                    })
+                    rows.sort((a, b) => {
+                        return a.order > b.order ? 1 : -1
+                    })
+                    let form = {
+                        rows: rows,
+                        actions: actions.sort((a, b) => {
                                 return a.save_form > b.save_form ? 1 : -1
                             }),
-                            success: response.data.success,
-                            message: response.data.message,
-                        };
-                        resolve(form);
+                        success: response.data.success,
+                        message: response.data.message
+                        }
+                    debugger;
+                    resolve(form)
                     return response.data.content
-                    }).then(content => {
+                })
+                .then(content => {
                     if (!!content) {
                         dispatch('info', content.entity_type_id)
                     }
@@ -230,7 +209,6 @@ export default {
 
                         commit('FIELDS', f)
                     })
-                    commit('PIVOTS', response.data.content.pivots);
                     resolve(response.data)
                 })
                 .catch(error => {

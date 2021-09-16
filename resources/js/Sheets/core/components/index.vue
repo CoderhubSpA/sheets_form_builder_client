@@ -2,10 +2,6 @@
     <div>
         <loading-message :status="loading"></loading-message>
         <div v-if="isPoll === false">
-            <!-- <sheets-form-render
-                :formid="id"
-                :recordid="recordid"
-            ></sheets-form-render> -->
             <sheets-form :entityId="id" :record_id="recordid"></sheets-form>
         </div>
         <div v-if="isPoll === true">
@@ -15,7 +11,6 @@
 </template>
 
 <script>
-// import SheetsFormRender from "./classic/render.vue";
 import SheetsForm from '../new_components/form.vue'
 import SheetsPollRender from "./poll/render.vue";
 import LoadingMessage from "./loading-message.vue";

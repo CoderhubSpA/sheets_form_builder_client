@@ -7,7 +7,8 @@
             <sheets-field v-for="(field, key) in fields"
                 :field="field"
                 :key="key"
-                v-model="sectionModel[key]">
+                v-model="sectionModel[key]"
+                :state="state">
             </sheets-field>
         </div>
 
@@ -15,49 +16,54 @@
 </template>
 
 <script>
-import SheetsField from '../field.vue'
+import SheetsField from '../field.vue';
+
 export default {
     components: {
-        'sheets-field': SheetsField
+        'sheets-field': SheetsField,
     },
     props: {
         section: {
             type: Object,
-            require: true
+            require: true,
         },
         value: {
-            required: true
-        }
+            required: true,
+        },
+        state: {
+            type: String,
+            require: true,
+        },
     },
     data: () => ({
-        sectionModel: []
+        sectionModel: [],
     }),
     watch: {
         sectionModel() {
-            this.$emit('input', this.sectionModel)
-        }
+            this.$emit('input', this.sectionModel);
+        },
     },
     computed: {
         id() {
-            return this.section.id
+            return this.section.id;
         },
         name() {
-            return this.section.name
+            return this.section.name;
         },
         sm() {
-            return `col-sm-${this.section.col_sm}`
+            return `col-sm-${this.section.col_sm}`;
         },
         md() {
-            return `col-md-${this.section.col_md}`
+            return `col-md-${this.section.col_md}`;
         },
         xl() {
-            return `col-xl-${this.section.col_xl}`
+            return `col-xl-${this.section.col_xl}`;
         },
         fields() {
-            return this.section.fields || []
-        }
-    }
-}
+            return this.section.fields || [];
+        },
+    },
+};
 </script>
 
 <style lang="scss">

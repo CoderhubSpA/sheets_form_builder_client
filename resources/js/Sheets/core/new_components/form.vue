@@ -1,55 +1,53 @@
 <template>
     <div class="">
-        <sheets-row
-            v-for="(row, key) in formRows"
+        <sheets-row v-for="(row, key) in formRows"
             :key="key"
             :row="row"
-            v-model="formAnswer[key]"
-        >
+            :state="namespace"
+            v-model="formAnswer[key]">
         </sheets-row>
 
         <div class="row text-center sheets-actions-container">
             <div class="col" v-for="(action, key) in formActions" :key="key">
-                <sheets-action
-                    :action="action"
-                    @trigger="handlerAction"
-                ></sheets-action>
+                <sheets-action :action="action" @trigger="handlerAction"></sheets-action>
             </div>
         </div>
-        <sheets-loading :status="loading" />
+        <!-- <sheets-loading :status="loading" /> -->
         <sheets-snackbar
             :message="snackbar.message"
             v-model="snackbar.show"
-            :type="snackbar.success"
-        />
+            :type="snackbar.success"/>
     </div>
 </template>
 
 <script>
 import Row from "./grid/row.vue";
 import Action from "./actions/button.vue";
-import Loading from "./utils/loading.vue";
+// import Loading from "./utils/loading.vue";
 import Snackbar from "./utils/snackbar.vue";
+import FormBuilderStore from '../../../store/formBuilder';
+import registerStore from './utils/reusabale-store';
+
 export default {
     name: "sheets-form",
     props: {
         // ID de la entidad
         entityId: {
             type: String,
-            require: true
+            require: true,
         },
         // ID del registro
         record_id: {
             type: String,
             require: false,
-            default: null
-        }
+            default: null,
+        },
     },
     components: {
-        "sheets-loading": Loading,
+        // "sheets-loading": Loading,
         "sheets-row": Row,
         "sheets-action": Action,
-        "sheets-snackbar": Snackbar
+        "sheets-snackbar": Snackbar,
     },
     data: () => ({
         // filas de form
@@ -67,18 +65,28 @@ export default {
     }),
     computed: {
         loading() {
-            return this.$store.getters["formBuilder/loading"];
+            return this.$store.getters[this.namespace+"/loading"];
         },
         result() {
             let arr = [];
-            this.formAnswer.forEach(row => {
+            this.formAnswer.forEach((row) => {
                 arr = arr.concat(row);
             });
             return arr;
         },
         filesInForm() {
-            return this.$store.getters["formBuilder/hasFiles"];
-        }
+            return this.$store.getters[this.namespace+"/hasFiles"];
+        },
+        form_id() {
+            return this.$store.getters[`${this.namespace}/form_id`];
+        },
+        default_form() {
+            return this.$store.getters[`${this.namespace}/default_form`];
+        },
+    },
+    beforeCreate() {
+        const { namespace } = registerStore(this.$store, FormBuilderStore, 'myStore');
+        this.namespace = namespace;
     },
     mounted() {
         window.name = this.windowName;
@@ -88,14 +96,14 @@ export default {
     methods: {
         postMessage(data) {
             try {
-                this.window.parent.postMessage(data, "*");
+                this.window.parent.postMessage(data, '*');
             } catch (error) {
                 console.warn(error);
             }
         },
         initForm() {
             this.$store
-                .dispatch("formBuilder/get", this.entityId)
+                .dispatch(this.namespace+"/get", this.entityId)
                 .then(form => {
                     if (form.success) {
                         this.formRows = form.rows;
@@ -122,34 +130,40 @@ export default {
         async get_record() {
             if (!!this.record_id) {
                 const data = {
-                    entity_name: this.$store.getters["formBuilder/entity_name"],
+                    entity_name: this.$store.getters[`${this.namespace}/entity_name`],
                     id: this.record_id
                 };
-                await this.$store.dispatch("formBuilder/get_record", data);
+                await this.$store.dispatch(`${this.namespace}/get_record`, data);
             }
         },
         save() {
-            const entityId = this.$store.getters["formBuilder/entity_id"];
+            const entityId = this.$store.getters[`${this.namespace}/entity_id`];
+
 
             let data = {};
             data[entityId] = [];
             // form fields
-            let form_fields = {};
-            this.formRows.map(row => {
-                row.sections.map(section => {
-                    section.fields.map(field => {
-                        this.result.map(r => {
-                            if (Object.keys(r)[0] == field.id)
-                                form_fields[field.id] = field.form_field_id;
+            if (!this.default_form) {
+                let form_fields = {};
+                this.formRows.map(row => {
+                    row.sections.map(section => {
+                        section.fields.map(field => {
+                            this.result.map(r => {
+                                if (Object.keys(r)[0] == field.id)
+                                    form_fields[field.id] = field.form_field_id;
+                            });
                         });
                     });
                 });
-            });
+                this.formAnswer.push({ form_fields: form_fields });
 
-            this.formAnswer.push({ form_fields: form_fields });
-            this.formAnswer.push({
-                form_id: this.$store.getters["formBuilder/form_id"]
-            });
+                const formId = this.$store.getters[this.namespace+"/form_id"];
+                if (formId) {
+                    this.formAnswer.push({
+                        form_id: formId,
+                    });
+                }
+            }
             let body = {};
 
             this.result.map(r => {
@@ -173,9 +187,7 @@ export default {
             Object.keys(data).forEach(key => {
                 form.append(key, JSON.stringify(data[key]));
             });
-            const action = !this.record_id
-                ? "formBuilder/save"
-                : "formBuilder/update";
+            const action = !this.record_id ? `${this.namespace}/save` : `${this.namespace}/update`;
             this.$store
                 .dispatch(action, form)
                 .then(response => {
@@ -188,13 +200,13 @@ export default {
                         if (this.action.refresh_form === 1) {
                             this.resetForm();
                         }
-                        // this.$store.commit("formBuilder/CLEARFIELDS", false)
-                        this.action = {}
+
+                        this.action = {};
                         this.postMessage(response);
                     }
                 })
                 .catch(error => {
-                    this.$store.commit("formBuilder/CLEARFIELDS", false);
+                    this.$store.commit(this.namespace+"/CLEARFIELDS", false);
                     this.snackbar = {
                         message: error.data.content.message || error.statusText,
                         success: false,
@@ -205,7 +217,7 @@ export default {
                 });
         },
         async sendFiles() {
-            const files = this.$store.getters["formBuilder/files"];
+            const files = this.$store.getters[this.namespace+"/files"];
 
             let promises = [];
             let req = [];
@@ -217,7 +229,7 @@ export default {
                 form.append("fileid", file[1].id);
 
                 promises.push(
-                    this.$store.dispatch("formBuilder/upload_files", form)
+                    this.$store.dispatch(this.namespace+"/upload_files", form)
                 );
             });
             await Promise.all(promises).then(resp => {
@@ -229,7 +241,8 @@ export default {
             });
         },
         async handlerAction(saveForm, action) {
-            this.$store.commit("formBuilder/CLEARFIELDS", false);
+            console.log(action)
+            this.$store.commit(this.namespace+"/CLEARFIELDS", false);
             if (action.id !== "DEFAULT-ACTION") {
                 this.formAnswer.push({ action_id: action.id });
             }
@@ -240,7 +253,7 @@ export default {
             this.action = action;
         },
         resetForm() {
-            this.$store.commit("formBuilder/CLEARFIELDS", true);
+            this.$store.commit(this.namespace+"/CLEARFIELDS", true);
             this.formAnswer = [];
         }
     }

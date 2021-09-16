@@ -2,107 +2,116 @@
 export default {
     props: {
         input: {
-            type: Object
+            type: Object,
         },
         value: {
-            required: true
-        }
+            required: true,
+        },
+        state: {
+            type: String,
+            required: true,
+        },
     },
     data: () => ({
-        selected: null
+        selected: null,
+        nested: false,
     }),
     computed: {
         selectedValue() {
             let result = null;
-            const fields = this.$store.getters['formBuilder/fields']
+            const fields = this.$store.getters[`${this.state}/fields`];
 
-            if (fields.length > 0) {
-                const field = fields.filter(f => Object.keys(f)[0] === this.id)[0]
+            if (fields && fields.length > 0) {
+                const field = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
 
-                if (!!field) {
-                    const key = Object.keys(field)[0]
-                    let search = this.multiple ? JSON.parse(field[key]) : field[key].toString()
-
+                if (field) {
+                    const key = Object.keys(field)[0];
+                    const search = this.multiple ? JSON.parse(field[key]) : field[key];
 
                     if (this.multiple && !!search) {
-                        result = Object.entries(search).map(s => {
-                            return this.options.find(o => o.id === s[1])
-                        })
-                    }
-                    else if(!this.multiple && !!search) {
-                        result = this.options.find(o => o.id === search)
+                        result = Object.entries(search).map((s) => this.options.find((o) => o.id === s[1]));
+                    } else if (!this.multiple && !!search) {
+                        result = this.options.find((o) => o.id === search);
                     }
                 }
             }
-            return result
+            return result;
         },
         options() {
-            const contentInfo = this.$store.getters['formBuilder/content_info']
+            const contentInfo = this.$store.getters[`${this.state}/content_info`];
+            let options = [];
 
-            if (!!contentInfo) {
-                const entities = contentInfo.content.entities_fk[this.input.entity_type_fk]
+            if (contentInfo) {
+                const fk = this.input.entity_type_fk;
 
-                if (entities)
-                    return entities.map(e => {
-                        return { id: e.id, name: e.name }
-                    })
-                else {
-                    let opt = JSON.parse(this.input.options)
+                const entities = contentInfo.content.entities_fk[fk];
 
-                    let options  = []
 
-                    Object.keys(opt).forEach(key => {
-                        options.push({ id: key, name: opt[key] })
-                    })
+                if (entities) {
+                    options = entities.map((e) => ({ id: e.id, name: e.name }));
+                } else {
+                    const opt = this.input.options ? JSON.parse(this.input.options) : {};
 
-                    return options
+                    Object.keys(opt).forEach((key) => {
+                        options.push({ id: key, name: opt[key] });
+                    });
                 }
             }
-            return []
+            return options;
         },
         multiple() {
-            const isMultiple = this.input.format === 'SELECTOR[MULTIPLE]'
+            const isMultiple = this.input.format === 'SELECTOR[MULTIPLE]';
 
-            const is1xnAll = this.input.format === 'SELECTOR[1XN][ALL]'
+            const is1xnAll = this.input.format === 'SELECTOR[1XN][ALL]';
 
-            const isMultipleAdvanced = this.input.format === 'SELECTOR[MULTIPLE][ADVANCED]'
+            const isMultipleAdvanced = this.input.format === 'SELECTOR[MULTIPLE][ADVANCED]';
 
-            return (isMultiple || is1xnAll || isMultipleAdvanced)
+            return (isMultiple || is1xnAll || isMultipleAdvanced);
         },
         clear() {
-            return this.$store.getters['formBuilder/clearfields']
+            return this.$store.getters[`${this.state}/clearfields`];
         },
         searchable() {
-            return window.outerWidth > 1024
-        }
+            return window.outerWidth > 1024;
+        },
+        /**
+         * Condicion para mostrar el btn +
+         * y permitir la apertura de un nuevo form
+         */
+        has_entity_type_permission_fk() {
+            return !!this.input.entity_type_permission_fk;
+        },
+        entity_type_permission_fk() {
+            return this.input.entity_type_permission_fk;
+        },
     },
     watch: {
         selected(val) {
-            if (!!val) {
-                let data = {}
+            if (val) {
+                const data = {};
 
-                if (this.multiple)
-                    data[this.id] = val.map(v => { return v.id })
-                else
-                    data[this.id] = val.id
+                if (this.multiple) {
+                    data[this.id] = val.map((v) => v.id);
+                } else {
+                    data[this.id] = val.id;
+                }
 
-                this.$emit("input", data)
+                this.$emit('input', data);
             }
-
         },
         selectedValue(val) {
-            this.selected = val
+            this.selected = val;
         },
         clear(val) {
             if (val) {
-                this.selected = null
-                this.$store.commit('formBuilder/CLEARFIELDS', false)
+                this.selected = null;
+                this.$store.commit(`${this.state}/CLEARFIELDS`, false);
             }
-        }
+        },
     },
-}
+};
 </script>
 
-<style>
+<style lang="scss">
 
 </style>

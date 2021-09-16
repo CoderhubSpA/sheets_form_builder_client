@@ -9,14 +9,18 @@ export default {
             type: Object,
             default: () => {},
             required: true
-        }
+        },
+        state: {
+            type: String,
+            required: true,
+        },
     },
     computed: {
         label() {
             return this.input.name
         },
         id() {
-            return this.input.id
+            return this.input.id;
         },
         autocomplete() {
             return !!this.input.autocomplete
@@ -34,16 +38,16 @@ export default {
             return this.input.placeholder
         },
         inputValue() {
-            const fields = this.$store.getters['formBuilder/fields']
-            if (fields.length > 0) {
+            const fields = this.$store.getters[this.state+'/fields']
+
+            if (fields && fields.length > 0) {
                 const val = fields.filter(f => Object.keys(f)[0] === this.id)[0]
                 if (!!val) {
                     this.$emit('input', val)
                     return val[this.id]
                 }
             }
-            // return this.value[this.id] == '' || this.$store.getters['formBuilder/clearfields'] ? '' : this.value[this.id]
-            return this.value ? this.value[this.id] : ''
+            return this.value ? this.value[this.id] : '';
         },
         col_name() {
             return this.input.col_name
@@ -62,7 +66,7 @@ export default {
 
             const isNumber = this.input.format === "NUMBER"
             const isClp = this.input.format === "CLP"
-            const isPercentage =this.input.format === "PERCENTAGE"
+            const isPercentage = this.input.format === "PERCENTAGE"
 
             if (isNumber || isClp || isPercentage) {
                 event.preventDefault();

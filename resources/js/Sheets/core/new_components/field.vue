@@ -9,6 +9,7 @@
             v-model="data"
             @poll-entry="handlePollEntry($event, field.id, field.col_name)"
             disabled
+            :state="state"
         >
         </component>
         <div class="row">
@@ -25,21 +26,25 @@
 export default {
     props: {
         field: {
-            type: Object
+            type: Object,
         },
         value: {
-            required: true
-        }
+            required: true,
+        },
+        state: {
+            type: String,
+            required: true,
+        },
     },
     data: () => ({
-        data: {}
+        data: {},
     }),
     computed: {
         fieldInput() {
-            const chars = { "[": "-", "]": "" };
+            const chars = { '[': '-', ']': '' };
             const format = this.field.format
                 .toLowerCase()
-                .replace(/\[|\]/g, m => chars[m]);
+                .replace(/\[|\]/g, (m) => chars[m]);
             return () => import(`./inputs/${format}`);
         },
         xl() {
@@ -52,26 +57,29 @@ export default {
             return this.field.col_md || 12;
         },
         error_messages() {
-            const errors = this.$store.getters["formBuilder/errors_fields"];
-
-            return errors[this.field.id];
+            const errors = this.$store.getters[`${this.state}/errors_fields`];
+            let result = '';
+            if (errors) {
+                result = errors[this.field.id];
+            }
+            return result;
         },
         clear() {
-            return this.$store.getters["formBuilder/clearfields"];
-        }
+            return this.$store.getters[`${this.state}/clearfields`];
+        },
     },
     watch: {
         data() {
             if (this.error_messages) {
-                this.$store.commit("formBuilder/CLEAR_ERROR_FIELD", this.field.id);
+                this.$store.commit(`${this.state}/CLEAR_ERROR_FIELD`, this.field.id);
             }
-            this.$emit("input", this.data);
+            this.$emit('input', this.data);
         },
         clear(val) {
             if (val) {
                 this.data = {};
             }
-        }
+        },
     },
     methods: {
         handlePollEntry(val, id, col_name) {
