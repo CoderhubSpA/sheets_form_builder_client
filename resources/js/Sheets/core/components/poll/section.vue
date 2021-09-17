@@ -40,6 +40,7 @@
                     :field="question"
                     :key="index"
                     v-model="sectionModel[index]"
+                    state="formBuilder"
                     @sheets-input-change="
                         getAnswerFromInputChange(
                             $event,

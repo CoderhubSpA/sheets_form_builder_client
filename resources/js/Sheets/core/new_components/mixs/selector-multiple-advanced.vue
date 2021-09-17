@@ -1,6 +1,11 @@
 <script>
 import { HotTable } from "@handsontable/vue";
-import Handsontable from "handsontable";
+import {
+    KeyValueOptions,
+    KeyValueRenderer,
+    KeyValueSelect
+} from "handsontable-key-value-select";
+import { clpRenderer } from "../handsontableCustom/renderers";
 export default {
     props: {
         input: {
@@ -62,7 +67,7 @@ export default {
         entityInfo: null,
         handsontableSettings: {
             colHeaders: ["ID"],
-            columns:[],
+            columns: [],
             width: "100%",
             height: "100%",
             rowHeights: 23,
@@ -102,7 +107,6 @@ export default {
     }),
     mounted() {
         this.getEntityInfo();
-        console.log(this.pivots);
     },
     methods: {
         getEntityInfo() {
@@ -137,7 +141,7 @@ export default {
                 return eInfo.col_name === this.input.col_fk_1_n;
             });
             this.columnsIds = [
-                { id: "id", column: {format: 'TEXT'} },
+                { id: "id", column: { format: "TEXT" } },
                 { id: mainPivot.id, column: mainPivot }
             ];
             this.entityInfo.columns.map(column => {
@@ -152,20 +156,66 @@ export default {
                     this.columnsIds.push({ id: column.id, column: column });
                 }
             });
+            this.columnsIds.map(format => {
+                console.log("formato", format.column.format);
+            });
         },
-        buildHotTableColumns(){
+        buildHotTableColumns() {
             let columns = [];
             this.columnsIds.map(column => {
                 let columnToPush = {};
-                if(column.column){
+                if (column.column) {
                     switch (column.column.format) {
-                        case 'CLP':
+                        case "CLP":
                             columnToPush.data = column.id;
-                            columnToPush.type = 'numeric';
+                            columnToPush.type = "numeric";
+                            columnToPush.renderer = clpRenderer;
                             break;
+                        case "NUMBER":
+                            columnToPush.data = column.id;
+                            columnToPush.type = "numeric";
+                            break;
+                        case "TEXT":
+                            columnToPush.data = column.id;
+                            columnToPush.type = "text";
+                            break;
+                        case "SELECTOR":
+                            const options = this.entityInfo.entities_fk[
+                                column.column.entity_type_fk
+                            ];
+                            const selectOptions = [];
+                            options.map(option => {
+                                selectOptions.push({
+                                    value: option.id,
+                                    label: option.name
+                                });
+                            });
+                            columnToPush.data = column.id;
+                            columnToPush.editor = KeyValueSelect;
+                            columnToPush.renderer = KeyValueRenderer;
+                            columnToPush.selectOptions = selectOptions;
+                            break;
+                        case "SiNo":
+                            columnToPush.data = column.id;
+                            columnToPush.type = "checkbox";
+                        case "DATE":
+                            columnToPush.data = column.id;
+                            columnToPush.type = "date";
+                            // TO DO: CHECK FORMAT
+                            columnToPush.dateFormat = 'MM/DD/YYYY',
+                            columnToPush.correctFormat = true;
+                            columnToPush.datePickerConfig = {
+                                firstDay: 0,
+                                showWeekNumber: true,
+                                numberOfMonths: 3,
+                                licenseKey: "non-commercial-and-evaluation"
+                            };
+                        // case "DATETIME":
+                        //     columnToPush.data = column.id;
+                        //     columnToPush.type = "checkbox";
                         default:
                             columnToPush.data = column.id;
-                            columnToPush.type = 'text';
+                            columnToPush.type = "text";
                             break;
                     }
                 }
@@ -182,7 +232,7 @@ export default {
             const newRow = {};
             this.handsontableData.push(newRow);
         },
-        logData(){
+        logData() {
             console.log(this.handsontableData);
         }
     }
