@@ -12,9 +12,6 @@
                     </button>
                 </div>
                 <div class="body">
-                    <!-- <component :is="formbuilder"
-                        :store="entity_type_permission_fk"
-                        :entityId="entity_type_permission_fk"/> -->
                     <div ref="nested" />
                 </div>
             </div>
@@ -23,9 +20,8 @@
 </template>
 
 <script>
-// import Vue from 'vue';
+import Vue from 'vue';
 import formbuilder from './form.vue';
-// import FormBuilderStore from '../../../store/formBuilder';
 
 export default {
     components: {
@@ -33,6 +29,10 @@ export default {
     },
     props: {
         entity_type_permission_fk: {
+            type: String,
+            require: true,
+        },
+        state: {
             type: String,
             require: true,
         },
@@ -51,14 +51,21 @@ export default {
             this.$refs.nested.innerHTML = '';
         },
         build() {
-            const store = this.$store
+            const store = this.$store;
             const FormBuilderClass = Vue.extend(formbuilder);
             const instance = new FormBuilderClass({
                 propsData: {
                     entityId: this.entity_type_permission_fk,
                     store: this.entity_type_permission_fk,
                 },
-                store
+                store,
+            });
+            instance.$on('input', () => {
+                const data = this.$store.getters[`${this.state}/raw`];
+                if (data.entity_type_id) {
+                    this.$store.dispatch(`${this.state}/info`, data.entity_type_id);
+                }
+                this.close();
             });
             instance.$mount();
 

@@ -8,10 +8,14 @@
                 :disabled="disabled"
                 :multiple="multiple"
                 v-model="selected"
-                :searchable="searchable">
+                :searchable="searchable"
+            >
             </v-select>
-            <nested-form v-if="has_entity_type_permission_fk"
-                :entity_type_permission_fk="entity_type_permission_fk"/>
+            <nested-form
+                v-if="has_entity_type_permission_fk"
+                :entity_type_permission_fk="entity_type_permission_fk"
+                :state="state"
+            />
         </form-group>
     </div>
 </template>

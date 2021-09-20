@@ -1,11 +1,12 @@
 <template>
     <div class="">
-        <sheets-row v-for="(row, key) in formRows"
+        <sheets-row
+            v-for="(row, key) in formRows"
             :key="key"
             :row="row"
             :state="namespace"
-            v-model="formAnswer[key]">
-        </sheets-row>
+            v-model="formAnswer[key]"
+        />
 
         <div class="row text-center sheets-actions-container">
             <div class="col" v-for="(action, key) in formActions" :key="key">
@@ -16,20 +17,21 @@
         <sheets-snackbar
             :message="snackbar.message"
             v-model="snackbar.show"
-            :type="snackbar.success"/>
+            :type="snackbar.success"
+        />
     </div>
 </template>
 
 <script>
-import Row from "./grid/row.vue";
-import Action from "./actions/button.vue";
+import Row from './grid/row.vue';
+import Action from './actions/button.vue';
 // import Loading from "./utils/loading.vue";
-import Snackbar from "./utils/snackbar.vue";
+import Snackbar from './utils/snackbar.vue';
 import FormBuilderStore from '../../../store/formBuilder';
 import registerStore from './utils/reusabale-store';
 
 export default {
-    name: "sheets-form",
+    name: 'sheets-form',
     props: {
         // ID de la entidad
         entityId: {
@@ -42,12 +44,15 @@ export default {
             require: false,
             default: null,
         },
+        value: {
+            require: false,
+        },
     },
     components: {
         // "sheets-loading": Loading,
-        "sheets-row": Row,
-        "sheets-action": Action,
-        "sheets-snackbar": Snackbar,
+        'sheets-row': Row,
+        'sheets-action': Action,
+        'sheets-snackbar': Snackbar,
     },
     data: () => ({
         // filas de form
@@ -59,13 +64,13 @@ export default {
         // archivos cargados en el form
         files: [],
         // snackbar para recepcion de mensajes desde el server
-        snackbar: { message: "", success: false, show: false },
+        snackbar: { message: '', success: false, show: false },
         //
-        action: {}
+        action: {},
     }),
     computed: {
         loading() {
-            return this.$store.getters[this.namespace+"/loading"];
+            return this.$store.getters[`${this.namespace}/loading`];
         },
         result() {
             let arr = [];
@@ -75,7 +80,7 @@ export default {
             return arr;
         },
         filesInForm() {
-            return this.$store.getters[this.namespace+"/hasFiles"];
+            return this.$store.getters[`${this.namespace}/hasFiles`];
         },
         form_id() {
             return this.$store.getters[`${this.namespace}/form_id`];
@@ -128,10 +133,10 @@ export default {
                 });
         },
         async get_record() {
-            if (!!this.record_id) {
+            if (this.record_id) {
                 const data = {
                     entity_name: this.$store.getters[`${this.namespace}/entity_name`],
-                    id: this.record_id
+                    id: this.record_id,
                 };
                 await this.$store.dispatch(`${this.namespace}/get_record`, data);
             }
@@ -139,32 +144,31 @@ export default {
         save() {
             const entityId = this.$store.getters[`${this.namespace}/entity_id`];
 
-
-            let data = {};
+            const data = {};
             data[entityId] = [];
             // form fields
             if (!this.default_form) {
-                let form_fields = {};
-                this.formRows.map(row => {
-                    row.sections.map(section => {
-                        section.fields.map(field => {
-                            this.result.map(r => {
-                                if (Object.keys(r)[0] == field.id)
-                                    form_fields[field.id] = field.form_field_id;
+                const formFields = {};
+                this.formRows.map((row) => {
+                    row.sections.map((section) => {
+                        section.fields.map((field) => {
+                            this.result.map((r) => {
+                                if (Object.keys(r)[0] === field.id)
+                                    formFields[field.id] = field.form_field_id;
                             });
                         });
                     });
                 });
-                this.formAnswer.push({ form_fields: form_fields });
+                this.formAnswer.push({ form_fields: formFields });
 
-                const formId = this.$store.getters[this.namespace+"/form_id"];
+                const formId = this.$store.getters[`${this.namespace}/form_id`];
                 if (formId) {
                     this.formAnswer.push({
                         form_id: formId,
                     });
                 }
             }
-            let body = {};
+            const body = {};
 
             this.result.map(r => {
                 if (!!r) {
@@ -174,27 +178,27 @@ export default {
                 }
             });
 
-            if (!!this.record_id) {
-                body["id"] = this.record_id;
+            if (this.record_id) {
+                body.id = this.record_id;
             }
 
             data[entityId].push(body);
 
-            let form = new FormData();
+            const form = new FormData();
 
-            form.append("entityKey", entityId);
+            form.append('entityKey', entityId);
 
-            Object.keys(data).forEach(key => {
+            Object.keys(data).forEach((key) => {
                 form.append(key, JSON.stringify(data[key]));
             });
             const action = !this.record_id ? `${this.namespace}/save` : `${this.namespace}/update`;
             this.$store
                 .dispatch(action, form)
-                .then(response => {
+                .then((response) => {
                     this.snackbar = {
                         success: response.success,
                         show: true,
-                        message: response.content.message
+                        message: response.content.message,
                     };
                     if (response.success) {
                         if (this.action.refresh_form === 1) {
@@ -203,47 +207,45 @@ export default {
 
                         this.action = {};
                         this.postMessage(response);
+                        this.$emit('input', response.content);
                     }
                 })
-                .catch(error => {
-                    this.$store.commit(this.namespace+"/CLEARFIELDS", false);
+                .catch((error) => {
+                    this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
                     this.snackbar = {
                         message: error.data.content.message || error.statusText,
                         success: false,
-                        show: true
-                    }
-                    this.action = {}
+                        show: true,
+                    };
+                    this.action = {};
                     this.postMessage(error.data);
                 });
         },
         async sendFiles() {
-            const files = this.$store.getters[this.namespace+"/files"];
+            const files = this.$store.getters[`${this.namespace}/files`];
 
-            let promises = [];
-            let req = [];
-            Object.entries(files).map(file => {
+            const promises = [];
+            const req = [];
+            Object.entries(files).map((file) => {
                 req.push(file[1].id);
                 const form = new FormData();
 
-                form.append("file", file[1].file);
-                form.append("fileid", file[1].id);
+                form.append('file', file[1].file);
+                form.append('fileid', file[1].id);
 
-                promises.push(
-                    this.$store.dispatch(this.namespace+"/upload_files", form)
-                );
+                promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, form));
             });
-            await Promise.all(promises).then(resp => {
-                for (let index = 0; index < resp.length; index++) {
-                    let obj = {};
+            await Promise.all(promises).then((resp) => {
+                for (let index = 0; index < resp.length; index += 1) {
+                    const obj = {};
                     obj[req[index]] = resp[index];
                     this.formAnswer[0].push(obj);
                 }
             });
         },
         async handlerAction(saveForm, action) {
-            console.log(action)
-            this.$store.commit(this.namespace+"/CLEARFIELDS", false);
-            if (action.id !== "DEFAULT-ACTION") {
+            this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
+            if (action.id !== 'DEFAULT-ACTION') {
                 this.formAnswer.push({ action_id: action.id });
             }
             if (saveForm) {
@@ -253,10 +255,10 @@ export default {
             this.action = action;
         },
         resetForm() {
-            this.$store.commit(this.namespace+"/CLEARFIELDS", true);
+            this.$store.commit(`${this.namespace}/CLEARFIELDS`, true);
             this.formAnswer = [];
-        }
-    }
+        },
+    },
 };
 </script>
 

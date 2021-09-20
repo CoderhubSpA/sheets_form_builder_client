@@ -40,6 +40,10 @@ export default {
          * action_id
          */
         default_form: false,
+        /**
+         * respuesta del server sin tratar
+         */
+        raw: {},
 
     }),
     getters: {
@@ -68,7 +72,7 @@ export default {
         record_id: state => state.record_id,
         errors_fields: state => state.errors_fields,
         default_form: state => state.default_form,
-
+        raw: (state) => state.raw
     },
     mutations: {
         LOADING(state, val) {
@@ -128,6 +132,9 @@ export default {
         },
         DEFAULT_FORM(state, val) {
             state.default_form = val
+        },
+        RAW(state, val) {
+            state.raw = val
         }
     },
     actions: {
@@ -138,7 +145,7 @@ export default {
                 axios.get(`/api/sheets/form/${id}`)
                     .then((response) => {
                         const data = response.data.content;
-
+                        commit('RAW', data);
                         const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
 
                         commit('FORM_ID', data.id);
@@ -150,7 +157,7 @@ export default {
                         commit('DEFAULT_FORM', data.default === 1);
 
                         let rows = data.rows.map((row) => {
-                            let sections = data.sections.filter(sect => {
+                            let sections = data.sections.filter((sect) => {
                                 return sect.form_row_id === row.id
                             })
 
@@ -162,12 +169,10 @@ export default {
                                 let fields = [];
                                 if (Array.isArray(data.fields)) {
                                     fields = data.fields.filter((f) => {
-                                        return f.form_section_id === section.id && f.permission !== 0
+                                        return f.form_section_id === section.id && (f.permission !== 0 || (data.default && f.permission === 0))
                                     })
                                 } else {
-                                    Object.keys(data.fields).forEach((key) => {
-                                        fields.push(data.fields[key]);
-                                    });
+                                    fields = [...data.fields];
                                 }
                                 fields.sort((a, b) => {
                                     return a.order > b.order ? 1 : -1

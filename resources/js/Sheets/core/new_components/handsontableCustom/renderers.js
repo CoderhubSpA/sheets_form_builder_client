@@ -10,7 +10,12 @@ export function clpRenderer(
     cellProperties
 ) {
     const span = document.createElement("SPAN");
-    span.innerHTML = `${value.toFixed(2).replace(".", ",")} $`;
+    if(value !== null && value !== undefined){
+        let renderValue = value.toFixed(0);
+        span.innerHTML = `$ ${parseInt(renderValue).toLocaleString()}`;
+    }else{
+        span.innerHTML = ``;
+    }
     Handsontable.dom.empty(td);
     td.appendChild(span);
     td.classList.add("htCenter");

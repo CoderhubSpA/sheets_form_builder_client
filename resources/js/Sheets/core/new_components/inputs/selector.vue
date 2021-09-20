@@ -1,14 +1,12 @@
 <template>
     <form-group :id="id" :label="label" :required="required">
-        <v-select
-            label="name"
-            :id="id"
-            :options="options"
-            :disabled="disabled"
-            v-model="selected">
+        <v-select label="name" :id="id" :options="options" :disabled="disabled" v-model="selected">
         </v-select>
-        <nested-form v-if="has_entity_type_permission_fk"
-                :entity_type_permission_fk="entity_type_permission_fk"/>
+        <nested-form
+            v-if="has_entity_type_permission_fk"
+            :entity_type_permission_fk="entity_type_permission_fk"
+            :state="state"
+        />
     </form-group>
 </template>
 
@@ -26,7 +24,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-</style>

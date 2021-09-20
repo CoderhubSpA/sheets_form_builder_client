@@ -5,7 +5,10 @@
                 <h6 @click="logData">{{ this.input.name }}</h6>
             </div>
             <div class="col-1">
-                <button class="btn btn-primary btn-sm float-right" @click="addRow">
+                <button
+                    class="btn btn-primary btn-sm float-right"
+                    @click="addRow"
+                >
                     &plus;
                 </button>
             </div>
@@ -27,6 +30,7 @@
 <script>
 import mix from "../mixs/selector-multiple-advanced.vue";
 import { HotTable, HotColumn } from "@handsontable/vue";
+
 export default {
     mixins: [mix],
     components: {

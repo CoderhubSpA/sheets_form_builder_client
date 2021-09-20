@@ -1,7 +1,5 @@
 <script>
-import { HotTable } from "@handsontable/vue";
 import {
-    KeyValueOptions,
     KeyValueRenderer,
     KeyValueSelect
 } from "handsontable-key-value-select";
@@ -84,23 +82,7 @@ export default {
                     }
                 }
             },
-            beforeOnCellContextMenu(event, coords, TD) {
-                if (coords.row === 0) {
-                    this.updateSettings({
-                        contextMenu: false
-                    });
-                } else {
-                    this.updateSettings({
-                        contextMenu: {
-                            items: {
-                                remove_row: {
-                                    name: "Eliminar fila"
-                                }
-                            }
-                        }
-                    });
-                }
-            },
+            beforeOnCellContextMenu(event, coords, TD) {},
             licenseKey: "non-commercial-and-evaluation"
         },
         hotTableLoaded: false
@@ -156,9 +138,9 @@ export default {
                     this.columnsIds.push({ id: column.id, column: column });
                 }
             });
-            this.columnsIds.map(format => {
-                console.log("formato", format.column.format);
-            });
+            // this.columnsIds.map(format => {
+            //     console.log("formato", format.column.format);
+            // });
         },
         buildHotTableColumns() {
             let columns = [];
@@ -198,11 +180,11 @@ export default {
                         case "SiNo":
                             columnToPush.data = column.id;
                             columnToPush.type = "checkbox";
+                            break;
                         case "DATE":
                             columnToPush.data = column.id;
                             columnToPush.type = "date";
-                            // TO DO: CHECK FORMAT
-                            columnToPush.dateFormat = 'MM/DD/YYYY',
+                            columnToPush.dateFormat = "YYYY-MM-DD";
                             columnToPush.correctFormat = true;
                             columnToPush.datePickerConfig = {
                                 firstDay: 0,
@@ -210,9 +192,19 @@ export default {
                                 numberOfMonths: 3,
                                 licenseKey: "non-commercial-and-evaluation"
                             };
-                        // case "DATETIME":
-                        //     columnToPush.data = column.id;
-                        //     columnToPush.type = "checkbox";
+                            break;
+                        case "DATETIME":
+                            columnToPush.data = column.id;
+                            columnToPush.type = "date";
+                            columnToPush.dateFormat = "YYYY-MM-DD HH:mm:ss";
+                            columnToPush.correctFormat = true;
+                            columnToPush.datePickerConfig = {
+                                firstDay: 0,
+                                showWeekNumber: true,
+                                numberOfMonths: 3,
+                                licenseKey: "non-commercial-and-evaluation"
+                            };
+                            break;
                         default:
                             columnToPush.data = column.id;
                             columnToPush.type = "text";
@@ -225,7 +217,29 @@ export default {
             this.handsontableSettings.columns = columns;
         },
         buildHotTableData() {
+            // a6cfe7e3-842f-11eb-965c-ed7fb50d217e
+            if (!this.pivots) return;
             const data = Object.values(this.pivots);
+            data.forEach(element => {
+                Object.keys(element).map(key => {
+                    this.columnsIds.map(column => {
+                        if (
+                            column.id === key &&
+                            column.column.format === "SiNo"
+                        ) {
+                            element[key] = element[key] === 1 ? true : false;
+                        }
+
+                        if (
+                            column.id === key &&
+                            column.column.format === "DATE"
+                        ) {
+                            let date = element[key].split(" ");
+                            element[key] = date[0];
+                        }
+                    });
+                });
+            });
             this.handsontableData = data;
         },
         addRow() {

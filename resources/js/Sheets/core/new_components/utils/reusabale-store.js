@@ -14,7 +14,7 @@ const generateModuleName = (store, name, suffix = 0) => {
 
 export default (store, module, name) => {
     const moduleName = generateModuleName(store, name);
-    console.log(moduleName);
+    console.log('reusable-store.js', moduleName);
     store.registerModule(moduleName, module);
 
     return {

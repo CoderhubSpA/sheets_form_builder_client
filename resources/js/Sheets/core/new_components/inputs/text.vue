@@ -6,7 +6,8 @@
             :value="inputValue"
             :disabled="disabled"
             @input="onInput"
-            class="form-control">
+            class="form-control"
+        />
     </form-group>
 </template>
 
