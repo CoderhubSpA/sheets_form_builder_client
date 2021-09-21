@@ -37,3 +37,25 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
     }
     return td;
 }
+
+
+export function customDateRenderer(instance, td, row, col, prop, value, cellProperties) {
+    const span = document.createElement('SPAN');
+    if (value !== null && value !== undefined && value !== "") {
+        let date = value.split(' ');
+        span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${date[0]}`;
+    } else {
+        span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>`;
+    }
+    Handsontable.dom.empty(td);
+    td.appendChild(span);
+    td.classList.add('htCenter');
+    td.classList.add('htMiddle');
+    td.classList.add('afterHiddenColumn');
+    td.classList.add('htAutocomplete');
+    
+    if(cellProperties.readOnly){
+        td.classList.add('htDimmed');
+    }
+    return td;
+}

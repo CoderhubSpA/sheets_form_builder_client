@@ -1,7 +1,7 @@
 <script>
 import Handsontable from 'handsontable';
 import { KeyValueSelect } from 'handsontable-key-value-select';
-import { clpRenderer, customSelectRenderer } from '../handsontableCustom/renderers';
+import { clpRenderer, customDateRenderer, customSelectRenderer } from '../handsontableCustom/renderers';
 export default {
     props: {
         input: {
@@ -66,6 +66,7 @@ export default {
         handsontableSettings: {
             colHeaders: ['ID'],
             columns: [],
+            stretchH: 'all',
             width: '100%',
             height: '100%',
             rowHeights: 23,
@@ -207,6 +208,7 @@ export default {
                         case 'DATE':
                             columnToPush.data = column.id;
                             columnToPush.type = 'date';
+                            columnToPush.renderer = customDateRenderer;
                             columnToPush.dateFormat = 'YYYY-MM-DD';
                             columnToPush.correctFormat = true;
                             columnToPush.datePickerConfig = {
@@ -242,25 +244,41 @@ export default {
 
             this.handsontableSettings.columns = columns;
         },
-        buildHotTableData() {
-            // a6cfe7e3-842f-11eb-965c-ed7fb50d217e
+        async buildHotTableData() {
+            if (this.pivots === null){
+                // Si pivot es identico a null,
+                // significa que aun no a llegado la data
+                // desde el store.
+                // Esperamos y volvemos a intentar
+                await this.sleep(500);
+                this.buildHotTableData();
+                return;
+            }
+            // Si no es null pero es falsy, esta vacio. Salir.
             if (!this.pivots) return;
+
             const data = Object.values(this.pivots);
             data.forEach(element => {
                 Object.keys(element).map(key => {
                     this.columnsIds.map(column => {
+                        let val = element[key];
                         if (column.id === key && column.column.format === 'SiNo') {
-                            element[key] = element[key] === 1 ? true : false;
+                            element[key] = val === 1 ? true : false;
                         }
-
-                        if (column.id === key && column.column.format === 'DATE') {
-                            let date = element[key].split(' ');
-                            element[key] = date[0];
-                        }
+                        // if (column.id === key && column.column.format === 'DATE') {
+                        //     let date = val.split(' ');
+                        //     val = date[0];
+                        // }
                     });
                 });
             });
+
             this.handsontableData = data;
+            // En caso de que la llegada de la data fue tardía y ya el componente se renderizó
+            // cargar la data mediante el método loadData.
+            // Esto puede pasar si los pivotes llegan tarde
+            if(this.$refs['hotTableComponent'])
+                console.log(this.$refs['hotTableComponent'].hotInstance.loadData(data));
         },
         addHooks() {
             this.$nextTick(function() {
@@ -282,6 +300,15 @@ export default {
             if(recordid){
                 newRow[this.mainPivot.id] = recordid;
             }
+            this.columnsIds.map((column) => {
+                if(column.column.default_value !== null && column.id !== 'id'){
+                    if(column.column.format === 'SiNo'){
+                        newRow[column.id] = column.column.default_value === 1 ? true : false;
+                    }else{
+                        newRow[column.id] = column.column.default_value;
+                    }
+                }
+            })
             this.handsontableData.push(newRow);
         },
         logData() {
@@ -303,6 +330,9 @@ export default {
                 }
             });
             this.$emit('input', dataToSend);
+        },
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
     }
 };
