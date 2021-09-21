@@ -1,5 +1,6 @@
 <script>
-import { KeyValueRenderer, KeyValueSelect } from 'handsontable-key-value-select';
+import Handsontable from 'handsontable';
+import { KeyValueSelect } from 'handsontable-key-value-select';
 import { clpRenderer, customSelectRenderer } from '../handsontableCustom/renderers';
 export default {
     props: {
@@ -52,11 +53,12 @@ export default {
         }
     },
     watch: {
-        handsontableData(val) {
-            // console.log(val);
+        handsontableData() {
+            this.changeData();
         }
     },
     data: () => ({
+        mainPivot:{},
         columnsIds: [],
         sendingIds: ['id'],
         handsontableData: [],
@@ -122,19 +124,21 @@ export default {
                     console.log(error);
                 })
                 .finally(() => {
-                    this.$store.commit(`${this.state}/LOADING`, false);
                     this.hotTableLoaded = true;
+                    // AGREGO LOS HOOKS
+                    this.addHooks();
                 });
         },
         buildColHeaders() {
             this.handsontableSettings.colHeaders.push(this.input.col_fk_1_n);
-            const mainPivot = this.entityInfo.columns.find(eInfo => {
+            this.mainPivot = this.entityInfo.columns.find(eInfo => {
                 return eInfo.col_name === this.input.col_fk_1_n;
             });
             this.columnsIds = [
                 { id: 'id', column: { format: 'TEXT' } },
-                { id: mainPivot.id, column: mainPivot }
+                { id: this.mainPivot.id, column: this.mainPivot }
             ];
+            this.sendingIds.push(this.mainPivot.id);
             this.entityInfo.columns.map(column => {
                 if (
                     column.visible === 1 &&
@@ -144,15 +148,17 @@ export default {
                     this.handsontableSettings.colHeaders.push(column.name);
                     const readonly = column.show_in_edit_form === 1 ? true : false;
                     const sendtobackend = column.show_in_edit_form === 2 ? true : false;
-                    if(sendtobackend){
+                    if (sendtobackend) {
                         this.sendingIds.push(column.id);
                     }
-                    this.columnsIds.push({ id: column.id, column: column, readonly, sendtobackend});
+                    this.columnsIds.push({
+                        id: column.id,
+                        column: column,
+                        readonly,
+                        sendtobackend
+                    });
                 }
             });
-            // this.columnsIds.map(format => {
-            //     console.log("formato", format.column.format);
-            // });
         },
         buildHotTableColumns() {
             let columns = [];
@@ -256,25 +262,47 @@ export default {
             });
             this.handsontableData = data;
         },
+        addHooks() {
+            this.$nextTick(function() {
+                this.$refs['hotTableComponent'].hotInstance.addHook('afterChange', changes => {
+                    this.changeData();
+                });
+                this.$refs['hotTableComponent'].hotInstance.addHook(
+                    'afterRemoveRow',
+                    (index, amount, physicalRows) => {
+                        this.changeData();
+                    }
+                );
+                this.$store.commit(`${this.state}/LOADING`, false);
+            });
+        },
         addRow() {
             const newRow = {};
+            const recordid = this.$store.getters[`${this.state}/record_id`];
+            if(recordid){
+                newRow[this.mainPivot.id] = recordid;
+            }
             this.handsontableData.push(newRow);
         },
         logData() {
             console.log('this.handsontableData', this.handsontableData);
-            const dataToSend = [];
+        },
+        changeData() {
+            const dataToSend = {};
+            dataToSend[this.input.id] = {};
+            dataToSend[this.input.id][this.input.entity_type_pivot_fk] = [];
             this.handsontableData.map(hotData => {
                 let dataToPush = {};
                 Object.keys(hotData).forEach(key => {
-                    if(this.sendingIds.indexOf(key) >= 0){
+                    if (this.sendingIds.indexOf(key) >= 0) {
                         dataToPush[key] = hotData[key];
                     }
                 });
-                if(Object.keys(dataToPush).length > 0){
-                    dataToSend.push(dataToPush);
+                if (Object.keys(dataToPush).length > 0) {
+                    dataToSend[this.input.id][this.input.entity_type_pivot_fk].push(dataToPush);
                 }
             });
-            console.log('dataToSend', dataToSend);
+            this.$emit('input', dataToSend);
         }
     }
 };

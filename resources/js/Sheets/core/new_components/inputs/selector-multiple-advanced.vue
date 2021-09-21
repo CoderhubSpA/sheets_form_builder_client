@@ -24,13 +24,12 @@
 
 <script>
 import mix from '../mixs/selector-multiple-advanced.vue';
-import { HotTable, HotColumn } from '@handsontable/vue';
+import { HotTable } from '@handsontable/vue';
 
 export default {
     mixins: [mix],
     components: {
-        HotTable,
-        HotColumn
+        HotTable
     },
     data: () => ({})
 };
