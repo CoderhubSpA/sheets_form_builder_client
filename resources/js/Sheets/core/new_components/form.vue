@@ -200,14 +200,15 @@ export default {
                         show: true,
                         message: response.content.message,
                     };
+
                     if (response.success) {
                         if (this.action.refresh_form === 1) {
                             this.resetForm();
                         }
 
                         this.action = {};
-                        this.postMessage(response);
                         this.$emit('input', response.content);
+                        this.postMessage(response);
                     }
                 })
                 .catch((error) => {

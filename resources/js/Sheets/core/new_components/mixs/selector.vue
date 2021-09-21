@@ -15,6 +15,7 @@ export default {
     data: () => ({
         selected: null,
         nested: false,
+        inserted: null,
     }),
     computed: {
         selectedValue() {
@@ -46,7 +47,6 @@ export default {
 
                 const entities = contentInfo.content.entities_fk[fk];
 
-
                 if (entities) {
                     options = entities.map((e) => ({ id: e.id, name: e.name }));
                 } else {
@@ -66,7 +66,7 @@ export default {
 
             const isMultipleAdvanced = this.input.format === 'SELECTOR[MULTIPLE][ADVANCED]';
 
-            return (isMultiple || is1xnAll || isMultipleAdvanced);
+            return isMultiple || is1xnAll || isMultipleAdvanced;
         },
         clear() {
             return this.$store.getters[`${this.state}/clearfields`];
@@ -108,10 +108,30 @@ export default {
                 this.$store.commit(`${this.state}/CLEARFIELDS`, false);
             }
         },
+        options(val) {
+            if (val.length > 1) {
+                if (this.inserted) {
+                    const option = this.options.find((options) => options.id === this.inserted);
+                    if (this.multiple) {
+                        if (this.selected) this.selected.push(option);
+                        else this.selected = [option];
+                    } else this.selected = option;
+                }
+            }
+        },
+    },
+    methods: {
+        createdOption(id) {
+            this.inserted = id
+            // const optionToSelect = this.options.find((option) => option.id === id);
+            // console.log(id, this.options, optionToSelect);
+            // if (this.multiple) {
+            //     if (this.selected) this.selected.push(optionToSelect);
+            //     else this.selected = [optionToSelect];
+            // } else this.selected = optionToSelect;
+
+            // console.log(this.selected, id, optionToSelect, this.options)
+        },
     },
 };
 </script>
-
-<style lang="scss">
-
-</style>

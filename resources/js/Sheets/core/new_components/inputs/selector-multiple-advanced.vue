@@ -1,20 +1,15 @@
 <template>
-    <div class="container">
-        <div class="row p-1">
-            <div class="col-11">
-                <h6 @click="logData">{{ this.input.name }}</h6>
-            </div>
-            <div class="col-1">
-                <button
-                    class="btn btn-primary btn-sm float-right"
-                    @click="addRow"
-                >
+    <div class="container-fluid">
+        <div class="row p-1 mb-2">
+            <div class="col-12">
+                <span @click="logData" class="selector-advanced-label">{{ this.input.name }}</span>
+                <button class="btn btn-primary btn-sm" @click="addRow">
                     &plus;
                 </button>
             </div>
         </div>
         <div class="row" v-if="hotTableLoaded">
-            <div class="col-12 min-height-150">
+            <div class="col-12 min-height-150 selector-advanced-container">
                 <hot-table
                     ref="hotTableComponent"
                     :settings="handsontableSettings"
@@ -28,8 +23,8 @@
 </template>
 
 <script>
-import mix from "../mixs/selector-multiple-advanced.vue";
-import { HotTable, HotColumn } from "@handsontable/vue";
+import mix from '../mixs/selector-multiple-advanced.vue';
+import { HotTable, HotColumn } from '@handsontable/vue';
 
 export default {
     mixins: [mix],
@@ -43,5 +38,12 @@ export default {
 <style scoped>
 .min-height-150 {
     min-height: 150px;
+}
+.selector-advanced-label {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    margin-right: 0.5rem;
 }
 </style>

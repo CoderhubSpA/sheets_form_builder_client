@@ -1,24 +1,39 @@
-import Handsontable from "handsontable";
+import Handsontable from 'handsontable';
 
-export function clpRenderer(
-    instance,
-    td,
-    row,
-    col,
-    prop,
-    value,
-    cellProperties
-) {
-    const span = document.createElement("SPAN");
-    if(value !== null && value !== undefined){
+export function clpRenderer(instance, td, row, col, prop, value, cellProperties) {
+    const span = document.createElement('SPAN');
+    if (value !== null && value !== undefined && value !== "") {
         let renderValue = value.toFixed(0);
         span.innerHTML = `$ ${parseInt(renderValue).toLocaleString()}`;
-    }else{
+    } else {
         span.innerHTML = ``;
     }
     Handsontable.dom.empty(td);
     td.appendChild(span);
-    td.classList.add("htCenter");
-    td.classList.add("htMiddle");
+    td.classList.add('htCenter');
+    td.classList.add('htMiddle');
+    
+    if(cellProperties.readOnly){
+        td.classList.add('htDimmed');
+    }
+    return td;
+}
+
+export function customSelectRenderer(instance, td, row, col, prop, value, cellProperties) {
+    const span = document.createElement('SPAN');
+    if (value !== null && value !== undefined && value !== "") {
+        let selected = cellProperties.selectOptions.find(opt => opt.value === value);
+        span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${selected.label}`;
+    } else {
+        span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>`;
+    }
+    Handsontable.dom.empty(td);
+    td.appendChild(span);
+    td.classList.add('htCenter');
+    td.classList.add('htMiddle');
+    
+    if(cellProperties.readOnly){
+        td.classList.add('htDimmed');
+    }
     return td;
 }

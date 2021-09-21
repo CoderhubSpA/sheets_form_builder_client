@@ -39,7 +39,6 @@ export default {
     },
     data: () => ({
         show: false,
-        vueInstance: null,
     }),
     methods: {
         open() {
@@ -60,10 +59,14 @@ export default {
                 },
                 store,
             });
-            instance.$on('input', () => {
+            instance.$on('input', (val) => {
+                const id = val.content.inserted_id;
+
                 const data = this.$store.getters[`${this.state}/raw`];
                 if (data.entity_type_id) {
-                    this.$store.dispatch(`${this.state}/info`, data.entity_type_id);
+                    this.$store.dispatch(`${this.state}/info`, data.entity_type_id).then(() => {
+                        this.$emit('inserted', id);
+                    });
                 }
                 this.close();
             });

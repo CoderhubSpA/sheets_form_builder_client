@@ -1,9 +1,6 @@
 <script>
-import {
-    KeyValueRenderer,
-    KeyValueSelect
-} from "handsontable-key-value-select";
-import { clpRenderer } from "../handsontableCustom/renderers";
+import { KeyValueRenderer, KeyValueSelect } from 'handsontable-key-value-select';
+import { clpRenderer, customSelectRenderer } from '../handsontableCustom/renderers';
 export default {
     props: {
         input: {
@@ -61,16 +58,16 @@ export default {
     },
     data: () => ({
         columnsIds: [],
+        sendingIds: ['id'],
         handsontableData: [],
         entityInfo: null,
         handsontableSettings: {
-            colHeaders: ["ID"],
+            colHeaders: ['ID'],
             columns: [],
-            width: "100%",
-            height: "100%",
+            width: '100%',
+            height: '100%',
             rowHeights: 23,
-            colWidths: 250,
-            className: "htCenter htMiddle",
+            className: 'htCenter htMiddle',
             hiddenColumns: {
                 columns: [0, 1],
                 indicators: false
@@ -78,12 +75,28 @@ export default {
             contextMenu: {
                 items: {
                     remove_row: {
-                        name: "Eliminar fila"
+                        name: 'Eliminar fila'
                     }
                 }
             },
-            beforeOnCellContextMenu(event, coords, TD) {},
-            licenseKey: "non-commercial-and-evaluation"
+            beforeOnCellContextMenu(event, coords, TD) {
+                if (coords.row === -1) {
+                    this.updateSettings({
+                        contextMenu: false
+                    });
+                } else {
+                    this.updateSettings({
+                        contextMenu: {
+                            items: {
+                                remove_row: {
+                                    name: 'Eliminar fila'
+                                }
+                            }
+                        }
+                    });
+                }
+            },
+            licenseKey: 'non-commercial-and-evaluation'
         },
         hotTableLoaded: false
     }),
@@ -94,9 +107,7 @@ export default {
         getEntityInfo() {
             this.$store.commit(`${this.state}/LOADING`, true);
             axios
-                .get(
-                    `/api/sheets/entity/info/${this.input.entity_type_pivot_fk}`
-                )
+                .get(`/api/sheets/entity/info/${this.input.entity_type_pivot_fk}`)
                 .then(response => {
                     // GUARDO LA RESPUESTA PARA FUTURO
                     this.entityInfo = response.data.content.content;
@@ -116,14 +127,12 @@ export default {
                 });
         },
         buildColHeaders() {
-            this.handsontableSettings.colHeaders.push(
-                this.input.col_fk_1_n.toUpperCase()
-            );
+            this.handsontableSettings.colHeaders.push(this.input.col_fk_1_n);
             const mainPivot = this.entityInfo.columns.find(eInfo => {
                 return eInfo.col_name === this.input.col_fk_1_n;
             });
             this.columnsIds = [
-                { id: "id", column: { format: "TEXT" } },
+                { id: 'id', column: { format: 'TEXT' } },
                 { id: mainPivot.id, column: mainPivot }
             ];
             this.entityInfo.columns.map(column => {
@@ -132,10 +141,13 @@ export default {
                     column.show_in_edit_form > 0 &&
                     column.col_name !== this.input.col_fk_1_n
                 ) {
-                    this.handsontableSettings.colHeaders.push(
-                        column.name.toUpperCase()
-                    );
-                    this.columnsIds.push({ id: column.id, column: column });
+                    this.handsontableSettings.colHeaders.push(column.name);
+                    const readonly = column.show_in_edit_form === 1 ? true : false;
+                    const sendtobackend = column.show_in_edit_form === 2 ? true : false;
+                    if(sendtobackend){
+                        this.sendingIds.push(column.id);
+                    }
+                    this.columnsIds.push({ id: column.id, column: column, readonly, sendtobackend});
                 }
             });
             // this.columnsIds.map(format => {
@@ -148,20 +160,23 @@ export default {
                 let columnToPush = {};
                 if (column.column) {
                     switch (column.column.format) {
-                        case "CLP":
+                        case 'CLP':
                             columnToPush.data = column.id;
-                            columnToPush.type = "numeric";
+                            columnToPush.type = 'numeric';
                             columnToPush.renderer = clpRenderer;
+                            columnToPush.readOnly = column.readonly;
                             break;
-                        case "NUMBER":
+                        case 'NUMBER':
                             columnToPush.data = column.id;
-                            columnToPush.type = "numeric";
+                            columnToPush.type = 'numeric';
+                            columnToPush.readOnly = column.readonly;
                             break;
-                        case "TEXT":
+                        case 'TEXT':
                             columnToPush.data = column.id;
-                            columnToPush.type = "text";
+                            columnToPush.type = 'text';
+                            columnToPush.readOnly = column.readonly;
                             break;
-                        case "SELECTOR":
+                        case 'SELECTOR':
                             const options = this.entityInfo.entities_fk[
                                 column.column.entity_type_fk
                             ];
@@ -174,40 +189,45 @@ export default {
                             });
                             columnToPush.data = column.id;
                             columnToPush.editor = KeyValueSelect;
-                            columnToPush.renderer = KeyValueRenderer;
+                            columnToPush.renderer = customSelectRenderer;
                             columnToPush.selectOptions = selectOptions;
+                            columnToPush.readOnly = column.readonly;
                             break;
-                        case "SiNo":
+                        case 'SiNo':
                             columnToPush.data = column.id;
-                            columnToPush.type = "checkbox";
+                            columnToPush.type = 'checkbox';
+                            columnToPush.readOnly = column.readonly;
                             break;
-                        case "DATE":
+                        case 'DATE':
                             columnToPush.data = column.id;
-                            columnToPush.type = "date";
-                            columnToPush.dateFormat = "YYYY-MM-DD";
+                            columnToPush.type = 'date';
+                            columnToPush.dateFormat = 'YYYY-MM-DD';
                             columnToPush.correctFormat = true;
                             columnToPush.datePickerConfig = {
                                 firstDay: 0,
                                 showWeekNumber: true,
                                 numberOfMonths: 3,
-                                licenseKey: "non-commercial-and-evaluation"
+                                licenseKey: 'non-commercial-and-evaluation'
                             };
+                            columnToPush.readOnly = column.readonly;
                             break;
-                        case "DATETIME":
+                        case 'DATETIME':
                             columnToPush.data = column.id;
-                            columnToPush.type = "date";
-                            columnToPush.dateFormat = "YYYY-MM-DD HH:mm:ss";
+                            columnToPush.type = 'date';
+                            columnToPush.dateFormat = 'YYYY-MM-DD HH:mm:ss';
                             columnToPush.correctFormat = true;
                             columnToPush.datePickerConfig = {
                                 firstDay: 0,
                                 showWeekNumber: true,
                                 numberOfMonths: 3,
-                                licenseKey: "non-commercial-and-evaluation"
+                                licenseKey: 'non-commercial-and-evaluation'
                             };
+                            columnToPush.readOnly = column.readonly;
                             break;
                         default:
                             columnToPush.data = column.id;
-                            columnToPush.type = "text";
+                            columnToPush.type = 'text';
+                            columnToPush.readOnly = column.readonly;
                             break;
                     }
                 }
@@ -223,18 +243,12 @@ export default {
             data.forEach(element => {
                 Object.keys(element).map(key => {
                     this.columnsIds.map(column => {
-                        if (
-                            column.id === key &&
-                            column.column.format === "SiNo"
-                        ) {
+                        if (column.id === key && column.column.format === 'SiNo') {
                             element[key] = element[key] === 1 ? true : false;
                         }
 
-                        if (
-                            column.id === key &&
-                            column.column.format === "DATE"
-                        ) {
-                            let date = element[key].split(" ");
+                        if (column.id === key && column.column.format === 'DATE') {
+                            let date = element[key].split(' ');
                             element[key] = date[0];
                         }
                     });
@@ -247,7 +261,20 @@ export default {
             this.handsontableData.push(newRow);
         },
         logData() {
-            console.log(this.handsontableData);
+            console.log('this.handsontableData', this.handsontableData);
+            const dataToSend = [];
+            this.handsontableData.map(hotData => {
+                let dataToPush = {};
+                Object.keys(hotData).forEach(key => {
+                    if(this.sendingIds.indexOf(key) >= 0){
+                        dataToPush[key] = hotData[key];
+                    }
+                });
+                if(Object.keys(dataToPush).length > 0){
+                    dataToSend.push(dataToPush);
+                }
+            });
+            console.log('dataToSend', dataToSend);
         }
     }
 };
