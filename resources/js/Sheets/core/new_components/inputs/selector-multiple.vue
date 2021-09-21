@@ -15,6 +15,7 @@
                 v-if="has_entity_type_permission_fk"
                 :entity_type_permission_fk="entity_type_permission_fk"
                 :state="state"
+                @inserted="createdOption"
             />
         </form-group>
     </div>

@@ -77,3 +77,34 @@ export default {
     },
 };
 </script>
+<style lang="scss">
+.nested-form {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.151); /* Black w/ opacity */
+    border: 1px solid rgb(240, 239, 239);
+    border-radius: 4px;
+
+    .content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        width: 80%; /* Could be more or less, depending on screen size */
+
+        .header {
+            background-color: #fefefe;
+            margin-bottom: 1rem;
+
+            button {
+                float: right;
+            }
+        }
+    }
+}
+</style>

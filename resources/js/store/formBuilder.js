@@ -139,13 +139,16 @@ export default {
     },
     actions: {
         async get({ commit, dispatch }, id) {
-            commit('LOADING', true)
-
+            commit('LOADING', true);
+            console.log(id)
+            // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
             return new Promise((resolve, reject) => {
                 axios.get(`/api/sheets/form/${id}`)
                     .then((response) => {
+                        console.log('formbuilder', response)
                         const data = response.data.content;
                         commit('RAW', data);
+                        console.log(data.actions)
                         const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
 
                         commit('FORM_ID', data.id);
@@ -239,6 +242,7 @@ export default {
                     resolve(response.data)
                 })
                 .catch(error => {
+                    console.log(error)
                     reject(error)
                 })
                 .finally(() => {
