@@ -146,7 +146,7 @@ export default {
                     column.show_in_edit_form > 0 &&
                     column.col_name !== this.input.col_fk_1_n
                 ) {
-                    this.handsontableSettings.colHeaders.push(column.name);
+                    this.handsontableSettings.colHeaders.push(column.col_name !== this.input.col_fk_n_1 ? column.name : `${column.name} <b style="color: red;">*</b>`);
                     const readonly = column.show_in_edit_form === 1 ? true : false;
                     const sendtobackend = column.show_in_edit_form === 2 ? true : false;
                     if (sendtobackend) {

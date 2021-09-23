@@ -1,5 +1,5 @@
 <template>
-    <button :class="styles" @click="trigger">
+    <button :class="styles" @click="trigger" :disabled="disabledaction">
         {{ name }}
     </button>
 </template>
@@ -10,33 +10,37 @@ export default {
         action: {
             type: Object,
             default: () => {}
+        },
+        disabledaction: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {
         name() {
-            return this.action.name
+            return this.action.name;
         },
         styles() {
             const styles = [
                 'btn',
                 'btn-block',
                 this.action.cancel_form == 1 ? 'btn-warning' : 'btn-success'
-            ]
-            return styles.join(' ')
+            ];
+            return styles.join(' ');
         }
     },
     methods: {
-        trigger(){
-            if(this.action.save_form === 1){
-                this.$emit("trigger", true, this.action);
-            }else{
-                this.$emit("trigger", false, this.action);
+        trigger() {
+            if (!this.disabledaction) {
+                if (this.action.save_form === 1) {
+                    this.$emit('trigger', true, this.action);
+                } else {
+                    this.$emit('trigger', false, this.action);
+                }
             }
         }
     }
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

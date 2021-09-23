@@ -10,7 +10,11 @@
 
         <div class="row text-center sheets-actions-container">
             <div class="col" v-for="(action, key) in formActions" :key="key">
-                <sheets-action :action="action" @trigger="handlerAction"></sheets-action>
+                <sheets-action
+                    :disabledaction="disabledAction"
+                    :action="action"
+                    @trigger="handlerAction"
+                ></sheets-action>
             </div>
         </div>
         <!-- <sheets-loading :status="loading" /> -->
@@ -36,23 +40,23 @@ export default {
         // ID de la entidad
         entityId: {
             type: String,
-            require: true,
+            require: true
         },
         // ID del registro
         record_id: {
             type: String,
             require: false,
-            default: null,
+            default: null
         },
         value: {
-            require: false,
-        },
+            require: false
+        }
     },
     components: {
         // "sheets-loading": Loading,
         'sheets-row': Row,
         'sheets-action': Action,
-        'sheets-snackbar': Snackbar,
+        'sheets-snackbar': Snackbar
     },
     data: () => ({
         // filas de form
@@ -67,6 +71,7 @@ export default {
         snackbar: { message: '', success: false, show: false },
         //
         action: {},
+        disabledAction: false
     }),
     computed: {
         loading() {
@@ -74,7 +79,7 @@ export default {
         },
         result() {
             let arr = [];
-            this.formAnswer.forEach((row) => {
+            this.formAnswer.forEach(row => {
                 arr = arr.concat(row);
             });
             return arr;
@@ -87,7 +92,7 @@ export default {
         },
         default_form() {
             return this.$store.getters[`${this.namespace}/default_form`];
-        },
+        }
     },
     beforeCreate() {
         const { namespace } = registerStore(this.$store, FormBuilderStore, 'myStore');
@@ -108,7 +113,7 @@ export default {
         },
         initForm() {
             this.$store
-                .dispatch(this.namespace+"/get", this.entityId)
+                .dispatch(this.namespace + '/get', this.entityId)
                 .then(form => {
                     if (form.success) {
                         this.formRows = form.rows;
@@ -136,12 +141,13 @@ export default {
             if (this.record_id) {
                 const data = {
                     entity_name: this.$store.getters[`${this.namespace}/entity_name`],
-                    id: this.record_id,
+                    id: this.record_id
                 };
                 await this.$store.dispatch(`${this.namespace}/get_record`, data);
             }
         },
         save() {
+            this.disabledAction = true;
             const entityId = this.$store.getters[`${this.namespace}/entity_id`];
 
             const data = {};
@@ -149,10 +155,10 @@ export default {
             // form fields
             if (!this.default_form) {
                 const formFields = {};
-                this.formRows.map((row) => {
-                    row.sections.map((section) => {
-                        section.fields.map((field) => {
-                            this.result.map((r) => {
+                this.formRows.map(row => {
+                    row.sections.map(section => {
+                        section.fields.map(field => {
+                            this.result.map(r => {
                                 if (Object.keys(r)[0] === field.id)
                                     formFields[field.id] = field.form_field_id;
                             });
@@ -164,7 +170,7 @@ export default {
                 const formId = this.$store.getters[`${this.namespace}/form_id`];
                 if (formId) {
                     this.formAnswer.push({
-                        form_id: formId,
+                        form_id: formId
                     });
                 }
             }
@@ -188,17 +194,17 @@ export default {
 
             form.append('entityKey', entityId);
 
-            Object.keys(data).forEach((key) => {
+            Object.keys(data).forEach(key => {
                 form.append(key, JSON.stringify(data[key]));
             });
             const action = !this.record_id ? `${this.namespace}/save` : `${this.namespace}/update`;
             this.$store
                 .dispatch(action, form)
-                .then((response) => {
+                .then(response => {
                     this.snackbar = {
                         success: response.success,
                         show: true,
-                        message: response.content.message,
+                        message: response.content.message
                     };
 
                     if (response.success) {
@@ -210,16 +216,29 @@ export default {
                         this.$emit('input', response.content);
                         this.postMessage(response);
                     }
+                    this.disabledAction = false;
                 })
-                .catch((error) => {
+                .catch(error => {
                     this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
-                    this.snackbar = {
-                        message: error.data.content.message || error.statusText,
-                        success: false,
-                        show: true,
-                    };
-                    this.action = {};
-                    this.postMessage(error.data);
+                    if (error.data) {
+                        this.snackbar = {
+                            message: error.data.content.message || error.statusText,
+                            success: false,
+                            show: true
+                        };
+                        this.action = {};
+                        this.postMessage(error.data);
+                    } else {
+                        this.snackbar = {
+                            message: error.response.data.content !== null ? error.response.data.content.message : 'Ocurrió un error inesperado',
+                            success: false,
+                            show: true
+                        };
+                        this.action = {};
+                        this.postMessage(error.response.data);
+                    }
+
+                    this.disabledAction = false;
                 });
         },
         async sendFiles() {
@@ -227,7 +246,7 @@ export default {
 
             const promises = [];
             const req = [];
-            Object.entries(files).map((file) => {
+            Object.entries(files).map(file => {
                 req.push(file[1].id);
                 const form = new FormData();
 
@@ -236,7 +255,7 @@ export default {
 
                 promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, form));
             });
-            await Promise.all(promises).then((resp) => {
+            await Promise.all(promises).then(resp => {
                 for (let index = 0; index < resp.length; index += 1) {
                     const obj = {};
                     obj[req[index]] = resp[index];
@@ -258,9 +277,13 @@ export default {
         resetForm() {
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, true);
             this.formAnswer = [];
-        },
-    },
+        }
+    }
 };
 </script>
 
-<style></style>
+<style>
+.sheets-actions-container {
+    margin: 2rem 0;
+}
+</style>

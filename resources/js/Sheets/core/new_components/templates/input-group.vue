@@ -1,15 +1,18 @@
 <template>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">
-                {{ character }}
-            </span>
+    <div>
+        <label>{{ label }}</label>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">
+                    {{ character }}
+                </span>
+            </div>
+            <slot />
         </div>
-        <slot />
     </div>
 </template>
 <script>
-import mixTemplate from '../mixs/template.vue'
+import mixTemplate from '../mixs/template.vue';
 export default {
     mixins: [mixTemplate],
     props: {
@@ -17,6 +20,10 @@ export default {
             type: String,
             default: ''
         },
+        label: {
+            type: String,
+            default: ''
+        }
     }
-}
+};
 </script>

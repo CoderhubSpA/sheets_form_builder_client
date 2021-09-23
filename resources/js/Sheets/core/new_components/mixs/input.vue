@@ -3,17 +3,17 @@ export default {
     props: {
         input: {
             type: Object,
-            required: true,
+            required: true
         },
         value: {
             type: Object,
             default: () => {},
-            required: true,
+            required: true
         },
         state: {
             type: String,
-            required: true,
-        },
+            required: true
+        }
     },
     computed: {
         label() {
@@ -38,25 +38,37 @@ export default {
             return this.input.placeholder;
         },
         inputValue() {
-            const fields = this.$store.getters[`${this.state}/fields`]
+            const fields = this.$store.getters[`${this.state}/fields`];
 
             if (fields && fields.length > 0) {
-                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                const val = fields.filter(f => Object.keys(f)[0] === this.id)[0];
                 if (val) {
                     this.$emit('input', val);
-                    return val[this.id];
+                    if (this.input.format !== 'PERCENTAGE[X100]') {
+                        return val[this.id];
+                    } else {
+                        return val[this.id] * 100;
+                    }
                 }
             }
-            return this.value ? this.value[this.id] : '';
+            if (this.input.format !== 'PERCENTAGE[X100]') {
+                return this.value ? this.value[this.id] : '';
+            } else {
+                return this.value ? parseFloat(this.value[this.id]) * 100 : '';
+            }
         },
         col_name() {
             return this.input.col_name;
-        },
+        }
     },
     methods: {
         onInput(e) {
             const data = {};
-            data[this.id] = e.target.value;
+            if (this.input.format !== 'PERCENTAGE[X100]') {
+                data[this.id] = e.target.value;
+            } else {
+                data[this.id] = parseFloat(e.target.value) / 100;
+            }
             this.$emit('input', data);
         },
         // evitar pegado de informacion en el componente
@@ -76,7 +88,7 @@ export default {
             }
             const changed = new Event('input');
             event.target.dispatchEvent(changed);
-        },
-    },
+        }
+    }
 };
 </script>
