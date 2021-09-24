@@ -99,6 +99,19 @@ export default {
                     });
                 }
             },
+            afterOnCellMouseUp(event, coords, TD){
+                if(TD.classList.contains('custom-hot-oneclick-trigger')){
+                    this.getActiveEditor().beginEditing();
+                    this.getActiveEditor().setValue(this.getInstance().getValue());
+                }
+            },
+            afterOnCellMouseOver(event, coords, TD){
+                if(TD.classList.contains('custom-hot-select')){
+                    this.selectCell(coords.row, coords.col);
+                    this.getActiveEditor().setValue(this.getInstance().getValue());
+                    this.getActiveEditor().beginEditing();
+                }
+            },
             licenseKey: 'non-commercial-and-evaluation'
         },
         hotTableLoaded: false

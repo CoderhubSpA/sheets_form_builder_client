@@ -13,7 +13,8 @@ use Config;
 class SheetsController extends Controller
 {
 
-    public function init(Request $request){
+    public function init(Request $request)
+    {
         $bearer = config('formbuilder.bearer');
         $external = config('formbuilder.external');
         $base_uri = config('formbuilder.api_url');
@@ -29,8 +30,7 @@ class SheetsController extends Controller
                 'AccessToken' => 'key',
                 'Authorization' => $bearer,
             ];
-
-        }else{
+        } else {
 
             $this->clientBuilder = [
                 'http_errors' => false,
@@ -41,23 +41,27 @@ class SheetsController extends Controller
                 return $item[0];
             })->toArray();
         }
-
     }
 
-    public function index($id,Request $request)
+    public function index($id, Request $request, $recordid = null)
     {
         $this->init($request);
 
         $endpoint = "form/{$id}";
+        // if ($recordid) {
+        //     $endpoint .= "/{$recordid}";
+        // }
+        // return response()->json($endpoint);
         $response = null;
 
         $client = new GuzzleClient($this->clientBuilder);
         $response = $client->request('GET', $endpoint);
 
         return $response->getBody()->getContents();
+        // return response()->json($response->getBody()->getContents(), $response->getStatusCode());
     }
 
-    public function getrecord($entityname,$recordid,Request $request)
+    public function getrecord($entityname, $recordid, Request $request)
     {
         $this->init($request);
 
@@ -79,10 +83,10 @@ class SheetsController extends Controller
             $file = $request->file('file');
             $name = $file->getClientOriginalName();
             $file->move(storage_path('app'), $name);
-            $path =  storage_path('app')."/{$name}";
+            $path =  storage_path('app') . "/{$name}";
 
             $endpoint = 'document';
-            $this->clientBuilder['headers']["Content-Type"] = "multipart/form-data" ;
+            $this->clientBuilder['headers']["Content-Type"] = "multipart/form-data";
             $client = new GuzzleClient($this->clientBuilder);
 
             $r = $client->request('POST', $endpoint, [
@@ -100,7 +104,6 @@ class SheetsController extends Controller
             $res->status  = $r->getStatusCode();
 
             return response()->json($res);
-
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }
@@ -129,7 +132,6 @@ class SheetsController extends Controller
             $res->status  = $r->getStatusCode();
 
             return response()->json($res, $res->status);
-
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => json_encode($th->getMessage())]);
         }
@@ -157,13 +159,12 @@ class SheetsController extends Controller
             $res->status  = $r->getStatusCode();
 
             return response()->json($res, $res->status);
-
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }
     }
 
-    public function entity_info($id,Request $request)
+    public function entity_info($id, Request $request)
     {
         $this->init($request);
 
@@ -180,7 +181,6 @@ class SheetsController extends Controller
             $response->status  = $res->getStatusCode();
 
             return response()->json($response, $response->status);
-
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }

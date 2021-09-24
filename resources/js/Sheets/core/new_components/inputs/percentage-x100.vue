@@ -3,12 +3,12 @@
         <input
             type="number"
             class="form-control"
-            :placeholder="label"
             aria-label="Username"
             aria-describedby="basic-addon1"
             :value="inputValue"
             @input="onInput"
-            @paste="onPaste">
+            @paste="onPaste"
+        />
     </input-group>
 </template>
 

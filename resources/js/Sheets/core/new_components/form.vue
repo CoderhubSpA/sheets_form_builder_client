@@ -106,7 +106,11 @@ export default {
     methods: {
         postMessage(data) {
             try {
-                this.window.parent.postMessage(data, '*');
+                const result = {
+                    ...data,
+                    action: this.action,
+                };
+                this.window.parent.postMessage(result, '*');
             } catch (error) {
                 console.warn(error);
             }

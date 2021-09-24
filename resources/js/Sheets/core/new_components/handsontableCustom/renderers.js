@@ -31,7 +31,8 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
     td.appendChild(span);
     td.classList.add('htCenter');
     td.classList.add('htMiddle');
-    
+    td.classList.add('custom-hot-oneclick-trigger')
+    td.classList.add('custom-hot-select')
     if(cellProperties.readOnly){
         td.classList.add('htDimmed');
     }
@@ -53,6 +54,7 @@ export function customDateRenderer(instance, td, row, col, prop, value, cellProp
     td.classList.add('htMiddle');
     td.classList.add('afterHiddenColumn');
     td.classList.add('htAutocomplete');
+    td.classList.add('custom-hot-oneclick-trigger')
     
     if(cellProperties.readOnly){
         td.classList.add('htDimmed');

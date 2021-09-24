@@ -8,19 +8,20 @@
 </template>
 
 <script>
-import mixTemplate from '../mixs/template.vue'
+import mixTemplate from '../mixs/template.vue';
+
 export default {
     mixins: [mixTemplate],
     computed: {
         templateClass() {
-            let classes = this.$attrs.classes
-            if (classes)
-                return classes.join(' ')
-            else
-                return ''
-        }
-    }
-}
+            const {classes} = this.$attrs;
+            let result = '';
+
+            if (classes) result = classes.join(' ');
+            return result;
+        },
+    },
+};
 </script>
 
 <style>
