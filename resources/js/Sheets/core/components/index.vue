@@ -2,7 +2,7 @@
     <div>
         <loading-message :status="loading"></loading-message>
         <div v-if="isPoll === false">
-            <sheets-form :entityId="id" :record_id="recordid"></sheets-form>
+            <sheets-form :entityId="id" :record_id="recordid" :params="params"></sheets-form>
         </div>
         <div v-if="isPoll === true">
             <sheets-poll-render :id="id" />
@@ -29,6 +29,10 @@ export default {
         recordid: {
             type: String,
             default: ""
+        },
+        params:{
+            type: String,
+            default: ""
         }
     },
 
@@ -39,7 +43,7 @@ export default {
     mounted() {
         this.loading = true;
         this.$store
-            .dispatch("form/get_form", this.id)
+            .dispatch("form/get_form", {id: this.id, params: this.params})
             .then(response => {
                 this.loading = false;
                 if (response.poll === 1) {

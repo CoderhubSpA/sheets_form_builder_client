@@ -1,5 +1,5 @@
 <template>
-    <file-template :label="label" :id="id" :required="required">
+    <file-template :label="label" :id="id" :required="required" :placeholder="ph">
         <input
             type="file"
             class="custom-file-input"
@@ -12,41 +12,44 @@
 </template>
 
 <script>
-import FileTemplate from '../templates/file.vue'
-import mix from '../mixs/input.vue'
-import mixFile from '../mixs/files'
+import FileTemplate from '../templates/file.vue';
+import mix from '../mixs/input.vue';
+import mixFile from '../mixs/files';
+
 export default {
     mixins: [mix, mixFile],
     components: {
-        'file-template': FileTemplate
+        'file-template': FileTemplate,
     },
     data: () => ({
-        preview: null
+        // placeholder
+        ph: '',
     }),
     computed: {
         accept() {
-            return '*'
-        }
+            return '*';
+        },
     },
     methods: {
         onChange(event) {
-            const file = event.target.files[0]
-            //
+            if (event.target.files.lenght > 1) {
+                this.ph = `${event.target.files.lenght} archivos seleccionados`;
+            } else {
+                this.ph = `${event.target.files[0].name}`;
+            }
+            const file = event.target.files[0];
+
             const data = {
                 id: this.id,
-                file: file
-            }
+                file: file,
+            };
             if (this.input.permission === 2) {
-                this.$store.commit('formBuilder/FILES', data)
+                this.$store.commit(`${this.state}/FILES`, data);
             }
         },
         onInput(event) {
             // console.log(event)
-        }
-    }
-}
+        },
+    },
+};
 </script>
-<style lang="scss">
-
-</style>
-

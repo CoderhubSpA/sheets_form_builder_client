@@ -19,6 +19,7 @@ export default {
         loading: false,
         entityId: '',
         entityName: '',
+        name: '',
         files: [],
         contentInfo: null,
         hasFiles: false,
@@ -72,85 +73,111 @@ export default {
         record_id: state => state.record_id,
         errors_fields: state => state.errors_fields,
         default_form: state => state.default_form,
-        raw: (state) => state.raw
+        raw: (state) => state.raw,
+        name: (state) => state.name,
     },
     mutations: {
         LOADING(state, val) {
-            state.loading = val
+            state.loading = val;
         },
         ENTITY_ID(state, val) {
-            state.entityId = val
+            state.entityId = val;
         },
         ENTITY_NAME(state, val) {
-            state.entityName = val
+            state.entityName = val;
         },
         RECORD_ID(state, val) {
-            state.record_id = val
+            state.record_id = val;
         },
         CONTENT_INFO(state, val) {
-            state.contentInfo = val
+            state.contentInfo = val;
         },
         FILES(state, val) {
-            state.hasFiles = true
-            state.files[val.id] = val
+            state.hasFiles = true;
+            state.files[val.id] = val;
         },
         FIELDS(state, val) {
-            state.fields.push(val)
+            let newKey = Object.keys(val)[0];
+            let found = false;
+            state.fields.map((field, index) => {
+                if(Object.keys(field)[0] === newKey){
+                    console.log(`Campo ${newKey} encontrado en la posición ${index}`);
+                    state.fields[index] = val;
+                    found = true;
+                }
+            });
+            if(!found){
+                state.fields.push(val);
+            }
         },
         SEARCH_MAP(state, val) {
-            Vue.set(state.searchMap, val.col_name, val.text)
+            Vue.set(state.searchMap, val.col_name, val.text);
         },
         POLL_SECTIONS(state, val) {
-            state.poll_sections = val
+            state.poll_sections = val;
         },
         POLL_QUESTIONS(state, val) {
-            state.poll_questions = val
+            state.poll_questions = val;
         },
         PIVOTS(state, val) {
-            state.pivots = val
+            state.pivots = val;
         },
         POLL_ACTIVE_SECTION(state, val) {
-            state.poll_active_section = val
+            state.poll_active_section = val;
         },
         HISTORY(state, val) {
-            state.history.push(val)
+            state.history.push(val);
         },
         DELETE_LAST_HISTORY(state) {
-            state.history.pop()
+            state.history.pop();
         },
         CLEARFIELDS(state, val) {
-            state.clearfields = val
+            state.clearfields = val;
         },
         FORM_ID(state, val) {
-            state.form_id = val
+            state.form_id = val;
         },
         ERRORS_FIELD(state, val) {
-            Vue.set(state.errors_fields, val.key, val.value)
+            Vue.set(state.errors_fields, val.key, val.value);
         },
         CLEAR_ERROR_FIELD(state, keyfield) {
-            state.errors_fields[keyfield] = ''
+            state.errors_fields[keyfield] = '';
         },
         DEFAULT_FORM(state, val) {
-            state.default_form = val
+            state.default_form = val;
         },
         RAW(state, val) {
-            state.raw = val
-        }
+            state.raw = val;
+        },
+        NAME(state, val) {
+            state.name = val;
+        },
     },
     actions: {
-        async get({ commit, dispatch }, id) {
+        async get({ commit, dispatch }, data) {
             commit('LOADING', true);
-            console.log(id)
+            const id = data.id;
+            const params = data.params;
             // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
             return new Promise((resolve, reject) => {
                 axios.get(`/api/sheets/form/${id}`)
                     .then((response) => {
-                        console.log('formbuilder', response)
                         const data = response.data.content;
                         commit('RAW', data);
-                        console.log(data.actions)
                         const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
-
+                        // console.log(params)
+                        if(params && params.length > 0){
+                            const parametrosJson = JSON.parse(params);
+                            data.fields.map((item) => {
+                                Object.keys(parametrosJson).forEach((paramkey) => {
+                                    if(paramkey === item.col_name){
+                                        let f = {};
+                                        f[item.id] = parametrosJson[paramkey];
+                                        commit('FIELDS', f);
+                                    }
+                                });
+                            });
+                        }
                         commit('FORM_ID', data.id);
 
                         commit('ENTITY_ID', data.entity_type_id);
@@ -158,6 +185,7 @@ export default {
                         commit('ENTITY_NAME', data.entity_type_name);
 
                         commit('DEFAULT_FORM', data.default === 1);
+                        commit('NAME', data.name);
 
                         let rows = data.rows.map((row) => {
                             let sections = data.sections.filter((sect) => {
@@ -197,20 +225,20 @@ export default {
                             message: response.data.message,
                         };
                         resolve(form);
-                    return response.data.content
-                    }).then(content => {
-                    if (!!content) {
-                        dispatch('info', content.entity_type_id)
-                    }
-
-                })
-                .catch(error => {
-                    reject(error)
-                })
-                .finally(() => {
-                    commit('LOADING', false)
-                })
-            })
+                        return response.data.content;
+                    })
+                    .then((content) => {
+                        if (content) {
+                            dispatch('info', content.entity_type_id);
+                        }
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    })
+                    .finally(() => {
+                        commit('LOADING', false);
+                    });
+            });
         },
         update({ commit }, data) {
             commit('LOADING', true)
@@ -251,19 +279,19 @@ export default {
             })
 
         },
-        info({ commit }, id) {
-            if (!!id) {
-                commit('LOADING', true)
-                axios.get(`/api/sheets/entity/info/${id}`)
-                .then(response => {
-                    commit('CONTENT_INFO', response.data.content)
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-                .finally(() => {
-                    commit('LOADING', false)
-                })
+        async info({ commit }, id) {
+            if (id) {
+                commit('LOADING', true);
+                await axios.get(`/api/sheets/entity/info/${id}`)
+                    .then((response) => {
+                        commit('CONTENT_INFO', response.data.content);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        commit('LOADING', false);
+                    });
             }
         },
         save({ commit }, data) {
@@ -343,6 +371,6 @@ export default {
                     commit('LOADING', false)
                 })
             })
-        }
-    }
-}
+        },
+    },
+};

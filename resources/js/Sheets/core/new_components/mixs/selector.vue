@@ -41,6 +41,7 @@ export default {
         options() {
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
             let options = [];
+            const key = this.input.col_name_fk || 'name';
 
             if (contentInfo) {
                 const fk = this.input.entity_type_fk;
@@ -48,7 +49,7 @@ export default {
                 const entities = contentInfo.content.entities_fk[fk];
 
                 if (entities) {
-                    options = entities.map((e) => ({ id: e.id, name: e.name }));
+                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
 
@@ -122,15 +123,14 @@ export default {
     },
     methods: {
         createdOption(id) {
-            this.inserted = id
-            // const optionToSelect = this.options.find((option) => option.id === id);
-            // console.log(id, this.options, optionToSelect);
-            // if (this.multiple) {
-            //     if (this.selected) this.selected.push(optionToSelect);
-            //     else this.selected = [optionToSelect];
-            // } else this.selected = optionToSelect;
+            this.inserted = id;
+            const optionToSelect = this.options.find((option) => option.id === id);
 
-            // console.log(this.selected, id, optionToSelect, this.options)
+            if (this.multiple) {
+                if (this.selected) this.selected.push(optionToSelect);
+                else this.selected = [optionToSelect];
+            } else this.selected = optionToSelect;
+            this.inserted = null;
         },
     },
 };

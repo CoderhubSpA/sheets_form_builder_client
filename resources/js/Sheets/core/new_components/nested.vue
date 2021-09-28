@@ -1,15 +1,13 @@
 <template>
     <div>
-        <button class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="open">
-            +
-        </button>
+        <button class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="open">+</button>
         <div class="nested-form" v-show="show">
             <div class="content">
                 <div class="header">
-                    Header
-                    <button @click="close">
-                    &times;
-                    </button>
+                    <div class="header-title">
+                        {{ form_name }}
+                    </div>
+                    <button @click="close">&times;</button>
                 </div>
                 <div class="body">
                     <div ref="nested" />
@@ -24,9 +22,6 @@ import Vue from 'vue';
 import formbuilder from './form.vue';
 
 export default {
-    components: {
-        formbuilder,
-    },
     props: {
         entity_type_permission_fk: {
             type: String,
@@ -39,6 +34,7 @@ export default {
     },
     data: () => ({
         show: false,
+        form_name: '',
     }),
     methods: {
         open() {
@@ -70,9 +66,23 @@ export default {
                 }
                 this.close();
             });
+
+            instance.$on('name', (val) => {
+                this.form_name = this.capitalize(val);
+            });
             instance.$mount();
 
             this.$refs.nested.appendChild(instance.$el);
+        },
+        capitalize(str) {
+            let result = '';
+
+            if (str) {
+                const lower = str.toLowerCase();
+                result = str.charAt(0).toUpperCase() + lower.slice(1);
+            }
+
+            return result;
         },
     },
 };
@@ -80,7 +90,7 @@ export default {
 <style lang="scss">
 .nested-form {
     position: fixed;
-    z-index: 1;
+    z-index: 170;
     left: 0;
     top: 0;
     width: 100%;

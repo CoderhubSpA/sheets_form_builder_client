@@ -40,23 +40,28 @@ export default {
         // ID de la entidad
         entityId: {
             type: String,
-            require: true
+            require: true,
         },
         // ID del registro
         record_id: {
             type: String,
             require: false,
-            default: null
+            default: null,
+        },
+        params: {
+            type: String,
+            require: false,
+            default: null,
         },
         value: {
-            require: false
-        }
+            require: false,
+        },
     },
     components: {
         // "sheets-loading": Loading,
         'sheets-row': Row,
         'sheets-action': Action,
-        'sheets-snackbar': Snackbar
+        'sheets-snackbar': Snackbar,
     },
     data: () => ({
         // filas de form
@@ -71,7 +76,7 @@ export default {
         snackbar: { message: '', success: false, show: false },
         //
         action: {},
-        disabledAction: false
+        disabledAction: false,
     }),
     computed: {
         loading() {
@@ -79,7 +84,7 @@ export default {
         },
         result() {
             let arr = [];
-            this.formAnswer.forEach(row => {
+            this.formAnswer.forEach((row) => {
                 arr = arr.concat(row);
             });
             return arr;
@@ -92,7 +97,18 @@ export default {
         },
         default_form() {
             return this.$store.getters[`${this.namespace}/default_form`];
-        }
+        },
+        entityName() {
+            return this.$store.getters[`${this.namespace}/entity_name`];
+        },
+        name() {
+            return this.$store.getters[`${this.namespace}/name`];
+        },
+    },
+    watch: {
+        name(val) {
+            this.$emit('name', val);
+        },
     },
     beforeCreate() {
         const { namespace } = registerStore(this.$store, FormBuilderStore, 'myStore');
@@ -106,19 +122,16 @@ export default {
     methods: {
         postMessage(data) {
             try {
-                const result = {
-                    ...data,
-                    action: this.action,
-                };
-                this.window.parent.postMessage(result, '*');
+                data.content.action = this.action;
+                this.window.parent.postMessage(data, '*');
             } catch (error) {
                 console.warn(error);
             }
         },
         initForm() {
             this.$store
-                .dispatch(this.namespace + '/get', this.entityId)
-                .then(form => {
+                .dispatch(this.namespace + '/get', {id: this.entityId, params: this.params})
+                .then((form) => {
                     if (form.success) {
                         this.formRows = form.rows;
                         this.formActions = form.actions;
@@ -126,18 +139,18 @@ export default {
                         this.snackbar = {
                             message: form.message,
                             success: form.success,
-                            show: true
+                            show: true,
                         };
                     }
                 })
                 .then(() => {
                     this.get_record();
                 })
-                .catch(error => {
+                .catch((error) => {
                     this.snackbar = {
                         message: error.message,
                         success: false,
-                        show: true
+                        show: true,
                     };
                 });
         },
@@ -179,8 +192,12 @@ export default {
                 }
             }
             const body = {};
-
-            this.result.map(r => {
+            console.log(this.formAnswer)
+            let result  = [];
+            this.formAnswer.forEach(element => {
+                result.push(...element);
+            });
+            result.map(r => {
                 if (!!r) {
                     let obj = Object.assign({}, r);
                     let key = Object.keys(obj)[0];
@@ -198,17 +215,17 @@ export default {
 
             form.append('entityKey', entityId);
 
-            Object.keys(data).forEach(key => {
+            Object.keys(data).forEach((key) => {
                 form.append(key, JSON.stringify(data[key]));
             });
             const action = !this.record_id ? `${this.namespace}/save` : `${this.namespace}/update`;
             this.$store
                 .dispatch(action, form)
-                .then(response => {
+                .then((response) => {
                     this.snackbar = {
                         success: response.success,
                         show: true,
-                        message: response.content.message
+                        message: response.content.message,
                     };
 
                     if (response.success) {
@@ -226,7 +243,7 @@ export default {
                     this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
                     if (error.data) {
                         this.snackbar = {
-                            message: error.data.content.message || error.statusText,
+                            message: error.data.content !== null ? error.data.content.message : 'Ocurrió un error inesperado',
                             success: false,
                             show: true
                         };
@@ -250,7 +267,7 @@ export default {
 
             const promises = [];
             const req = [];
-            Object.entries(files).map(file => {
+            Object.entries(files).map((file) => {
                 req.push(file[1].id);
                 const form = new FormData();
 
@@ -259,18 +276,21 @@ export default {
 
                 promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, form));
             });
-            await Promise.all(promises).then(resp => {
+            await Promise.all(promises).then((resp) => {
                 for (let index = 0; index < resp.length; index += 1) {
                     const obj = {};
                     obj[req[index]] = resp[index];
+                    // obj.id = resp[index]
                     this.formAnswer[0].push(obj);
                 }
             });
         },
         async handlerAction(saveForm, action) {
+
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
             if (action.id !== 'DEFAULT-ACTION') {
                 this.formAnswer.push({ action_id: action.id });
+
             }
             if (saveForm) {
                 if (this.filesInForm) await this.sendFiles();
@@ -281,8 +301,8 @@ export default {
         resetForm() {
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, true);
             this.formAnswer = [];
-        }
-    }
+        },
+    },
 };
 </script>
 

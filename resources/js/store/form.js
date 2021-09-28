@@ -115,14 +115,31 @@ export default {
                 resolve(this.state.form.form);
             });
         },
-        get_form({ commit }, id) {
+        get_form({ commit }, data) {
             commit("LOADING", true);
+            const id = data.id;
+            const params = data.params;
+            
             return new Promise((resolve, reject) => {
                 axios
                     .get(`/api/sheets/form/${id}`)
                     .then(response => {
                         let rows = [];
                         let apiResponse = response.data.content;
+                        if(params.length > 0){
+                            const parametrosJson = JSON.parse(params);
+                            apiResponse.fields.map((item) => {
+                                Object.keys(parametrosJson).forEach((paramkey) => {
+                                    if(paramkey === item.col_name){
+                                        const commitData = {
+                                            key: item.id,
+                                            value: parametrosJson[paramkey]
+                                        };
+                                        commit("FIELDSVALUES", commitData);
+                                    }
+                                })
+                            });
+                        }
                         commit("ENTITYID", apiResponse.entity_type_id);
                         commit("ENTITYNAME", apiResponse.entity_type_name);
                         axios

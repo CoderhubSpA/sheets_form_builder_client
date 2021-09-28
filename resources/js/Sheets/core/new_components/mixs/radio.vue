@@ -50,7 +50,7 @@ export default {
                 const val = fields.filter(
                     f => Object.keys(f)[0] === this.id
                 )[0];
-                if (val !== null) {
+                if (val !== null && val !== undefined) {
                     return val[this.id];
                 }
             }

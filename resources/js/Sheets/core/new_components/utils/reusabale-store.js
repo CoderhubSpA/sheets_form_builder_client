@@ -14,11 +14,10 @@ const generateModuleName = (store, name, suffix = 0) => {
 
 export default (store, module, name) => {
     const moduleName = generateModuleName(store, name);
-    console.log('reusable-store.js', moduleName);
     store.registerModule(moduleName, module);
 
     return {
         namespace: moduleName,
         namespacedHelpers: createNamespacedHelpers(moduleName),
     };
-}
+};
