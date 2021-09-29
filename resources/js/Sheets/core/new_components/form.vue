@@ -192,12 +192,12 @@ export default {
                 }
             }
             const body = {};
-            console.log(this.formAnswer)
-            let result  = [];
-            this.formAnswer.forEach(element => {
-                result.push(...element);
-            });
-            result.map(r => {
+            // console.log(this.formAnswer)
+            // let result  = [];
+            // this.formAnswer.forEach(element => {
+            //     result.push(...element);
+            // });
+            this.result.map(r => {
                 if (!!r) {
                     let obj = Object.assign({}, r);
                     let key = Object.keys(obj)[0];
