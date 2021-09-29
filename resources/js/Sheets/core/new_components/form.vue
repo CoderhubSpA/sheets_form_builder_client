@@ -124,6 +124,7 @@ export default {
         postMessage(data) {
             try {
                 data.content.action = this.action;
+                console.log(data.content, this.action)
                 this.window.parent.postMessage(data, '*');
             } catch (error) {
                 console.warn(error);
@@ -285,8 +286,6 @@ export default {
                             if (this.action.refresh_form === 1) {
                                 this.resetForm();
                             }
-
-                            this.action = {};
                             this.$emit('input', response.content);
                             this.postMessage(response);
                             this.action = {};
@@ -304,8 +303,8 @@ export default {
                                 success: false,
                                 show: true
                             };
-                            this.action = {};
                             this.postMessage(error.data);
+                            this.action = {};
                         } else {
                             this.snackbar = {
                                 message:
@@ -315,7 +314,6 @@ export default {
                                 success: false,
                                 show: true
                             };
-                            this.action = {};
                             this.postMessage(error.response.data);
                             this.action = {};
                         }
