@@ -1,6 +1,10 @@
 FILE=./README.md
 if [ -f "$FILE" ]; then
-    echo "git pull"
+    echo "git pull Form Builder"
+    cd ../sheets_form_builder/
+    git pull
+    echo "git pull Form Builder Client"
+    cd ../sheets_form_builder_client/
     git pull
     echo "Limpiando"
     rm -rf ./resources/js/Sheets
