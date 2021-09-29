@@ -36,6 +36,9 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
     if(cellProperties.readOnly){
         td.classList.add('htDimmed');
     }
+    if(cellProperties.isRequired && (value === '' || value === null || value === undefined)){
+        td.classList.add('htErrorWaiting');
+    }
     return td;
 }
 

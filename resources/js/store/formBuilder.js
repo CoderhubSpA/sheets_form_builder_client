@@ -34,6 +34,8 @@ export default {
         form_id: '',
         record_id: null,
         errors_fields: {},
+        smarequiredfields:[],
+        errorssma: null,
         /**
          * Si “default:1”, el Form Builder no debe enviar al backend:
          * form_id
@@ -62,6 +64,8 @@ export default {
         poll_questions: state => state.poll_questions,
         poll_active_section: state => state.poll_active_section,
         clearfields: state => state.clearfields,
+        smarequiredfields: state => state.smarequiredfields,
+        errorssma: state => state.errorssma,
         last_section: (state) => {
             const index = state.history.length -1
 
@@ -79,6 +83,12 @@ export default {
     mutations: {
         LOADING(state, val) {
             state.loading = val;
+        },
+        SMAREQUIREDFIELDS(state, val){
+            state.smarequiredfields.push(val)
+        },
+        ERRORSSMA(state, val){
+            state.errorssma = val
         },
         ENTITY_ID(state, val) {
             state.entityId = val;
@@ -101,7 +111,6 @@ export default {
             let found = false;
             state.fields.map((field, index) => {
                 if(Object.keys(field)[0] === newKey){
-                    console.log(`Campo ${newKey} encontrado en la posición ${index}`);
                     state.fields[index] = val;
                     found = true;
                 }
@@ -164,7 +173,11 @@ export default {
                     .then((response) => {
                         const data = response.data.content;
                         commit('RAW', data);
-                        const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
+                        // const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
+                        let actions = null;
+                        if (data.actions.length > 0)
+                            actions = data.actions.filter((action) => action.valid !== 0);
+                        else actions = [DEFAULT_ACTION];
                         // console.log(params)
                         if(params && params.length > 0){
                             const parametrosJson = JSON.parse(params);

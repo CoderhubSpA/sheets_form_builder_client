@@ -1,7 +1,11 @@
 <script>
 import Handsontable from 'handsontable';
 import { KeyValueSelect } from 'handsontable-key-value-select';
-import { clpRenderer, customDateRenderer, customSelectRenderer } from '../handsontableCustom/renderers';
+import {
+    clpRenderer,
+    customDateRenderer,
+    customSelectRenderer
+} from '../handsontableCustom/renderers';
 export default {
     props: {
         input: {
@@ -48,6 +52,14 @@ export default {
             }
             return result;
         },
+        errors() {
+            const globalErrors = this.$store.getters[`${this.state}/errorssma`];
+            if (globalErrors === this.input.id) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         col_name() {
             return this.input.col_name;
         }
@@ -55,10 +67,22 @@ export default {
     watch: {
         handsontableData() {
             this.changeData();
+        },
+        errors(val) {
+            const elementos = this.$el.getElementsByClassName('htErrorWaiting');
+            if (val === true) {
+                [].forEach.call(elementos, function(el) {
+                    Handsontable.dom.addClass(el, 'htErrorConfirmed');
+                });
+            } else {
+                [].forEach.call(elementos, function(el) {
+                    Handsontable.dom.removeClass(el, 'htErrorConfirmed');
+                });
+            }
         }
     },
     data: () => ({
-        mainPivot:{},
+        mainPivot: {},
         columnsIds: [],
         sendingIds: ['id'],
         handsontableData: [],
@@ -99,8 +123,11 @@ export default {
                     });
                 }
             },
-            afterOnCellMouseUp(event, coords, TD){
-                if(TD.classList.contains('custom-hot-oneclick-trigger') && event.target.classList.contains('htAutocompleteArrow')){
+            afterOnCellMouseUp(event, coords, TD) {
+                if (
+                    TD.classList.contains('custom-hot-oneclick-trigger') &&
+                    event.target.classList.contains('htAutocompleteArrow')
+                ) {
                     this.getActiveEditor().beginEditing();
                     this.getActiveEditor().setValue(this.getInstance().getValue());
                 }
@@ -159,9 +186,21 @@ export default {
                     column.show_in_edit_form > 0 &&
                     column.col_name !== this.input.col_fk_1_n
                 ) {
-                    this.handsontableSettings.colHeaders.push(column.col_name !== this.input.col_fk_n_1 ? column.name : `${column.name} <b style="color: red;">*</b>`);
+                    this.handsontableSettings.colHeaders.push(
+                        column.col_name !== this.input.col_fk_n_1
+                            ? column.name
+                            : `${column.name} <b style="color: red;">*</b>`
+                    );
+                    if (column.col_name === this.input.col_fk_n_1) {
+                        this.$store.commit(`${this.state}/SMAREQUIREDFIELDS`, {
+                            fieldId: this.input.id,
+                            name: column.col_name,
+                            id: column.id
+                        });
+                    }
                     const readonly = column.show_in_edit_form === 1 ? true : false;
                     const sendtobackend = column.show_in_edit_form === 2 ? true : false;
+                    const isRequired = column.col_name === this.input.col_fk_n_1 ? true : false;
                     if (sendtobackend) {
                         this.sendingIds.push(column.id);
                     }
@@ -169,7 +208,8 @@ export default {
                         id: column.id,
                         column: column,
                         readonly,
-                        sendtobackend
+                        sendtobackend,
+                        isRequired
                     });
                 }
             });
@@ -212,6 +252,7 @@ export default {
                             columnToPush.renderer = customSelectRenderer;
                             columnToPush.selectOptions = selectOptions;
                             columnToPush.readOnly = column.readonly;
+                            columnToPush.isRequired = column.isRequired;
                             break;
                         case 'SiNo':
                             columnToPush.data = column.id;
@@ -258,7 +299,7 @@ export default {
             this.handsontableSettings.columns = columns;
         },
         async buildHotTableData() {
-            if (this.pivots === null){
+            if (this.pivots === null) {
                 // Si pivot es identico a null,
                 // significa que aun no a llegado la data
                 // desde el store.
@@ -290,7 +331,7 @@ export default {
             // En caso de que la llegada de la data fue tardía y ya el componente se renderizó
             // cargar la data mediante el método loadData.
             // Esto puede pasar si los pivotes llegan tarde
-            if(this.$refs['hotTableComponent'])
+            if (this.$refs['hotTableComponent'])
                 console.log(this.$refs['hotTableComponent'].hotInstance.loadData(data));
         },
         addHooks() {
@@ -310,18 +351,18 @@ export default {
         addRow() {
             const newRow = {};
             const recordid = this.$store.getters[`${this.state}/record_id`];
-            if(recordid){
+            if (recordid) {
                 newRow[this.mainPivot.id] = recordid;
             }
-            this.columnsIds.map((column) => {
-                if(column.column.default_value !== null && column.id !== 'id'){
-                    if(column.column.format === 'SiNo'){
+            this.columnsIds.map(column => {
+                if (column.column.default_value !== null && column.id !== 'id') {
+                    if (column.column.format === 'SiNo') {
                         newRow[column.id] = column.column.default_value === 1 ? true : false;
-                    }else{
+                    } else {
                         newRow[column.id] = column.column.default_value;
                     }
                 }
-            })
+            });
             this.handsontableData.push(newRow);
         },
         logData() {

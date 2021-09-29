@@ -19,6 +19,11 @@
                 </hot-table>
             </div>
         </div>
+        <div class="row" v-if="errors">
+            <div class="col-12">
+                <p class="text-danger">Por favor complete los campos requeridos</p>
+            </div>
+        </div>
     </div>
 </template>
 

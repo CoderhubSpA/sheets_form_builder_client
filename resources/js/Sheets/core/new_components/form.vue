@@ -40,28 +40,28 @@ export default {
         // ID de la entidad
         entityId: {
             type: String,
-            require: true,
+            require: true
         },
         // ID del registro
         record_id: {
             type: String,
             require: false,
-            default: null,
+            default: null
         },
         params: {
             type: String,
             require: false,
-            default: null,
+            default: null
         },
         value: {
-            require: false,
-        },
+            require: false
+        }
     },
     components: {
         // "sheets-loading": Loading,
         'sheets-row': Row,
         'sheets-action': Action,
-        'sheets-snackbar': Snackbar,
+        'sheets-snackbar': Snackbar
     },
     data: () => ({
         // filas de form
@@ -77,6 +77,7 @@ export default {
         //
         action: {},
         disabledAction: false,
+        errorsOnSMA: false
     }),
     computed: {
         loading() {
@@ -84,7 +85,7 @@ export default {
         },
         result() {
             let arr = [];
-            this.formAnswer.forEach((row) => {
+            this.formAnswer.forEach(row => {
                 arr = arr.concat(row);
             });
             return arr;
@@ -103,12 +104,12 @@ export default {
         },
         name() {
             return this.$store.getters[`${this.namespace}/name`];
-        },
+        }
     },
     watch: {
         name(val) {
             this.$emit('name', val);
-        },
+        }
     },
     beforeCreate() {
         const { namespace } = registerStore(this.$store, FormBuilderStore, 'myStore');
@@ -130,8 +131,8 @@ export default {
         },
         initForm() {
             this.$store
-                .dispatch(this.namespace + '/get', {id: this.entityId, params: this.params})
-                .then((form) => {
+                .dispatch(this.namespace + '/get', { id: this.entityId, params: this.params })
+                .then(form => {
                     if (form.success) {
                         this.formRows = form.rows;
                         this.formActions = form.actions;
@@ -139,18 +140,18 @@ export default {
                         this.snackbar = {
                             message: form.message,
                             success: form.success,
-                            show: true,
+                            show: true
                         };
                     }
                 })
                 .then(() => {
                     this.get_record();
                 })
-                .catch((error) => {
+                .catch(error => {
                     this.snackbar = {
                         message: error.message,
                         success: false,
-                        show: true,
+                        show: true
                     };
                 });
         },
@@ -163,111 +164,172 @@ export default {
                 await this.$store.dispatch(`${this.namespace}/get_record`, data);
             }
         },
-        save() {
-            this.disabledAction = true;
-            const entityId = this.$store.getters[`${this.namespace}/entity_id`];
-
-            const data = {};
-            data[entityId] = [];
-            // form fields
-            if (!this.default_form) {
-                const formFields = {};
+        async verifySelectorMultipleAdvanced(fieldId, content) {
+            const smarequiredfields = await this.$store.getters[
+                `${this.namespace}/smarequiredfields`
+            ];
+            let valid = true;
+            smarequiredfields.forEach(rf => {
+                if (fieldId === rf.fieldId) {
+                    content.map(item => {
+                        const keys = Object.keys(item);
+                        if (
+                            !keys.includes(rf.id) ||
+                            item[rf.id] === null ||
+                            item[rf.id] === undefined ||
+                            item[rf.id] === ''
+                        ) {
+                            valid = false;
+                        }
+                    });
+                }
+            });
+            return valid;
+        },
+        async getSMAValidation() {
+            this.$store.commit(`${this.namespace}/ERRORSSMA`, null);
+            this.errorsOnSMA = false;
+            await this.result.forEach(data => {
+                const fieldId = Object.keys(data)[0];
                 this.formRows.map(row => {
                     row.sections.map(section => {
-                        section.fields.map(field => {
-                            this.result.map(r => {
-                                if (Object.keys(r)[0] === field.id)
-                                    formFields[field.id] = field.form_field_id;
-                            });
+                        section.fields.map(async field => {
+                            if (field.id === fieldId) {
+                                if (field.format === 'SELECTOR[MULTIPLE][ADVANCED]') {
+                                    const valid = await this.verifySelectorMultipleAdvanced(
+                                        fieldId,
+                                        data[fieldId][field.entity_type_pivot_fk]
+                                    );
+                                    if (!valid) {
+                                        this.$store.commit(`${this.namespace}/ERRORSSMA`, field.id);
+                                        this.errorsOnSMA = true;
+                                    }
+                                }
+                            }
                         });
                     });
                 });
-                this.formAnswer.push({ form_fields: formFields });
+            });
+            return true;
+        },
+        async save() {
+            const finishedvalidationsma = await this.getSMAValidation();
+            if (this.errorsOnSMA === false) {
+                this.disabledAction = true;
+                const entityId = this.$store.getters[`${this.namespace}/entity_id`];
 
-                const formId = this.$store.getters[`${this.namespace}/form_id`];
-                if (formId) {
-                    this.formAnswer.push({
-                        form_id: formId
+                const data = {};
+                data[entityId] = [];
+                // form fields
+                if (!this.default_form) {
+                    const formFields = {};
+                    this.formRows.map(row => {
+                        row.sections.map(section => {
+                            section.fields.map(field => {
+                                this.result.map(r => {
+                                    if (Object.keys(r)[0] === field.id)
+                                        formFields[field.id] = field.form_field_id;
+                                });
+                            });
+                        });
                     });
+                    this.formAnswer.push({ form_fields: formFields });
+
+                    const formId = this.$store.getters[`${this.namespace}/form_id`];
+                    if (formId) {
+                        this.formAnswer.push({
+                            form_id: formId
+                        });
+                    }
                 }
-            }
-            const body = {};
-            // console.log(this.formAnswer)
-            // let result  = [];
-            // this.formAnswer.forEach(element => {
-            //     result.push(...element);
-            // });
-            this.result.map(r => {
-                if (!!r) {
-                    let obj = Object.assign({}, r);
-                    let key = Object.keys(obj)[0];
-                    body[key] = obj[key];
+                const body = {};
+                // console.log(this.formAnswer)
+                // let result  = [];
+                // this.formAnswer.forEach(element => {
+                //     result.push(...element);
+                // });
+                this.result.map(r => {
+                    if (!!r) {
+                        let obj = Object.assign({}, r);
+                        let key = Object.keys(obj)[0];
+                        body[key] = obj[key];
+                    }
+                });
+
+                if (this.record_id) {
+                    body.id = this.record_id;
                 }
-            });
 
-            if (this.record_id) {
-                body.id = this.record_id;
-            }
+                data[entityId].push(body);
 
-            data[entityId].push(body);
+                const form = new FormData();
 
-            const form = new FormData();
+                form.append('entityKey', entityId);
 
-            form.append('entityKey', entityId);
+                Object.keys(data).forEach(key => {
+                    form.append(key, JSON.stringify(data[key]));
+                });
+                const action = !this.record_id
+                    ? `${this.namespace}/save`
+                    : `${this.namespace}/update`;
+                this.$store
+                    .dispatch(action, form)
+                    .then(response => {
+                        this.snackbar = {
+                            success: response.success,
+                            show: true,
+                            message: response.content.message
+                        };
 
-            Object.keys(data).forEach((key) => {
-                form.append(key, JSON.stringify(data[key]));
-            });
-            const action = !this.record_id ? `${this.namespace}/save` : `${this.namespace}/update`;
-            this.$store
-                .dispatch(action, form)
-                .then((response) => {
-                    this.snackbar = {
-                        success: response.success,
-                        show: true,
-                        message: response.content.message,
-                    };
+                        if (response.success) {
+                            if (this.action.refresh_form === 1) {
+                                this.resetForm();
+                            }
 
-                    if (response.success) {
-                        if (this.action.refresh_form === 1) {
-                            this.resetForm();
+                            this.action = {};
+                            this.$emit('input', response.content);
+                            this.postMessage(response);
+                            this.action = {};
+                        }
+                        this.disabledAction = false;
+                    })
+                    .catch(error => {
+                        this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
+                        if (error.data) {
+                            this.snackbar = {
+                                message:
+                                    error.data.content !== null
+                                        ? error.data.content.message
+                                        : 'Ocurrió un error inesperado',
+                                success: false,
+                                show: true
+                            };
+                            this.action = {};
+                            this.postMessage(error.data);
+                        } else {
+                            this.snackbar = {
+                                message:
+                                    error.response.data.content !== null
+                                        ? error.response.data.content.message
+                                        : 'Ocurrió un error inesperado',
+                                success: false,
+                                show: true
+                            };
+                            this.action = {};
+                            this.postMessage(error.response.data);
+                            this.action = {};
                         }
 
-                        this.action = {};
-                        this.$emit('input', response.content);
-                        this.postMessage(response);
-                    }
-                    this.disabledAction = false;
-                })
-                .catch(error => {
-                    this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
-                    if (error.data) {
-                        this.snackbar = {
-                            message: error.data.content !== null ? error.data.content.message : 'Ocurrió un error inesperado',
-                            success: false,
-                            show: true
-                        };
-                        this.action = {};
-                        this.postMessage(error.data);
-                    } else {
-                        this.snackbar = {
-                            message: error.response.data.content !== null ? error.response.data.content.message : 'Ocurrió un error inesperado',
-                            success: false,
-                            show: true
-                        };
-                        this.action = {};
-                        this.postMessage(error.response.data);
-                    }
-
-                    this.disabledAction = false;
-                });
+                        this.disabledAction = false;
+                    });
+            }
         },
         async sendFiles() {
             const files = this.$store.getters[`${this.namespace}/files`];
 
             const promises = [];
             const req = [];
-            Object.entries(files).map((file) => {
+            Object.entries(files).map(file => {
                 req.push(file[1].id);
                 const form = new FormData();
 
@@ -276,25 +338,25 @@ export default {
 
                 promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, form));
             });
-            await Promise.all(promises).then((resp) => {
+            await Promise.all(promises).then(resp => {
                 for (let index = 0; index < resp.length; index += 1) {
                     const obj = {};
                     obj[req[index]] = resp[index];
-                    // obj.id = resp[index]
-                    this.formAnswer[0].push(obj);
+                    obj.id = resp[index];
+                    this.formAnswer.push(obj);
+                    this.formAnswer.push({ id: obj.id });
+                    // this.formAnswer[0].push(obj);
                 }
             });
         },
         async handlerAction(saveForm, action) {
-
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
             if (action.id !== 'DEFAULT-ACTION') {
                 this.formAnswer.push({ action_id: action.id });
-
             }
             if (saveForm) {
                 if (this.filesInForm) await this.sendFiles();
-                this.save();
+                await this.save();
             }
             this.action = action;
         },

@@ -46,13 +46,14 @@ export default {
         options() {
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
             let options = [];
+            const key = this.input.col_name_fk || 'name';
 
             if (contentInfo) {
                 const fk = this.input.entity_type_fk;
-
                 const entities = contentInfo.content.entities_fk[fk];
+                console.log(key, entities.find(e => e.id === 'aa0301c8-e04d-42c3-b92c-76d4d2cd6a7c'));
                 if (entities) {
-                    options = entities.map((e) => ({ id: e.id, name: e.name }));
+                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
                 }
             }
             return options;
@@ -63,7 +64,7 @@ export default {
             const RAW = this.$store.getters[`${this.state}/raw`];
             await this.$store.dispatch(`${this.state}/info`, RAW.entity_type_id);
             const result = this.options.find((o) => o.id === id);
-            // console.log(result)
+            console.log(result);
             this.selected.push(result);
         },
     },
