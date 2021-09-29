@@ -3,6 +3,7 @@ if [ -f "$FILE" ]; then
     echo "git pull Form Builder"
     cd ../sheets_form_builder/
     git pull
+    npm run production
     echo "git pull Form Builder Client"
     cd ../sheets_form_builder_client/
     git pull
