@@ -2,6 +2,7 @@ FILE=./README.md
 if [ -f "$FILE" ]; then
     echo "git pull Form Builder"
     cd ../sheets_form_builder/
+    git reset --hard
     git pull
     npm run production
     echo "git pull Form Builder Client"

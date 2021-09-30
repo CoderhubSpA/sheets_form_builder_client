@@ -4,23 +4,24 @@ import { KeyValueSelect } from 'handsontable-key-value-select';
 import {
     clpRenderer,
     customDateRenderer,
-    customSelectRenderer
+    customSelectRenderer,
 } from '../handsontableCustom/renderers';
+
 export default {
     props: {
         input: {
             type: Object,
-            required: true
+            required: true,
         },
         value: {
             type: Object,
             default: () => {},
-            required: true
+            required: true,
         },
         state: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
     computed: {
         label() {
@@ -39,7 +40,7 @@ export default {
             return this.input.readonly;
         },
         required() {
-            return this.input.required == 1 ? true : false;
+            return this.input.required === 1;
         },
         placeholder() {
             return this.input.placeholder;
@@ -56,13 +57,12 @@ export default {
             const globalErrors = this.$store.getters[`${this.state}/errorssma`];
             if (globalErrors === this.input.id) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         },
         col_name() {
             return this.input.col_name;
-        }
+        },
     },
     watch: {
         handsontableData() {
@@ -71,15 +71,17 @@ export default {
         errors(val) {
             const elementos = this.$el.getElementsByClassName('htErrorWaiting');
             if (val === true) {
-                [].forEach.call(elementos, function(el) {
+                // eslint-disable-next-line prefer-arrow-callback, func-names
+                [].forEach.call(elementos, function (el) {
                     Handsontable.dom.addClass(el, 'htErrorConfirmed');
                 });
             } else {
-                [].forEach.call(elementos, function(el) {
+                // eslint-disable-next-line prefer-arrow-callback, func-names
+                [].forEach.call(elementos, function (el) {
                     Handsontable.dom.removeClass(el, 'htErrorConfirmed');
                 });
             }
-        }
+        },
     },
     data: () => ({
         mainPivot: {},
@@ -97,29 +99,29 @@ export default {
             className: 'htCenter htMiddle',
             hiddenColumns: {
                 columns: [0, 1],
-                indicators: false
+                indicators: false,
             },
             contextMenu: {
                 items: {
                     remove_row: {
-                        name: 'Eliminar fila'
-                    }
-                }
+                        name: 'Eliminar fila',
+                    },
+                },
             },
-            beforeOnCellContextMenu(event, coords, TD) {
+            beforeOnCellContextMenu(event, coords) {
                 if (coords.row === -1) {
                     this.updateSettings({
-                        contextMenu: false
+                        contextMenu: false,
                     });
                 } else {
                     this.updateSettings({
                         contextMenu: {
                             items: {
                                 remove_row: {
-                                    name: 'Eliminar fila'
-                                }
-                            }
-                        }
+                                    name: 'Eliminar fila',
+                                },
+                            },
+                        },
                     });
                 }
             },
@@ -132,16 +134,16 @@ export default {
                     this.getActiveEditor().setValue(this.getInstance().getValue());
                 }
             },
-            /*afterOnCellMouseOver(event, coords, TD){
+            /* afterOnCellMouseOver(event, coords, TD){
                 if(TD.classList.contains('custom-hot-select')){
                     this.selectCell(coords.row, coords.col);
                     this.getActiveEditor().setValue(this.getInstance().getValue());
                     this.getActiveEditor().beginEditing();
                 }
-            },*/
-            licenseKey: 'non-commercial-and-evaluation'
+            }, */
+            licenseKey: 'non-commercial-and-evaluation',
         },
-        hotTableLoaded: false
+        hotTableLoaded: false,
     }),
     mounted() {
         this.getEntityInfo();
@@ -149,9 +151,10 @@ export default {
     methods: {
         getEntityInfo() {
             this.$store.commit(`${this.state}/LOADING`, true);
+            // eslint-disable-next-line no-undef
             axios
                 .get(`/api/sheets/entity/info/${this.input.entity_type_pivot_fk}`)
-                .then(response => {
+                .then((response) => {
                     // GUARDO LA RESPUESTA PARA FUTURO
                     this.entityInfo = response.data.content.content;
                     // ARMO LOS HEADERS DE LA TABLA
@@ -161,7 +164,8 @@ export default {
                     // ARMO EL CONTENIDO DE CADA ROW
                     this.buildHotTableData();
                 })
-                .catch(error => {
+                .catch((error) => {
+                    // eslint-disable-next-line no-console
                     console.log(error);
                 })
                 .finally(() => {
@@ -172,15 +176,16 @@ export default {
         },
         buildColHeaders() {
             this.handsontableSettings.colHeaders.push(this.input.col_fk_1_n);
-            this.mainPivot = this.entityInfo.columns.find(eInfo => {
-                return eInfo.col_name === this.input.col_fk_1_n;
-            });
+            this.mainPivot = this.entityInfo.columns.find(
+                (eInfo) => eInfo.col_name === this.input.col_fk_1_n
+            );
             this.columnsIds = [
                 { id: 'id', column: { format: 'TEXT' } },
-                { id: this.mainPivot.id, column: this.mainPivot }
+                { id: this.mainPivot.id, column: this.mainPivot },
             ];
             this.sendingIds.push(this.mainPivot.id);
-            this.entityInfo.columns.map(column => {
+            // eslint-disable-next-line array-callback-return
+            this.entityInfo.columns.map((column) => {
                 if (
                     column.visible === 1 &&
                     column.show_in_edit_form > 0 &&
@@ -195,29 +200,30 @@ export default {
                         this.$store.commit(`${this.state}/SMAREQUIREDFIELDS`, {
                             fieldId: this.input.id,
                             name: column.col_name,
-                            id: column.id
+                            id: column.id,
                         });
                     }
-                    const readonly = column.show_in_edit_form === 1 ? true : false;
-                    const sendtobackend = column.show_in_edit_form === 2 ? true : false;
-                    const isRequired = column.col_name === this.input.col_fk_n_1 ? true : false;
+                    const readonly = column.show_in_edit_form === 1;
+                    const sendtobackend = column.show_in_edit_form === 2;
+                    const isRequired = column.col_name === this.input.col_fk_n_1;
                     if (sendtobackend) {
                         this.sendingIds.push(column.id);
                     }
                     this.columnsIds.push({
                         id: column.id,
-                        column: column,
+                        column,
                         readonly,
                         sendtobackend,
-                        isRequired
+                        isRequired,
                     });
                 }
             });
         },
         buildHotTableColumns() {
-            let columns = [];
-            this.columnsIds.map(column => {
-                let columnToPush = {};
+            const columns = [];
+            // eslint-disable-next-line array-callback-return
+            this.columnsIds.map((column) => {
+                const columnToPush = {};
                 if (column.column) {
                     switch (column.column.format) {
                         case 'CLP':
@@ -237,14 +243,16 @@ export default {
                             columnToPush.readOnly = column.readonly;
                             break;
                         case 'SELECTOR':
-                            const options = this.entityInfo.entities_fk[
-                                column.column.entity_type_fk
-                            ];
+                            // eslint-disable-next-line no-case-declarations
+                            const options =
+                                this.entityInfo.entities_fk[column.column.entity_type_fk];
+                            // eslint-disable-next-line no-case-declarations
                             const selectOptions = [];
-                            options.map(option => {
+                            // eslint-disable-next-line array-callback-return
+                            options.map((option) => {
                                 selectOptions.push({
                                     value: option.id,
-                                    label: option.name
+                                    label: option.name,
                                 });
                             });
                             columnToPush.data = column.id;
@@ -269,7 +277,7 @@ export default {
                                 firstDay: 0,
                                 showWeekNumber: true,
                                 numberOfMonths: 3,
-                                licenseKey: 'non-commercial-and-evaluation'
+                                licenseKey: 'non-commercial-and-evaluation',
                             };
                             columnToPush.readOnly = column.readonly;
                             break;
@@ -282,7 +290,7 @@ export default {
                                 firstDay: 0,
                                 showWeekNumber: true,
                                 numberOfMonths: 3,
-                                licenseKey: 'non-commercial-and-evaluation'
+                                licenseKey: 'non-commercial-and-evaluation',
                             };
                             columnToPush.readOnly = column.readonly;
                             break;
@@ -312,12 +320,15 @@ export default {
             if (!this.pivots) return;
 
             const data = Object.values(this.pivots);
-            data.forEach(element => {
-                Object.keys(element).map(key => {
-                    this.columnsIds.map(column => {
-                        let val = element[key];
+            data.forEach((element) => {
+                // eslint-disable-next-line array-callback-return
+                Object.keys(element).map((key) => {
+                    // eslint-disable-next-line array-callback-return
+                    this.columnsIds.map((column) => {
+                        const val = element[key];
                         if (column.id === key && column.column.format === 'SiNo') {
-                            element[key] = val === 1 ? true : false;
+                            // eslint-disable-next-line no-param-reassign
+                            element[key] = val === 1;
                         }
                         // if (column.id === key && column.column.format === 'DATE') {
                         //     let date = val.split(' ');
@@ -331,20 +342,19 @@ export default {
             // En caso de que la llegada de la data fue tardía y ya el componente se renderizó
             // cargar la data mediante el método loadData.
             // Esto puede pasar si los pivotes llegan tarde
-            if (this.$refs['hotTableComponent'])
-                console.log(this.$refs['hotTableComponent'].hotInstance.loadData(data));
+            if (this.$refs.hotTableComponent)
+                // eslint-disable-next-line no-console
+                console.log(this.$refs.hotTableComponent.hotInstance.loadData(data));
         },
         addHooks() {
-            this.$nextTick(function() {
-                this.$refs['hotTableComponent'].hotInstance.addHook('afterChange', changes => {
+            // eslint-disable-next-line func-names
+            this.$nextTick(function () {
+                this.$refs.hotTableComponent.hotInstance.addHook('afterChange', () => {
                     this.changeData();
                 });
-                this.$refs['hotTableComponent'].hotInstance.addHook(
-                    'afterRemoveRow',
-                    (index, amount, physicalRows) => {
-                        this.changeData();
-                    }
-                );
+                this.$refs.hotTableComponent.hotInstance.addHook('afterRemoveRow', () => {
+                    this.changeData();
+                });
                 this.$store.commit(`${this.state}/LOADING`, false);
             });
         },
@@ -354,10 +364,11 @@ export default {
             if (recordid) {
                 newRow[this.mainPivot.id] = recordid;
             }
-            this.columnsIds.map(column => {
+            // eslint-disable-next-line array-callback-return
+            this.columnsIds.map((column) => {
                 if (column.column.default_value !== null && column.id !== 'id') {
                     if (column.column.format === 'SiNo') {
-                        newRow[column.id] = column.column.default_value === 1 ? true : false;
+                        newRow[column.id] = column.column.default_value === 1;
                     } else {
                         newRow[column.id] = column.column.default_value;
                     }
@@ -366,15 +377,17 @@ export default {
             this.handsontableData.push(newRow);
         },
         logData() {
+            // eslint-disable-next-line no-console
             console.log('this.handsontableData', this.handsontableData);
         },
         changeData() {
             const dataToSend = {};
             dataToSend[this.input.id] = {};
             dataToSend[this.input.id][this.input.entity_type_pivot_fk] = [];
-            this.handsontableData.map(hotData => {
-                let dataToPush = {};
-                Object.keys(hotData).forEach(key => {
+            // eslint-disable-next-line array-callback-return
+            this.handsontableData.map((hotData) => {
+                const dataToPush = {};
+                Object.keys(hotData).forEach((key) => {
                     if (this.sendingIds.indexOf(key) >= 0) {
                         dataToPush[key] = hotData[key];
                     }
@@ -386,8 +399,25 @@ export default {
             this.$emit('input', dataToSend);
         },
         sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-    }
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        },
+    },
 };
 </script>
+<style>
+.min-height-150 {
+    min-height: 150px;
+}
+.selector-advanced-label {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    margin-right: 0.5rem;
+}
+.htErrorConfirmed,
+.handsontable td.htInvalid {
+    border: 2px solid #ff0000 !important;
+    background-color: #ffbebe !important;
+}
+</style>

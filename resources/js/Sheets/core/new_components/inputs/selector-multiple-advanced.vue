@@ -3,9 +3,7 @@
         <div class="row p-1 mb-2">
             <div class="col-12">
                 <span @click="logData" class="selector-advanced-label">{{ this.input.name }}</span>
-                <button class="btn btn-primary btn-sm" @click="addRow">
-                    &plus;
-                </button>
+                <button class="btn btn-primary btn-sm" @click="addRow">&plus;</button>
             </div>
         </div>
         <div class="row" v-if="hotTableLoaded">
@@ -28,15 +26,15 @@
 </template>
 
 <script>
-import mix from '../mixs/selector-multiple-advanced.vue';
 import { HotTable } from '@handsontable/vue';
+import mix from '../mixs/selector-multiple-advanced.vue';
 
 export default {
     mixins: [mix],
     components: {
-        HotTable
+        HotTable,
     },
-    data: () => ({})
+    data: () => ({}),
 };
 </script>
 <style scoped>
@@ -49,5 +47,9 @@ export default {
     line-height: 1.5;
     color: #212529;
     margin-right: 0.5rem;
+}
+.htErrorConfirmed {
+    border: 2px solid #ff0000 !important;
+    background-color: #ffbebe !important;
 }
 </style>
