@@ -317,14 +317,15 @@ export default {
                 .catch(error => {
                     if (error.response.data.content) {
                         const content = error.response.data.content
-                        Object.keys(content.errors).map(key => {
-                            let value = {
-                                key: key,
-                                value: content.errors[key]
-                            }
-
-                            commit('ERRORS_FIELD', value)
-                        })
+                        if(typeof content === 'object'){
+                            Object.keys(content.errors).map(key => {
+                                let value = {
+                                    key: key,
+                                    value: content.errors[key]
+                                }
+                                commit('ERRORS_FIELD', value)
+                            })
+                        }
                     }
                     reject(error.response)
                 })
