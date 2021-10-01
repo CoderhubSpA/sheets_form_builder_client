@@ -78,6 +78,7 @@ export default {
         action: {},
         disabledAction: false,
         errorsOnSMA: false,
+        errorRequiredFields: false,
     }),
     computed: {
         loading() {
@@ -123,16 +124,19 @@ export default {
     methods: {
         postMessage(data) {
             try {
+                // eslint-disable-next-line no-param-reassign
                 data.content.action = this.action;
+                // eslint-disable-next-line no-console
                 console.log(data.content, this.action);
                 this.window.parent.postMessage(data, '*');
             } catch (error) {
+                // eslint-disable-next-line no-console
                 console.warn(error);
             }
         },
         initForm() {
             this.$store
-                .dispatch(this.namespace + '/get', { id: this.entityId, params: this.params })
+                .dispatch(`${this.namespace}/get`, { id: this.entityId, params: this.params })
                 .then((form) => {
                     if (form.success) {
                         this.formRows = form.rows;
@@ -165,6 +169,67 @@ export default {
                 await this.$store.dispatch(`${this.namespace}/get_record`, data);
             }
         },
+        async validateAllFields() {
+            this.errorRequiredFields = false;
+            const resultValidator = {};
+            this.result.forEach((r) => {
+                if (r) {
+                    const obj = { ...r };
+                    const key = Object.keys(obj)[0];
+                    resultValidator[key] = obj[key];
+                }
+            });
+
+            this.formRows.forEach((row) => {
+                row.sections.forEach((section) => {
+                    section.fields.forEach(async (field) => {
+                        if (field.required === 1) {
+                            if (Object.keys(resultValidator).includes(field.id)) {
+                                if (
+                                    resultValidator[field.id] === null ||
+                                    resultValidator[field.id] === '' ||
+                                    resultValidator[field.id] === undefined
+                                ) {
+                                    this.errorRequiredFields = true;
+                                    const errorOnRequired = {
+                                        key: field.id,
+                                        value: `El campo ${field.name} es requerido`,
+                                    };
+                                    await this.$store.commit(
+                                        `${this.namespace}/ERRORS_FIELD`,
+                                        errorOnRequired
+                                    );
+                                } else {
+                                    this.errorRequiredFields = false;
+                                }
+                            } else {
+                                this.errorRequiredFields = true;
+                                const errorOnRequired = {
+                                    key: field.id,
+                                    value: `El campo ${field.name} es requerido`,
+                                };
+                                await this.$store.commit(
+                                    `${this.namespace}/ERRORS_FIELD`,
+                                    errorOnRequired
+                                );
+                            }
+                        }
+                        /* if (field.id === fieldId) {
+                                if (field.format === 'SELECTOR[MULTIPLE][ADVANCED]') {
+                                    const valid = await this.verifySelectorMultipleAdvanced(
+                                        fieldId,
+                                        data[fieldId][field.entity_type_pivot_fk]
+                                    );
+                                    if (!valid) {
+                                        this.$store.commit(`${this.namespace}/ERRORSSMA`, field.id);
+                                        this.errorsOnSMA = true;
+                                    }
+                                }
+                            } */
+                    });
+                });
+            });
+        },
         async verifySelectorMultipleAdvanced(fieldId, content) {
             const smarequiredfields = await this.$store.getters[
                 `${this.namespace}/smarequiredfields`
@@ -172,7 +237,7 @@ export default {
             let valid = true;
             smarequiredfields.forEach((rf) => {
                 if (fieldId === rf.fieldId) {
-                    content.map((item) => {
+                    content.forEach((item) => {
                         const keys = Object.keys(item);
                         if (
                             !keys.includes(rf.id) ||
@@ -192,9 +257,9 @@ export default {
             this.errorsOnSMA = false;
             await this.result.forEach((data) => {
                 const fieldId = Object.keys(data)[0];
-                this.formRows.map((row) => {
-                    row.sections.map((section) => {
-                        section.fields.map(async (field) => {
+                this.formRows.forEach((row) => {
+                    row.sections.forEach((section) => {
+                        section.fields.forEach(async (field) => {
                             if (field.id === fieldId) {
                                 if (field.format === 'SELECTOR[MULTIPLE][ADVANCED]') {
                                     const valid = await this.verifySelectorMultipleAdvanced(
@@ -214,112 +279,115 @@ export default {
             return true;
         },
         async save() {
-            const finishedvalidationsma = await this.getSMAValidation();
-            if (this.errorsOnSMA === false) {
-                this.disabledAction = true;
-                const entityId = this.$store.getters[`${this.namespace}/entity_id`];
+            await this.validateAllFields();
+            if (this.errorRequiredFields === false) {
+                await this.getSMAValidation();
+                if (this.errorsOnSMA === false) {
+                    this.disabledAction = true;
+                    const entityId = this.$store.getters[`${this.namespace}/entity_id`];
 
-                const data = {};
-                data[entityId] = [];
-                // form fields
-                if (!this.default_form) {
-                    const formFields = {};
-                    this.formRows.map((row) => {
-                        row.sections.map((section) => {
-                            section.fields.map((field) => {
-                                this.result.map((r) => {
-                                    if (Object.keys(r)[0] === field.id)
-                                        formFields[field.id] = field.form_field_id;
+                    const data = {};
+                    data[entityId] = [];
+                    // form fields
+                    if (!this.default_form) {
+                        const formFields = {};
+                        this.formRows.forEach((row) => {
+                            row.sections.forEach((section) => {
+                                section.fields.forEach((field) => {
+                                    this.result.forEach((r) => {
+                                        if (Object.keys(r)[0] === field.id)
+                                            formFields[field.id] = field.form_field_id;
+                                    });
                                 });
                             });
                         });
+                        this.formAnswer.push({ form_fields: formFields });
+
+                        const formId = this.$store.getters[`${this.namespace}/form_id`];
+                        if (formId) {
+                            this.formAnswer.push({
+                                form_id: formId,
+                            });
+                        }
+                    }
+                    const body = {};
+                    // console.log(this.formAnswer)
+                    // let result  = [];
+                    // this.formAnswer.forEach(element => {
+                    //     result.push(...element);
+                    // });
+                    this.result.forEach((r) => {
+                        if (r) {
+                            const obj = { ...r };
+                            const key = Object.keys(obj)[0];
+                            body[key] = obj[key];
+                        }
                     });
-                    this.formAnswer.push({ form_fields: formFields });
 
-                    const formId = this.$store.getters[`${this.namespace}/form_id`];
-                    if (formId) {
-                        this.formAnswer.push({
-                            form_id: formId,
-                        });
+                    if (this.record_id) {
+                        body.id = this.record_id;
                     }
-                }
-                const body = {};
-                // console.log(this.formAnswer)
-                // let result  = [];
-                // this.formAnswer.forEach(element => {
-                //     result.push(...element);
-                // });
-                this.result.map((r) => {
-                    if (!!r) {
-                        let obj = Object.assign({}, r);
-                        let key = Object.keys(obj)[0];
-                        body[key] = obj[key];
-                    }
-                });
 
-                if (this.record_id) {
-                    body.id = this.record_id;
-                }
+                    data[entityId].push(body);
 
-                data[entityId].push(body);
+                    const form = new FormData();
 
-                const form = new FormData();
+                    form.append('entityKey', entityId);
 
-                form.append('entityKey', entityId);
+                    Object.keys(data).forEach((key) => {
+                        form.append(key, JSON.stringify(data[key]));
+                    });
+                    const action = !this.record_id
+                        ? `${this.namespace}/save`
+                        : `${this.namespace}/update`;
+                    this.$store
+                        .dispatch(action, form)
+                        .then((response) => {
+                            this.snackbar = {
+                                success: response.success,
+                                show: true,
+                                message: response.content.message,
+                            };
 
-                Object.keys(data).forEach((key) => {
-                    form.append(key, JSON.stringify(data[key]));
-                });
-                const action = !this.record_id
-                    ? `${this.namespace}/save`
-                    : `${this.namespace}/update`;
-                this.$store
-                    .dispatch(action, form)
-                    .then((response) => {
-                        this.snackbar = {
-                            success: response.success,
-                            show: true,
-                            message: response.content.message,
-                        };
-
-                        if (response.success) {
-                            if (this.action.refresh_form === 1) {
-                                this.resetForm();
+                            if (response.success) {
+                                if (this.action.refresh_form === 1) {
+                                    this.resetForm();
+                                }
+                                this.$emit('input', response.content);
+                                this.postMessage(response);
+                                this.action = {};
                             }
-                            this.$emit('input', response.content);
-                            this.postMessage(response);
-                            this.action = {};
-                        }
-                        this.disabledAction = false;
-                    })
-                    .catch((error) => {
-                        this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
-                        if (error.data) {
-                            this.snackbar = {
-                                message:
-                                    error.data.content !== null
-                                        ? error.data.content.message
-                                        : 'Ocurrió un error inesperado',
-                                success: false,
-                                show: true,
-                            };
-                            this.postMessage(error.data);
-                            this.action = {};
-                        } else {
-                            this.snackbar = {
-                                message:
-                                    error.response.data.content !== null
-                                        ? error.response.data.content.message
-                                        : 'Ocurrió un error inesperado',
-                                success: false,
-                                show: true,
-                            };
-                            this.postMessage(error.response.data);
-                            this.action = {};
-                        }
+                            this.disabledAction = false;
+                        })
+                        .catch((error) => {
+                            this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
+                            if (error.data) {
+                                this.snackbar = {
+                                    message:
+                                        error.data.content !== null
+                                            ? error.data.content.message
+                                            : 'Ocurrió un error inesperado',
+                                    success: false,
+                                    show: true,
+                                };
+                                this.postMessage(error.data);
+                                this.action = {};
+                            } else {
+                                this.snackbar = {
+                                    message:
+                                        error.response.data.content !== null
+                                            ? error.response.data.content.message
+                                            : 'Ocurrió un error inesperado',
+                                    success: false,
+                                    show: true,
+                                };
+                                this.postMessage(error.response.data);
+                                this.action = {};
+                            }
 
-                        this.disabledAction = false;
-                    });
+                            this.disabledAction = false;
+                        });
+                }
             }
         },
         async sendFiles() {
@@ -327,7 +395,7 @@ export default {
 
             const promises = [];
             const req = [];
-            Object.entries(files).map((file) => {
+            Object.entries(files).forEach((file) => {
                 req.push(file[1].id);
                 const form = new FormData();
 
