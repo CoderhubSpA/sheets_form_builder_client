@@ -43,22 +43,21 @@ class SheetsController extends Controller
         }
     }
 
-    public function index($id, Request $request, $recordid = null)
+    public function index($id, $recordid = null, Request $request)
     {
         $this->init($request);
 
         $endpoint = "form/{$id}";
-        // if ($recordid) {
-        //     $endpoint .= "/{$recordid}";
-        // }
-        // return response()->json($endpoint);
+        if ($recordid) {
+            $endpoint .= "/{$recordid}";
+        }
+
         $response = null;
 
         $client = new GuzzleClient($this->clientBuilder);
         $response = $client->request('GET', $endpoint);
 
         return $response->getBody()->getContents();
-        // return response()->json($response->getBody()->getContents(), $response->getStatusCode());
     }
 
     public function getrecord($entityname, $recordid, Request $request)
