@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import axios from 'axios';
 import Vue from 'vue';
 
@@ -108,9 +110,9 @@ export default {
             state.files[val.id] = val;
         },
         FIELDS(state, val) {
-            let newKey = Object.keys(val)[0];
+            const newKey = Object.keys(val)[0];
             let found = false;
-            state.fields.map((field, index) => {
+            state.fields.forEach((field, index) => {
                 if (Object.keys(field)[0] === newKey) {
                     state.fields[index] = val;
                     found = true;
@@ -164,14 +166,20 @@ export default {
         },
     },
     actions: {
-        async get({ commit, dispatch }, data) {
+        async get({ commit, dispatch }, payload) {
             commit('LOADING', true);
-            const id = data.id;
-            const params = data.params;
+
+            const { id } = payload;
+            const { params } = payload;
+            const { recordid } = payload;
+            const URL =
+                recordid.length > 0
+                    ? `/api/sheets/form/${id}/${recordid}`
+                    : `/api/sheets/form/${id}`;
             // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
             return new Promise((resolve, reject) => {
                 axios
-                    .get(`/api/sheets/form/${id}`)
+                    .get(URL)
                     .then((response) => {
                         const data = response.data.content;
                         commit('RAW', data);
@@ -183,10 +191,10 @@ export default {
                         // console.log(params)
                         if (params && params.length > 0) {
                             const parametrosJson = JSON.parse(params);
-                            data.fields.map((item) => {
+                            data.fields.forEach((item) => {
                                 Object.keys(parametrosJson).forEach((paramkey) => {
                                     if (paramkey === item.col_name) {
-                                        let f = {};
+                                        const f = {};
                                         f[item.id] = parametrosJson[paramkey];
                                         commit('FIELDS', f);
                                     }
@@ -202,44 +210,35 @@ export default {
                         commit('DEFAULT_FORM', data.default === 1);
                         commit('NAME', data.name);
 
-                        let rows = data.rows.map((row) => {
-                            let sections = data.sections.filter((sect) => {
-                                return sect.form_row_id === row.id;
-                            });
+                        const rows = data.rows.map((row) => {
+                            const sections = data.sections.filter(
+                                (sect) => sect.form_row_id === row.id
+                            );
 
-                            sections.sort((a, b) => {
-                                return a.order > b.order ? 1 : -1;
-                            });
+                            sections.sort((a, b) => (a.order > b.order ? 1 : -1));
 
-                            sections.map((section) => {
+                            sections.forEach((section) => {
                                 let fields = [];
                                 if (Array.isArray(data.fields)) {
-                                    fields = data.fields.filter((f) => {
-                                        return (
+                                    fields = data.fields.filter(
+                                        (f) =>
                                             f.form_section_id === section.id &&
                                             (f.permission !== 0 ||
                                                 (data.default && f.permission === 0))
-                                        );
-                                    });
+                                    );
                                 } else {
                                     fields = [...data.fields];
                                 }
-                                fields.sort((a, b) => {
-                                    return a.order > b.order ? 1 : -1;
-                                });
+                                fields.sort((a, b) => (a.order > b.order ? 1 : -1));
                                 section.fields = fields;
                             });
                             row.sections = sections;
                             return row;
                         });
-                        rows.sort((a, b) => {
-                            return a.order > b.order ? 1 : -1;
-                        });
-                        let form = {
-                            rows: rows,
-                            actions: actions.sort((a, b) => {
-                                return a.save_form > b.save_form ? 1 : -1;
-                            }),
+                        rows.sort((a, b) => (a.order > b.order ? 1 : -1));
+                        const form = {
+                            rows,
+                            actions: actions.sort((a, b) => (a.save_form > b.save_form ? 1 : -1)),
                             success: response.data.success,
                             message: response.data.message,
                         };
@@ -284,7 +283,7 @@ export default {
                     .then((response) => {
                         const fields = response.data.content.data[0];
                         Object.keys(fields).forEach((key) => {
-                            let f = {};
+                            const f = {};
                             f[key] = fields[key];
 
                             commit('FIELDS', f);
@@ -293,6 +292,7 @@ export default {
                         resolve(response.data);
                     })
                     .catch((error) => {
+                        // eslint-disable-next-line no-console
                         console.log(error);
                         reject(error);
                     })
@@ -310,6 +310,7 @@ export default {
                         commit('CONTENT_INFO', response.data.content);
                     })
                     .catch((error) => {
+                        // eslint-disable-next-line no-console
                         console.log(error);
                     })
                     .finally(() => {
@@ -327,12 +328,12 @@ export default {
                     })
                     .catch((error) => {
                         if (error.response.data.content) {
-                            const content = error.response.data.content;
+                            const { content } = error.response.data;
                             if (typeof content === 'object') {
                                 if (typeof content.errors === 'object') {
-                                    Object.keys(content.errors).map((key) => {
-                                        let value = {
-                                            key: key,
+                                    Object.keys(content.errors).forEach((key) => {
+                                        const value = {
+                                            key,
                                             value: content.errors[key],
                                         };
                                         commit('ERRORS_FIELD', value);
@@ -379,22 +380,23 @@ export default {
 
                         commit('POLL_SECTIONS', data.sections);
 
-                        const active_section = data.sections.find(
+                        const activeSection = data.sections.find(
                             (sec) => sec.visible_on_load === 1
                         );
-                        commit('POLL_ACTIVE_SECTION', active_section);
+                        commit('POLL_ACTIVE_SECTION', activeSection);
 
                         commit('POLL_QUESTIONS', data.fields);
 
-                        const actions = data.actions.sort((a, b) => {
-                            return a.save_form > b.save_form ? 1 : -1;
-                        });
+                        // eslint-disable-next-line no-unused-vars
+                        const actions = data.actions.sort((a, b) =>
+                            a.save_form > b.save_form ? 1 : -1
+                        );
                         // commit('POLL_ACTIONS', actions)
                         return data.entity_type_id;
                     })
-                    .then((entity_type_id) => {
-                        if (!!entity_type_id) {
-                            dispatch('info', entity_type_id);
+                    .then((entityTypeId) => {
+                        if (entityTypeId) {
+                            dispatch('info', entityTypeId);
                         }
                     })
                     .catch((error) => {

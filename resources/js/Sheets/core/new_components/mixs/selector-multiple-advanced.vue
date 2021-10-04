@@ -382,6 +382,7 @@ export default {
         },
         changeData() {
             const dataToSend = {};
+            this.$store.commit(`${this.state}/ERRORSSMA`, null);
             dataToSend[this.input.id] = {};
             dataToSend[this.input.id][this.input.entity_type_pivot_fk] = [];
             // eslint-disable-next-line array-callback-return

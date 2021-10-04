@@ -11,70 +11,78 @@
 </template>
 
 <script>
-import SheetsForm from '../new_components/form.vue'
-import SheetsPollRender from "./poll/render.vue";
-import LoadingMessage from "./loading-message.vue";
+import SheetsForm from '../new_components/form.vue';
+import SheetsPollRender from './poll/render.vue';
+import LoadingMessage from './loading-message.vue';
+
 export default {
     components: {
         // SheetsFormRender,
         SheetsForm,
         SheetsPollRender,
-        LoadingMessage
+        LoadingMessage,
     },
     props: {
         id: {
             type: String,
-            default: ""
+            default: '',
         },
         recordid: {
             type: String,
-            default: ""
+            default: '',
         },
-        params:{
+        params: {
             type: String,
-            default: ""
-        }
+            default: '',
+        },
     },
 
     data: () => ({
         loading: false,
-        isPoll: undefined
+        isPoll: undefined,
     }),
     mounted() {
         this.loading = true;
         this.$store
-            .dispatch("form/get_form", {id: this.id, params: this.params})
-            .then(response => {
+            .dispatch('form/get_form', {
+                id: this.id,
+                recordid: this.recordid,
+                params: this.params,
+            })
+            .then((response) => {
                 this.loading = false;
                 if (response.poll === 1) {
                     this.isPoll = true;
                     this.$store
-                        .dispatch("poll/load_poll", response.fullResponse.data)
-                        .then(data => {
+                        .dispatch('poll/load_poll', response.fullResponse.data)
+                        .then(() => {
                             this.loading = false;
                         })
-                        .catch(err => {
-                            console.error("error cargando formulario", err);
+                        .catch((err) => {
+                            // eslint-disable-next-line no-console
+                            console.error('error cargando formulario', err);
                         });
                 } else {
                     this.isPoll = false;
                     this.$store
-                        .dispatch("form/load_form", response.fullResponse.data)
-                        .then(data => {
+                        .dispatch('form/load_form', response.fullResponse.data)
+                        .then(() => {
                             this.loading = false;
                         })
-                        .catch(err => {
-                            console.error("error cargando formulario", err);
+                        .catch((err) => {
+                            // eslint-disable-next-line no-console
+                            console.error('error cargando formulario', err);
                         });
                 }
             })
-            .catch(err => {
+            .catch((err) => {
                 this.loading = false;
                 this.isPoll = false;
-                console.log("error", err);
+                // eslint-disable-next-line no-console
+                console.log('error', err);
             });
     },
-    computed: {}
+    computed: {},
 };
 </script>
 
@@ -84,7 +92,7 @@ pre {
     background-color: #f1f1f1;
 }
 code {
-    font-family: Consolas, "courier new";
+    font-family: Consolas, 'courier new';
     color: crimson;
     background-color: #f1f1f1;
     padding: 2px;

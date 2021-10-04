@@ -1,17 +1,24 @@
-import axios from "axios";
-import Vue from "vue";
+/* eslint-disable no-console */
+/* eslint-disable array-callback-return */
+/* eslint-disable arrow-body-style */
+/* eslint-disable prefer-promise-reject-errors */
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-unused-vars */
+import axios from 'axios';
+import Vue from 'vue';
 
 export default {
     namespaced: true,
     state: {
-        form:{
+        form: {
             rows: null,
             title: null,
-            actions: null
+            actions: null,
         },
         loading: false,
-        title: "RENDERIZADO DE FORMULARIO",
-        entityid: "0",
+        title: 'RENDERIZADO DE FORMULARIO',
+        entityid: '0',
         fieldsvalues: {},
         files: false,
         filearray: [],
@@ -20,25 +27,25 @@ export default {
         entityname: null,
         recordid: null,
         entities_fk: null,
-        contentinfo: null
+        contentinfo: null,
     },
     getters: {
-        form: state => state.form,
-        loading: state => state.loading,
-        title: state => state.title,
-        entityid: state => state.entityid,
-        fieldsvalues: state => state.fieldsvalues,
-        files: state => state.files,
-        filearray: state => state.filearray,
-        pendingfiles: state => state.pendingfiles,
-        pendingfilesBck: state => state.pendingfilesBck,
-        entityname: state => state.entityname,
-        recordid: state => state.recordid,
-        entities_fk: state => state.entities_fk,
-        contentinfo: state => state.contentinfo
+        form: (state) => state.form,
+        loading: (state) => state.loading,
+        title: (state) => state.title,
+        entityid: (state) => state.entityid,
+        fieldsvalues: (state) => state.fieldsvalues,
+        files: (state) => state.files,
+        filearray: (state) => state.filearray,
+        pendingfiles: (state) => state.pendingfiles,
+        pendingfilesBck: (state) => state.pendingfilesBck,
+        entityname: (state) => state.entityname,
+        recordid: (state) => state.recordid,
+        entities_fk: (state) => state.entities_fk,
+        contentinfo: (state) => state.contentinfo,
     },
     mutations: {
-        FORM(state,form){
+        FORM(state, form) {
             state.form = form;
         },
         LOADING(state, loading) {
@@ -62,12 +69,12 @@ export default {
         FILES(state, file) {
             state.files = true;
             if (!(file.id in state.filearray)) {
-                state.pendingfiles = state.pendingfiles + 1;
+                state.pendingfiles += 1;
                 state.pendingfilesBck = state.pendingfiles;
             }
         },
         UPLOADEDFILE(state) {
-            state.pendingfiles = state.pendingfiles - 1;
+            state.pendingfiles -= 1;
         },
         FAILEDFILEFORMUPLOAD(state) {
             state.pendingfiles = state.pendingfilesBck;
@@ -75,7 +82,7 @@ export default {
         PUSHFILES(state, file) {
             const data = {
                 fileid: file.id,
-                file: file.file
+                file: file.file,
             };
             state.filearray[file.id] = data;
         },
@@ -85,23 +92,23 @@ export default {
             state.filearray = [];
         },
         FILTERFIELDSVALUES(state, ids) {
-            const fieldsValues = Object.assign({}, state.fieldsvalues);
+            const fieldsValues = { ...state.fieldsvalues };
             state.fieldsvalues = {};
-            ids.map(id => {
+            ids.forEach((id) => {
                 if (fieldsValues[id] !== null) {
                     state.fieldsvalues[id] = fieldsValues[id];
                 }
             });
         },
-        ENTITIESFK(state, entities_fk) {
-            state.entities_fk = entities_fk;
+        ENTITIESFK(state, entitiesFk) {
+            state.entities_fk = entitiesFk;
         },
         CONTENTINFO(state, contentinfo) {
             state.contentinfo = contentinfo;
-        }
+        },
     },
     actions: {
-        load_form({commit}, data){
+        load_form({ commit }, data) {
             return new Promise((resolve, reject) => {
                 try {
                     resolve({ success: true, error: null });
@@ -110,70 +117,66 @@ export default {
                 }
             });
         },
-        get_loaded_form({commit}){
+        get_loaded_form({ commit }) {
             return new Promise((resolve, reject) => {
                 resolve(this.state.form.form);
             });
         },
-        get_form({ commit }, data) {
-            commit("LOADING", true);
-            const id = data.id;
-            const params = data.params;
-            
+        get_form({ commit }, payload) {
+            commit('LOADING', true);
+            const { id } = payload;
+            const { params } = payload;
+            const { recordid } = payload;
+            const URL =
+                recordid.length > 0
+                    ? `/api/sheets/form/${id}/${recordid}`
+                    : `/api/sheets/form/${id}`;
+
             return new Promise((resolve, reject) => {
                 axios
-                    .get(`/api/sheets/form/${id}`)
-                    .then(response => {
-                        let rows = [];
-                        let apiResponse = response.data.content;
-                        if(params.length > 0){
+                    .get(URL)
+                    .then((response) => {
+                        const rows = [];
+                        const apiResponse = response.data.content;
+                        if (params.length > 0) {
                             const parametrosJson = JSON.parse(params);
                             apiResponse.fields.map((item) => {
                                 Object.keys(parametrosJson).forEach((paramkey) => {
-                                    if(paramkey === item.col_name){
+                                    if (paramkey === item.col_name) {
                                         const commitData = {
                                             key: item.id,
-                                            value: parametrosJson[paramkey]
+                                            value: parametrosJson[paramkey],
                                         };
-                                        commit("FIELDSVALUES", commitData);
+                                        commit('FIELDSVALUES', commitData);
                                     }
-                                })
+                                });
                             });
                         }
-                        commit("ENTITYID", apiResponse.entity_type_id);
-                        commit("ENTITYNAME", apiResponse.entity_type_name);
+                        commit('ENTITYID', apiResponse.entity_type_id);
+                        commit('ENTITYNAME', apiResponse.entity_type_name);
                         axios
-                            .get(
-                                `/api/sheets/entity/info/${apiResponse.entity_type_id}`
-                            )
-                            .then(responseInfo => {
-                                commit(
-                                    "CONTENTINFO",
-                                    responseInfo.data.content
-                                );
-                                apiResponse.rows.map(responseRow => {
-                                    let rowToPush = responseRow;
-                                    rowToPush["sections"] = null;
+                            .get(`/api/sheets/entity/info/${apiResponse.entity_type_id}`)
+                            .then((responseInfo) => {
+                                commit('CONTENTINFO', responseInfo.data.content);
+                                apiResponse.rows.map((responseRow) => {
+                                    const rowToPush = responseRow;
+                                    rowToPush.sections = null;
 
                                     rowToPush.sections = apiResponse.sections.filter(
-                                        responseSection => {
-                                            return (
-                                                responseSection.form_row_id ===
-                                                responseRow.id
-                                            );
+                                        (responseSection) => {
+                                            return responseSection.form_row_id === responseRow.id;
                                         }
                                     );
                                     rowToPush.sections.sort((a, b) => {
                                         return a.order > b.order ? 1 : -1;
                                     });
-                                    rowToPush.sections.map(sectionToPush => {
+                                    rowToPush.sections.map((sectionToPush) => {
                                         sectionToPush.fields = apiResponse.fields.filter(
-                                            responseField => {
+                                            (responseField) => {
                                                 return (
                                                     responseField.form_section_id ===
                                                         sectionToPush.id &&
-                                                    responseField.permission !==
-                                                        0
+                                                    responseField.permission !== 0
                                                 );
                                             }
                                         );
@@ -187,71 +190,65 @@ export default {
                                 rows.sort((a, b) => {
                                     return a.order > b.order ? 1 : -1;
                                 });
-                                const actions = apiResponse.actions.sort(
-                                    (a, b) => {
-                                        return a.save_form > b.save_form
-                                            ? 1
-                                            : -1;
-                                    }
-                                );
+                                const actions = apiResponse.actions.sort((a, b) => {
+                                    return a.save_form > b.save_form ? 1 : -1;
+                                });
                                 const data = {
                                     rows,
                                     title: apiResponse.name.toUpperCase(),
                                     actions,
                                     poll: apiResponse.poll,
-                                    fullResponse: response
+                                    fullResponse: response,
                                 };
                                 const form = {
                                     rows,
                                     title: apiResponse.name.toUpperCase(),
-                                    actions
-                                }
+                                    actions,
+                                };
                                 commit('FORM', form);
                                 resolve(data);
                             })
-                            .catch(error => {
+                            .catch((error) => {
                                 reject(error);
                             });
                     })
-                    .catch(error => {
-                        console.log(error)
+                    .catch((error) => {
+                        console.log(error);
                         reject(error);
                     })
                     .finally(() => {
-                        commit("LOADING", false);
+                        commit('LOADING', false);
                     });
             });
         },
         get_row({ commit }, data) {
-            commit("RECORDID", data.recordid);
+            commit('RECORDID', data.recordid);
             return new Promise((resolve, reject) => {
                 axios
-                    .get(
-                        `/api/sheets/getrecord/${data.entityname}/${data.recordid}`
-                    )
-                    .then(response => {
+                    .get(`/api/sheets/getrecord/${data.entityname}/${data.recordid}`)
+                    .then((response) => {
                         const notApplicableKeys = [
-                            "contract_type_id",
-                            "path_id",
-                            "tiene_permiso_crear",
-                            "tiene_permiso_lectura",
-                            "tiene_permiso_edicion"
+                            'contract_type_id',
+                            'path_id',
+                            'tiene_permiso_crear',
+                            'tiene_permiso_lectura',
+                            'tiene_permiso_edicion',
                         ];
                         const fields = response.data.content.data[0];
-                        Object.keys(fields).forEach(key => {
+                        Object.keys(fields).forEach((key) => {
                             const commitData = {
                                 key,
-                                value: fields[key]
+                                value: fields[key],
                             };
                             if (!notApplicableKeys.includes(key)) {
-                                commit("FIELDSVALUES", commitData);
+                                commit('FIELDSVALUES', commitData);
                             }
                         });
-                        commit("ENTITIESFK", response.data.content.entities_fk);
+                        commit('ENTITIESFK', response.data.content.entities_fk);
 
                         resolve({});
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         reject(error);
                     })
                     .finally(() => {});
@@ -262,16 +259,16 @@ export default {
                 axios
                     .post(`/api/sheets/save/file`, formData, {
                         headers: {
-                            "Content-Type": "multipart/form-data"
-                        }
+                            'Content-Type': 'multipart/form-data',
+                        },
                     })
-                    .then(response => {
+                    .then((response) => {
                         const data = {
-                            response
+                            response,
                         };
                         resolve(data);
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         reject(error);
                     })
                     .finally(() => {});
@@ -281,13 +278,13 @@ export default {
             return new Promise((resolve, reject) => {
                 axios
                     .post(`/api/sheets/save/form`, formData, {})
-                    .then(response => {
+                    .then((response) => {
                         const data = {
-                            response
+                            response,
                         };
                         resolve(data);
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         reject(error);
                     })
                     .finally(() => {});
@@ -297,17 +294,17 @@ export default {
             return new Promise((resolve, reject) => {
                 axios
                     .post(`/api/sheets/save/form/update`, formData, {})
-                    .then(response => {
+                    .then((response) => {
                         const data = {
-                            response
+                            response,
                         };
                         resolve(data);
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         reject(error);
                     })
                     .finally(() => {});
             });
-        }
-    }
+        },
+    },
 };

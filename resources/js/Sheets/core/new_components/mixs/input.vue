@@ -3,17 +3,17 @@ export default {
     props: {
         input: {
             type: Object,
-            required: true
+            required: true,
         },
         value: {
             type: Object,
             default: () => {},
-            required: true
+            required: true,
         },
         state: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
     computed: {
         label() {
@@ -41,25 +41,17 @@ export default {
             const fields = this.$store.getters[`${this.state}/fields`];
 
             if (fields && fields.length > 0) {
-                const val = fields.filter(f => Object.keys(f)[0] === this.id)[0];
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
                     this.$emit('input', val);
-                    if (this.input.format !== 'PERCENTAGE[X100]') {
-                        return val[this.id];
-                    } else {
-                        return val[this.id] * 100;
-                    }
+                    return val[this.id];
                 }
             }
-            if (this.input.format !== 'PERCENTAGE[X100]') {
-                return this.value ? this.value[this.id] : '';
-            } else {
-                return this.value ? parseFloat(this.value[this.id]) * 100 : '';
-            }
+            return this.value ? this.value[this.id] : '';
         },
         col_name() {
             return this.input.col_name;
-        }
+        },
     },
     methods: {
         onInput(e) {
@@ -78,17 +70,19 @@ export default {
 
             const isNumber = this.input.format === 'NUMBER';
             const isClp = this.input.format === 'CLP';
-            const isPercentage = this.input.format === 'PERCENTAGE';
+            const isPercentage =
+                this.input.format === 'PERCENTAGE' || this.input.format === 'PERCENTAGE[X100]';
 
             if (isNumber || isClp || isPercentage) {
                 event.preventDefault();
                 if (regex.test(pasted)) {
+                    // eslint-disable-next-line no-param-reassign
                     event.target.value = pasted;
                 }
             }
             const changed = new Event('input');
             event.target.dispatchEvent(changed);
-        }
-    }
+        },
+    },
 };
 </script>
