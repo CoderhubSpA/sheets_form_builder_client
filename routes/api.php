@@ -15,7 +15,7 @@ use paupololi\sheetsformbuilder\Http\Controllers\API\SheetsController;
 |
 */
 
-Route::post('sheets/form/{id}',[SheetsController::class, 'index']);
+Route::get('sheets/form/{id}/{recordid?}',[SheetsController::class, 'index']);
 Route::get('sheets/getrecord/{entityname}/{recordid}',[SheetsController::class, 'getrecord']);
 Route::get('sheets/entity/info/{id}',[SheetsController::class, 'entity_info']);
 Route::post('sheets/save/file',[SheetsController::class, 'saveFile']);
