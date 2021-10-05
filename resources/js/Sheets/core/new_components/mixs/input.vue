@@ -56,11 +56,7 @@ export default {
     methods: {
         onInput(e) {
             const data = {};
-            if (this.input.format !== 'PERCENTAGE[X100]') {
-                data[this.id] = e.target.value;
-            } else {
-                data[this.id] = parseFloat(e.target.value) / 100;
-            }
+            data[this.id] = e.target.value;
             this.$emit('input', data);
         },
         // evitar pegado de informacion en el componente
