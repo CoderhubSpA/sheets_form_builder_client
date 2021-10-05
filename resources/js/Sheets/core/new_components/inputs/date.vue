@@ -4,7 +4,8 @@
             type="date"
             :format="dateFormat"
             @input="onInput"
-            v-model="picker"></date-picker>
+            v-model="picker"
+        ></date-picker>
     </form-group>
 </template>
 <script>
@@ -22,6 +23,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

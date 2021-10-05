@@ -38,6 +38,7 @@ export default {
         errors_fields: {},
         smarequiredfields: [],
         errorssma: null,
+        selectorfilters: {},
         /**
          * Si “default:1”, el Form Builder no debe enviar al backend:
          * form_id
@@ -49,6 +50,12 @@ export default {
          * respuesta del server sin tratar
          */
         raw: {},
+        /**
+         * Conjunto de opciones disponibles
+         * para multiples selectore 1xn Availables
+         * con la misma col_fk_1_n
+         */
+        col_fk_1_n: {}
     }),
     getters: {
         loading: (state) => state.loading,
@@ -82,6 +89,8 @@ export default {
         default_form: (state) => state.default_form,
         raw: (state) => state.raw,
         name: (state) => state.name,
+        col_fk_1_n_common: (state) => state.col_fk_1_n,
+        selectorfilters: (state) => state.selectorfilters,
     },
     mutations: {
         LOADING(state, val) {
@@ -92,6 +101,12 @@ export default {
         },
         ERRORSSMA(state, val) {
             state.errorssma = val;
+        },
+        SELECTORFILTERS(state, val) {
+            state.selectorfilters = {
+                ...state.selectorfilters,
+                [val.key]: val.value,
+            };
         },
         ENTITY_ID(state, val) {
             state.entityId = val;
@@ -164,6 +179,17 @@ export default {
         NAME(state, val) {
             state.name = val;
         },
+        COL_FK_1_N_COMMON(state, val) {
+            const key = Object.keys(val)[0]
+            if (!state.col_fk_1_n[key]) {
+                Vue.set(state.col_fk_1_n, key, val[key])
+                console.log(state.col_fk_1_n)
+            } else {
+                state.col_fk_1_n[key] = state.col_fk_1_n[key].concat(...val[key])
+                console.log(state.col_fk_1_n)
+            }
+
+        },
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -172,19 +198,18 @@ export default {
             const { id } = payload;
             const { params } = payload;
             const { recordid } = payload;
-            const URL =
-                recordid.length > 0
-                    ? `/api/sheets/form/${id}/${recordid}`
-                    : `/api/sheets/form/${id}`;
+
+            const URL = recordid ? `/api/sheets/form/${id}/${recordid}` : `/api/sheets/form/${id}`;
             // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
             return new Promise((resolve, reject) => {
                 axios
                     .get(URL)
                     .then((response) => {
                         const data = response.data.content;
+
                         commit('RAW', data);
                         // const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
-                        let actions = null;
+                        let actions = [];
                         if (data.actions.length > 0)
                             actions = data.actions.filter((action) => action.valid !== 0);
                         else actions = [DEFAULT_ACTION];

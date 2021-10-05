@@ -43,6 +43,11 @@ export default {
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
+                    const dataToSelectorFilters = {
+                        key: this.input.col_name,
+                        value: val[this.id].toString(),
+                    };
+                    this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
                     this.$emit('input', val);
                     return val[this.id];
                 }
@@ -55,6 +60,11 @@ export default {
     },
     methods: {
         onInput(e) {
+            const dataToSelectorFilters = {
+                key: this.input.col_name,
+                value: e.target.value,
+            };
+            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
             const data = {};
             data[this.id] = e.target.value;
             this.$emit('input', data);
