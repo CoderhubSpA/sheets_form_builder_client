@@ -5,7 +5,7 @@
         label="name"
         :id="id"
         :options="options"
-        :disabled="disabled"
+        :disabled="true"
         :multiple="multiple"
         v-model="selected"
         :searchable="searchable"
@@ -23,7 +23,7 @@
 
 <script>
 import mix from '../mixs/input.vue';
-import mixSelector from '../mixs/selector.vue';
+// import mixSelector from '../mixs/selector.vue';
 import FormGroup from '../templates/form-group.vue';
 import NestedForm from '../nested.vue';
 
@@ -32,7 +32,8 @@ export default {
     FormGroup,
     NestedForm,
   },
-  mixins: [mix, mixSelector],
+  //   mixins: [mix, mixSelector],
+  mixins: [mix],
   data: () => ({
     selected: [],
   }),
@@ -64,6 +65,12 @@ export default {
       }
       return options;
     },
+    has_entity_type_permission_fk() {
+      return !!this.input.entity_type_permission_fk;
+    },
+    entity_type_permission_fk() {
+      return this.input.entity_type_permission_fk;
+    },
   },
   methods: {
     async createdOption(id) {
@@ -72,6 +79,9 @@ export default {
       const result = this.options.find((o) => o.id === id);
       console.log(result);
       this.selected.push(result);
+    },
+    dropdownShouldOpen(noDrop, open, mutableLoading) {
+      return false;
     },
   },
 };
