@@ -5,10 +5,11 @@
         label="name"
         :id="id"
         :options="options"
-        :disabled="true"
+        :disabled="disabled"
         :multiple="multiple"
         v-model="selected"
         :searchable="searchable"
+        :no-drop="true"
       >
       </v-select>
       <nested-form
