@@ -8,13 +8,13 @@
             :multiple="multiple"
             v-model="selected"
             :searchable="searchable">
-            <nested-form
-                v-if="has_entity_type_permission_fk"
-                :entity_type_permission_fk="entity_type_permission_fk"
-                :state="state"
-                @inserted="createdOption"
-            />
         </v-select>
+        <nested-form
+            v-if="has_entity_type_permission_fk"
+            :entity_type_permission_fk="entity_type_permission_fk"
+            :state="state"
+            @inserted="createdOption"
+        />
     </form-group>
 </template>
 
@@ -30,5 +30,9 @@ export default {
         'form-group': FormGroup,
         'nested-form': NestedForm,
     },
+    data: () => ({
+        defaultEmpty: [],
+        selected: [],
+    }),
 };
 </script>

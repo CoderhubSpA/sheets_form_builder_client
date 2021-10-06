@@ -21,7 +21,7 @@ export default {
     }),
     computed: {
         preSelectedValue() {
-            let result = this.defaultEmpty;
+            let result = _.cloneDeep(this.defaultEmpty);
             const fields = this.$store.getters[`${this.state}/fields`];
             if (fields && fields.length > 0) {
                 const field = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
@@ -67,6 +67,7 @@ export default {
             return options;
         },
         options() {
+            console.log("mix options"); 
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
             let options = [];
             const key = this.input.col_name_fk || 'name';
@@ -155,12 +156,12 @@ export default {
                 this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
             }
         },
-        selectedValue(val) {
+        selectedValue(val, old) {
             this.selected = val;
         },
         clear(val) {
             if (val) {
-                this.selected = this.defaultEmpty;
+                this.selected = _.cloneDeep(this.defaultEmpty);
                 this.$store.commit(`${this.state}/CLEARFIELDS`, false);
             }
         },
@@ -175,15 +176,17 @@ export default {
                     });
                 }
                 if (!selectedPresent) {
-                    this.selected = this.defaultEmpty;
+                    this.selected = _.cloneDeep(this.defaultEmpty);
                 }
                 if (val.length > 1) {
                     if (this.inserted) {
-                        const option = this.options.find((options) => options.id === this.inserted);
+                        const option = this.options.find((opt) => opt.id === this.inserted);
                         if (this.multiple) {
                             if (this.selected) this.selected.push(option);
                             else this.selected = [option];
-                        } else this.selected = option;
+                        } else{
+                            this.selected = option;  
+                        } 
                     }
                 }
             }

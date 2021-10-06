@@ -56,11 +56,11 @@ export default {
       if (contentInfo) {
         const fk = this.input.entity_type_fk;
         const entities = contentInfo.content.entities_fk[fk];
-        // eslint-disable-next-line no-console
-        console.log(
-          `${key}`,
-          entities.find((e) => e.id === 'aa0301c8-e04d-42c3-b92c-76d4d2cd6a7c')
-        );
+        // eslint-disable-next-line no-//console
+        //console.log(
+        //   `${key}`,
+        //   entities.find((e) => e.id === 'aa0301c8-e04d-42c3-b92c-76d4d2cd6a7c')
+        // );
         if (entities) {
           options = entities.map((e) => ({ id: e.id, name: e[key] }));
         }
@@ -79,8 +79,8 @@ export default {
       const RAW = this.$store.getters[`${this.state}/raw`];
       await this.$store.dispatch(`${this.state}/info`, RAW.entity_type_id);
       const result = this.options.find((o) => o.id === id);
-      // eslint-disable-next-line no-console
-      console.log(result);
+      // eslint-disable-next-line no-//console
+      //console.log(result);
       this.selected.push(result);
     },
     // eslint-disable-next-line no-unused-vars
