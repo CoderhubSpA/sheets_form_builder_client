@@ -37,11 +37,6 @@ export default {
                     }
                     const dv = actualLimpio.substring(actualLimpio.length - 1);
                     rutPuntos = `${rutPuntos}-${dv}`;
-                    const dataToSelectorFilters = {
-                        key: this.input.col_name,
-                        value: rutPuntos,
-                    };
-                    this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
                     return rutPuntos;
                 }
                 const dataToSelectorFilters = {

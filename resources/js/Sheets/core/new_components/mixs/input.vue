@@ -43,11 +43,6 @@ export default {
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
-                    const dataToSelectorFilters = {
-                        key: this.input.col_name,
-                        value: val[this.id].toString(),
-                    };
-                    this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
                     this.$emit('input', val);
                     return val[this.id];
                 }
@@ -58,7 +53,17 @@ export default {
             return this.input.col_name;
         },
     },
+    mounted() {
+        this.readInputValue();
+    },
     methods: {
+        readInputValue() {
+            const dataToSelectorFilters = {
+                key: this.input.col_name,
+                value: this.inputValue,
+            };
+            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
+        },
         onInput(e) {
             const dataToSelectorFilters = {
                 key: this.input.col_name,

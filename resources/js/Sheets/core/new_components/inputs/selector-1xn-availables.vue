@@ -9,23 +9,23 @@
       :multiple="multiple"
     >
     </v-select>
-    <nested-form
+    <!-- <nested-form
       v-if="has_entity_type_permission_fk"
       :entity_type_permission_fk="entity_type_permission_fk"
       :state="state"
       @inserted="createdOption"
-    />
+    /> -->
   </form-group>
 </template>
 
 <script>
 import mix from '../mixs/input.vue';
-import mixSelector from '../mixs/selector.vue';
+// import mixSelector from '../mixs/selector.vue';
 import FormGroup from '../templates/form-group.vue';
 import NestedForm from '../nested.vue';
 
 export default {
-  mixins: [mix, mixSelector],
+  mixins: [mix],
   components: {
     'form-group': FormGroup,
     'nested-form': NestedForm,
@@ -36,6 +36,12 @@ export default {
   computed: {
     multiple() {
       return true;
+    },
+    has_entity_type_permission_fk() {
+      return !!this.input.entity_type_permission_fk;
+    },
+    entity_type_permission_fk() {
+      return this.input.entity_type_permission_fk;
     },
     options() {
       let options = [];
@@ -65,7 +71,7 @@ export default {
   watch: {
     selected(val) {
       const data = {};
-
+      console.log(val);
       data[this.id] = val.map((v) => v.id);
 
       this.$emit('input', data);

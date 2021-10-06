@@ -29,11 +29,6 @@ export default {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
                     this.$emit('input', val);
-                    const dataToSelectorFilters = {
-                        key: this.input.col_name,
-                        value: (val[this.id] * 100).toString(),
-                    };
-                    this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
                     return val[this.id] * 100;
                 }
             }

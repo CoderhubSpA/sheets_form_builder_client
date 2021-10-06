@@ -32,11 +32,6 @@ export default {
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
-                    const dataToSelectorFilters = {
-                        key: this.input.col_name,
-                        value: val[this.id].toString(),
-                    };
-                    this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
                     result = val[this.id];
                 }
             }
@@ -45,16 +40,22 @@ export default {
     },
     watch: {
         inputValue(val) {
-            const dataToSelectorFilters = {
-                key: this.input.col_name,
-                value: val.toString(),
-            };
-            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
             this.indeterminate = false;
             this.checked = val;
         },
     },
     methods: {
+        readInputValue() {
+            const dataToSelectorFilters = {
+                key: this.input.col_name,
+                value: this.inputValue === 1 ? 'true' : 'false',
+            };
+            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
+            if (this.inputValue) {
+                this.indeterminate = false;
+                this.checked = this.inputValue === 1;
+            }
+        },
         onInput(e) {
             const data = {};
             data[this.id] = e.target.checked;

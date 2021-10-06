@@ -15,6 +15,7 @@ const DEFAULT_ACTION = {
     text_color: null,
 };
 
+
 export default {
     namespaced: true,
     state: () => ({
@@ -182,6 +183,7 @@ export default {
         COL_FK_1_N_COMMON(state, val) {
             const key = Object.keys(val)[0]
             if (!state.col_fk_1_n[key]) {
+                console.log(val)
                 Vue.set(state.col_fk_1_n, key, val[key])
                 console.log(state.col_fk_1_n)
             } else {
@@ -206,7 +208,6 @@ export default {
                     .get(URL)
                     .then((response) => {
                         const data = response.data.content;
-
                         commit('RAW', data);
                         // const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
                         let actions = [];

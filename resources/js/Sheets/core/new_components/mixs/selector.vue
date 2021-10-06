@@ -16,24 +16,24 @@ export default {
         selected: null,
         nested: false,
         inserted: null,
+        selectedValue: null,
     }),
     computed: {
-        selectedValue() {
+        preSelectedValue() {
             let result = null;
             const fields = this.$store.getters[`${this.state}/fields`];
             if (fields && fields.length > 0) {
                 const field = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
-
                 if (field) {
                     const key = Object.keys(field)[0];
                     const search = this.multiple ? JSON.parse(field[key]) : field[key];
 
                     if (this.multiple && !!search) {
                         result = Object.entries(search).map((s) =>
-                            this.options.find((o) => o.id === s[1])
+                            this.allOptions.find((o) => o.id === s[1])
                         );
                     } else if (!this.multiple && !!search) {
-                        result = this.options.find((o) => o.id === search);
+                        result = this.allOptions.find((o) => o.id === search);
                     }
                 }
             }
@@ -42,6 +42,28 @@ export default {
         selectorFilters() {
             const selectorfilters = this.$store.getters[`${this.state}/selectorfilters`];
             return selectorfilters;
+        },
+        allOptions() {
+            const contentInfo = this.$store.getters[`${this.state}/content_info`];
+            let options = [];
+            const key = this.input.col_name_fk || 'name';
+
+            if (contentInfo) {
+                const fk = this.input.entity_type_fk;
+
+                const entities = contentInfo.content.entities_fk[fk];
+
+                if (entities) {
+                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
+                } else {
+                    const opt = this.input.options ? JSON.parse(this.input.options) : {};
+
+                    Object.keys(opt).forEach((optKey) => {
+                        options.push({ id: optKey, name: opt[optKey] });
+                    });
+                }
+            }
+            return options;
         },
         options() {
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
@@ -61,13 +83,15 @@ export default {
                         if (
                             Object.keys(this.selectorFilters).indexOf(this.input.col_filter_by) >= 0
                         ) {
-                            // eslint-disable-next-line array-callback-return,  consistent-return
-                            const optionsfiltered = entities.filter(
-                                (e) =>
-                                    e[this.input.col_fk_filter] ===
-                                    this.selectorFilters[this.input.col_filter_by]
-                            );
-                            options = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));
+                            if (this.selectorFilters[this.input.col_filter_by]) {
+                                // eslint-disable-next-line array-callback-return,  consistent-return
+                                const optionsfiltered = entities.filter(
+                                    (e) =>
+                                        e[this.input.col_fk_filter] ===
+                                        this.selectorFilters[this.input.col_filter_by].toString()
+                                );
+                                options = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));
+                            }
                         }
                     }
                 } else {
@@ -167,7 +191,15 @@ export default {
             }
         },
     },
+    mounted() {
+        this.readPreSelectedValue();
+    },
     methods: {
+        readPreSelectedValue() {
+            if (this.preSelectedValue) {
+                this.selectedValue = this.preSelectedValue;
+            }
+        },
         createdOption(id) {
             this.inserted = id;
             const optionToSelect = this.options.find((option) => option.id === id);
