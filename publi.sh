@@ -4,7 +4,7 @@ if [ -f "$FILE" ]; then
     cd ../sheets_form_builder/
     git reset --hard
     git pull
-    npm run production
+    npm run --silent production
     echo "git pull Form Builder Client"
     cd ../sheets_form_builder_client/
     git pull
