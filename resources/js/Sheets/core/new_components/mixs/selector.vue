@@ -13,6 +13,7 @@ export default {
         },
     },
     data: () => ({
+        defaultEmpty: null,
         selected: null,
         nested: false,
         inserted: null,
@@ -20,7 +21,7 @@ export default {
     }),
     computed: {
         preSelectedValue() {
-            let result = null;
+            let result = this.defaultEmpty;
             const fields = this.$store.getters[`${this.state}/fields`];
             if (fields && fields.length > 0) {
                 const field = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
@@ -133,11 +134,6 @@ export default {
     watch: {
         selected(val) {
             if (val) {
-                const dataToSelectorFilters = {
-                    key: this.input.col_name,
-                    value: val.id,
-                };
-                this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
                 const data = {};
 
                 if (this.multiple) {
@@ -145,6 +141,11 @@ export default {
                 } else {
                     data[this.id] = val.id;
                 }
+                const dataToSelectorFilters = {
+                    key: this.input.col_name,
+                    value: data[this.id],
+                };
+                this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
                 this.$emit('input', data);
             } else if (val === null) {
                 const dataToSelectorFilters = {
@@ -152,9 +153,6 @@ export default {
                     value: '',
                 };
                 this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
-                const data = {};
-                data[this.id] = '';
-                this.$emit('input', data);
             }
         },
         selectedValue(val) {
@@ -162,7 +160,7 @@ export default {
         },
         clear(val) {
             if (val) {
-                this.selected = null;
+                this.selected = this.defaultEmpty;
                 this.$store.commit(`${this.state}/CLEARFIELDS`, false);
             }
         },
@@ -177,7 +175,7 @@ export default {
                     });
                 }
                 if (!selectedPresent) {
-                    this.selected = null;
+                    this.selected = this.defaultEmpty;
                 }
                 if (val.length > 1) {
                     if (this.inserted) {

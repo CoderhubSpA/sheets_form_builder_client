@@ -96,7 +96,7 @@ export default {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgb(0, 0, 0); /* Fallback color */
     background-color: rgba(0, 0, 0, 0.151); /* Black w/ opacity */
     border: 1px solid rgb(240, 239, 239);
     border-radius: 4px;
