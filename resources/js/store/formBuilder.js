@@ -56,7 +56,11 @@ export default {
          * para multiples selectore 1xn Availables
          * con la misma col_fk_1_n
          */
-        col_fk_1_n: {}
+        col_fk_1_n: {},
+        /**
+         * Titulo del form
+         */
+        form_name: '',
     }),
     getters: {
         loading: (state) => state.loading,
@@ -92,6 +96,7 @@ export default {
         name: (state) => state.name,
         col_fk_1_n_common: (state) => state.col_fk_1_n,
         selectorfilters: (state) => state.selectorfilters,
+        form_name: (state) => state.form_name
     },
     mutations: {
         LOADING(state, val) {
@@ -190,8 +195,10 @@ export default {
                 state.col_fk_1_n[key] = state.col_fk_1_n[key].concat(...val[key])
                 console.log(state.col_fk_1_n)
             }
-
         },
+        FORM_NAME(state, val) {
+            state.form_name = val
+        }
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -208,6 +215,9 @@ export default {
                     .get(URL)
                     .then((response) => {
                         const data = response.data.content;
+                        console.log(data)
+                        // asignacion del titulo de formulario
+                        commit('FORM_NAME', data.name)
                         commit('RAW', data);
                         // const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
                         let actions = [];

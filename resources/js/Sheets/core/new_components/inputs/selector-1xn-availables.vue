@@ -45,18 +45,17 @@ export default {
       return this.input.entity_type_permission_fk;
     },
     options() {
-      console.log("available options"); 
+      console.log('available options');
       let options = [];
       const contentInfo = this.$store.getters[`${this.state}/content_info`];
-      
+
       const key = this.input.entity_type_fk;
       if (contentInfo) {
-        
         const fk = this.input.entity_type_fk;
         const entities = contentInfo.content.entities_fk[fk];
 
         if (entities) {
-            options = entities.filter((e) => !e[this.input.col_fk_1_n]);
+          options = entities.filter((e) => !e[this.input.col_fk_1_n]);
         }
       }
       // options = options.filter((o) => this.selected.indexOf(o) < 0 );
@@ -66,7 +65,7 @@ export default {
        * y asi limitar las opciones entre ellos
        */
       const col_fk_1_n_common = this.$store.getters[`${this.state}/col_fk_1_n_common`];
-      console.log(col_fk_1_n_common); 
+      console.log(col_fk_1_n_common);
       // if (col_fk_1_n_common[this.input.col_fk_1_n]) {
       //   options = options.filter((o) => col_fk_1_n_common[this.input.col_fk_1_n].indexOf(o) < 0);
       // }
@@ -83,6 +82,9 @@ export default {
       const store = {};
       store[this.input.col_fk_1_n] = val;
       this.$store.commit(`${this.state}/COL_FK_1_N_COMMON`, store);
+    },
+    options(val) {
+      console.log(val);
     },
   },
   methods: {
