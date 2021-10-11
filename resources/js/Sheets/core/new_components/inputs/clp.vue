@@ -1,5 +1,12 @@
 <template>
-    <input-group :character="'$'" :label="label" :required="required">
+    <input-group
+        :character="'$'"
+        :label="label"
+        :required="required"
+        :linkTarget="this.input.link_url"
+        :linkDescription="this.input.link_name"
+        :tooltipInfo="this.input.description"
+    >
         <input
             type="number"
             class="form-control"

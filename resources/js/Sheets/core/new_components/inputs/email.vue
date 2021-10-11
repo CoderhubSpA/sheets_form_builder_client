@@ -1,5 +1,12 @@
 <template>
-    <form-group :id="id" :label="label" :required="required">
+    <form-group
+        :id="id"
+        :label="label"
+        :required="required"
+        :linkTarget="this.input.link_url"
+        :linkDescription="this.input.link_name"
+        :tooltipInfo="this.input.description"
+    >
         <input type="email" :id="id" :value="inputValue" @input="onInput" class="form-control" />
     </form-group>
 </template>

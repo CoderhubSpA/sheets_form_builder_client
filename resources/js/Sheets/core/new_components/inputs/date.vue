@@ -1,5 +1,12 @@
 <template>
-    <form-group :label="label" :id="id" :required="required">
+    <form-group
+        :label="label"
+        :id="id"
+        :required="required"
+        :linkTarget="this.input.link_url"
+        :linkDescription="this.input.link_name"
+        :tooltipInfo="this.input.description"
+    >
         <date-picker
             type="date"
             :format="dateFormat"

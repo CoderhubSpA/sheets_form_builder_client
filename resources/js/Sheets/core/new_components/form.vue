@@ -122,6 +122,9 @@ export default {
     const { namespace } = registerStore(this.$store, FormBuilderStore, 'myStore');
     this.namespace = namespace;
   },
+  created() {
+    // this.get_record();
+  },
   mounted() {
     window.name = this.windowName;
     this.window = window;
@@ -161,7 +164,7 @@ export default {
           }
         })
         .then(() => {
-          this.get_record();
+          //this.get_record();
         })
         .catch((error) => {
           this.snackbar = {
@@ -382,21 +385,32 @@ export default {
       const promises = [];
       const req = [];
       Object.entries(files).forEach((file) => {
+        // console.log(388, file[1]);
         req.push(file[1].id);
         const form = new FormData();
 
         form.append('file', file[1].file);
         form.append('fileid', file[1].id);
-
-        promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, form));
+        const data = {
+          form: form,
+          file: file[1],
+        };
+        promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, data));
       });
       await Promise.all(promises).then((resp) => {
         for (let index = 0; index < resp.length; index += 1) {
           const obj = {};
-          obj[req[index]] = resp[index];
-          obj.id = resp[index];
+          obj[req[index]] = resp[index].id;
+          //   obj.id = resp[index].id;
           this.formAnswer.push(obj);
-          this.formAnswer.push({ id: obj.id });
+
+          let finded = this.formAnswer.find((ans) => !!ans.id);
+          console.log(finded, !finded, resp[index], resp[index].data.entity_type_fk === 'document');
+          if (!finded && resp[index].data.entity_type_fk === 'document') {
+            console.log('agregando id');
+            this.formAnswer.push({ id: resp[index].id });
+          }
+
           // this.formAnswer[0].push(obj);
         }
       });
