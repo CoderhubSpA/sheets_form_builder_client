@@ -1,12 +1,5 @@
 <template>
-    <form-check
-        :label="label"
-        :id="id"
-        :required="required"
-        :linkTarget="this.input.link_url"
-        :linkDescription="this.input.link_name"
-        :tooltipInfo="this.input.description"
-    >
+    <form-check :label="label" :id="id" :required="required">
         <input
             class="form-check-input"
             type="checkbox"

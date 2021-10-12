@@ -2,28 +2,7 @@
     <div class="container-fluid">
         <div class="row p-1 mb-2">
             <div class="col-12">
-                <div class="row">
-                    <div class="col-8">
-                        <label :for="id">{{ this.input.name }}</label>
-                        <span v-if="required" class="text-danger">*</span>
-                        <span class="tooltip-custom" v-if="this.input.description">
-                            <img src="/images/infoicon.png" />
-                            <span class="tooltiptext">
-                                {{ this.input.description }}
-                            </span>
-                        </span>
-                    </div>
-                    <div class="col-4" v-if="this.input.link_url">
-                        <a
-                            class="float-right sheet-field-info-link"
-                            :href="this.input.link_url"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {{ this.input.link_name }}
-                        </a>
-                    </div>
-                </div>
+                <span @click="logData" class="selector-advanced-label">{{ this.input.name }}</span>
                 <button class="btn btn-primary btn-sm" @click="addRow">&plus;</button>
             </div>
         </div>

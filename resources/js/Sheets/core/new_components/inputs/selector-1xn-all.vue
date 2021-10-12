@@ -1,12 +1,5 @@
 <template>
-    <form-group
-        :id="id"
-        :label="label"
-        :required="required"
-        :linkTarget="this.input.link_url"
-        :linkDescription="this.input.link_name"
-        :tooltipInfo="this.input.description"
-    >
+    <form-group :id="id" :label="label" :required="required">
         <v-select
             label="name"
             :id="id"
@@ -14,8 +7,7 @@
             :disabled="disabled"
             :multiple="multiple"
             v-model="selected"
-            :searchable="searchable"
-        >
+            :searchable="searchable">
         </v-select>
         <nested-form
             v-if="has_entity_type_permission_fk"

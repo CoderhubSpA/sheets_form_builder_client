@@ -372,6 +372,8 @@ export default {
                     } else {
                         newRow[column.id] = column.column.default_value;
                     }
+                } else if (column.column.default_value === null) {
+                    newRow[column.id] = '';
                 }
             });
             this.handsontableData.push(newRow);

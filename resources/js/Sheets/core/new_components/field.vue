@@ -96,36 +96,4 @@ export default {
 .sheets-required-answer {
     font-weight: 700;
 }
-.sheet-field-info-link {
-    font-size: 10px;
-    padding: 5px;
-}
-.tooltip-custom {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-.tooltip-custom img {
-    width: 20px;
-}
-
-.tooltip-custom .tooltiptext {
-    visibility: hidden;
-    width: 250px;
-    background-color: white;
-    border: 1px solid black;
-    color: black;
-    text-align: center;
-    border-radius: 6px;
-    padding: 3px;
-    position: absolute;
-    width: 120px;
-    top: 100%;
-    left: 50%;
-    z-index: 180;
-}
-
-.tooltip-custom:hover .tooltiptext {
-    visibility: visible;
-}
 </style>

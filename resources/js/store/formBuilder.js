@@ -131,20 +131,17 @@ export default {
             state.files[val.id] = val;
         },
         FIELDS(state, val) {
-            Vue.set(state.fields, state.fields.length, val)
-            // state.fields.push(val);
-
-            // const newKey = Object.keys(val)[0];
-            // let found = false;
-            // state.fields.forEach((field, index) => {
-            //     if (Object.keys(field)[0] === newKey) {
-            //         state.fields[index] = val;
-            //         found = true;
-            //     }
-            // });
-            // if (!found) {
-            //     state.fields.push(val);
-            // }
+            const newKey = Object.keys(val)[0];
+            let found = false;
+            state.fields.forEach((field, index) => {
+                if (Object.keys(field)[0] === newKey) {
+                    state.fields[index] = val;
+                    found = true;
+                }
+            });
+            if (!found) {
+                state.fields.push(val);
+            }
         },
         SEARCH_MAP(state, val) {
             Vue.set(state.searchMap, val.col_name, val.text);
@@ -191,9 +188,12 @@ export default {
         COL_FK_1_N_COMMON(state, val) {
             const key = Object.keys(val)[0]
             if (!state.col_fk_1_n[key]) {
+                console.log(val)
                 Vue.set(state.col_fk_1_n, key, val[key])
+                console.log(state.col_fk_1_n)
             } else {
-                state.col_fk_1_n[key] = val[key];
+                state.col_fk_1_n[key] = state.col_fk_1_n[key].concat(...val[key])
+                console.log(state.col_fk_1_n)
             }
         },
         FORM_NAME(state, val) {
@@ -207,10 +207,7 @@ export default {
             const { id } = payload;
             const { params } = payload;
             const { recordid } = payload;
-            let record = {
-                entity_name: '',
-                id: recordid
-            };
+
             const URL = recordid ? `/api/sheets/form/${id}/${recordid}` : `/api/sheets/form/${id}`;
             // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
             return new Promise((resolve, reject) => {
@@ -218,6 +215,7 @@ export default {
                     .get(URL)
                     .then((response) => {
                         const data = response.data.content;
+                        console.log(data)
                         // asignacion del titulo de formulario
                         commit('FORM_NAME', data.name)
                         commit('RAW', data);
@@ -244,7 +242,7 @@ export default {
                         commit('ENTITY_ID', data.entity_type_id);
 
                         commit('ENTITY_NAME', data.entity_type_name);
-                        record.entity_name = data.entity_type_name
+
                         commit('DEFAULT_FORM', data.default === 1);
                         commit('NAME', data.name);
 
@@ -286,9 +284,6 @@ export default {
                     .then((content) => {
                         if (content) {
                             dispatch('info', content.entity_type_id);
-
-                            if (record.id)
-                                dispatch('get_record', record)
                         }
                     })
                     .catch((error) => {
@@ -323,7 +318,6 @@ export default {
                     .get(`/api/sheets/getrecord/${data.entity_name}/${data.id}`)
                     .then((response) => {
                         const fields = response.data.content.data[0];
-
                         Object.keys(fields).forEach((key) => {
                             const f = {};
                             f[key] = fields[key];
@@ -335,7 +329,7 @@ export default {
                     })
                     .catch((error) => {
                         // eslint-disable-next-line no-console
-                        // console.log(error);
+                        console.log(error);
                         reject(error);
                     })
                     .finally(() => {
@@ -398,12 +392,13 @@ export default {
                         'Content-Type': 'multipart/form-data',
                     },
                 };
-                console.log(data.form)
-                axios.post(`/api/sheets/save/file`, data.form, headers)
+                axios
+                    .post(`/api/sheets/save/file`, data, headers)
                     .then((response) => {
                         const id = response.data.content.content.inserted_id;
-                        resolve({ id: id, data: data.file });
-                    }).catch((error) => {
+                        resolve(id);
+                    })
+                    .catch((error) => {
                         reject(error);
                     })
                     .finally(() => {
