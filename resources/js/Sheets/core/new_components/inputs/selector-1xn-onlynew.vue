@@ -15,7 +15,6 @@
         :no-drop="true"
         :multiple="multiple"
         v-model="selected"
-        @option:deselected="deselected"
       >
       </v-select>
       <nested-form
@@ -48,12 +47,6 @@ export default {
       return true;
     },
   },
-  methods: {
-    deselected(val) {
-      const item = this.selected.find((option) => option.id === val.id);
-      const index = this.selected.indexOf(item);
-      this.selected.splice(index, 1);
-    },
-  },
+  methods: {},
 };
 </script>
