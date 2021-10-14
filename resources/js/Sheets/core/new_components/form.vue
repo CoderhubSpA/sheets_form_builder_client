@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <h3 class="sheets-form-title">
-      {{ form_title }}
+      <!-- {{ form_title }} -->
     </h3>
     <sheets-row
       v-for="(row, key) in formRows"

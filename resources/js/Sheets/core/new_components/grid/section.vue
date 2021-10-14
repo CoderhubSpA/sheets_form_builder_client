@@ -3,7 +3,7 @@
     <h5 class="sheets-section-title">
       {{ name }}
     </h5>
-    <img :src="img" :alt="name" class="sheets-img-section" v-if="img" />
+    <!-- <img :src="img" :alt="name" class="sheets-img-section" v-if="img" /> -->
 
     <span class="tooltip-custom" v-if="this.section.description">
       <img src="/images/infoicon.png" />
