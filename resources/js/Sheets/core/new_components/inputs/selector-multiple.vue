@@ -1,6 +1,13 @@
 <template>
     <div>
-        <form-group :id="id" :label="label" :required="required">
+        <form-group
+            :id="id"
+            :label="label"
+            :required="required"
+            :linkTarget="this.input.link_url"
+            :linkDescription="this.input.link_name"
+            :tooltipInfo="this.input.description"
+        >
             <v-select
                 label="name"
                 :id="id"

@@ -1,5 +1,12 @@
 <template>
-    <form-group :id="id" :label="label" :required="required">
+    <form-group
+        :id="id"
+        :label="label"
+        :required="required"
+        :linkTarget="this.input.link_url"
+        :linkDescription="this.input.link_name"
+        :tooltipInfo="this.input.description"
+    >
         <div class="custom-control custom-radio" v-for="(option, key) in options" :key="key">
             <input
                 type="radio"
