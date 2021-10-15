@@ -4,7 +4,7 @@
             <div class="col-12">
                 <div class="row">
                     <div class="col-8">
-                        <label :for="id">{{ this.input.name }}</label>
+                        <label :for="id" @click="logData()">{{ this.input.name }}</label>
                         <span v-if="required" class="text-danger">*</span>
                         <span class="tooltip-custom" v-if="this.input.description">
                             <img src="/images/infoicon.png" />
@@ -72,5 +72,8 @@ export default {
 .htErrorConfirmed {
     border: 2px solid #ff0000 !important;
     background-color: #ffbebe !important;
+}
+.htCenter .htMiddle .handsontable .ht__selection--columns .htRowHeaders .htColumnHeaders {
+    overflow-y: scroll !important;
 }
 </style>

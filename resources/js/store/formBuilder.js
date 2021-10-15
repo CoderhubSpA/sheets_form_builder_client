@@ -402,7 +402,6 @@ export default {
                 console.log(data.form)
                 axios.post(`/api/sheets/save/file`, data.form, headers)
                     .then((response) => {
-                        console.log(response.data)
                         const id = response.data.content.content.inserted_id;
                         resolve({ id: id, data: data.file });
                     }).catch((error) => {

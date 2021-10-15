@@ -1,11 +1,15 @@
 <script>
 import Handsontable from 'handsontable';
 import { KeyValueSelect } from 'handsontable-key-value-select';
+import CustomMultiSelectEditor from '../handsontableCustom/customMultiSelectEditor';
 import {
     clpRenderer,
     customDateRenderer,
     customSelectRenderer,
+    customMultiSelectRenderer,
 } from '../handsontableCustom/renderers';
+import 'handsontable-multi-select/dist/css/handsontable-multi-select.css';
+import 'handsontable/dist/handsontable.full.css';
 
 export default {
     props: {
@@ -84,6 +88,11 @@ export default {
         },
     },
     data: () => ({
+        multipleSelectorsFormats: [
+            'SELECTOR[MULTIPLE]',
+            'SELECTOR[1XN][ALL]',
+            'SELECTOR[1XN][AVAILABLES]',
+        ],
         mainPivot: {},
         columnsIds: [],
         sendingIds: ['id'],
@@ -97,6 +106,7 @@ export default {
             height: '100%',
             rowHeights: 23,
             className: 'htCenter htMiddle',
+            observeChanges: true,
             hiddenColumns: {
                 columns: [0, 1],
                 indicators: false,
@@ -175,6 +185,12 @@ export default {
                 });
         },
         buildColHeaders() {
+            const selectorsFormats = [
+                'SELECTOR',
+                'SELECTOR[MULTIPLE]',
+                'SELECTOR[1XN][ALL]',
+                'SELECTOR[1XN][AVAILABLES]',
+            ];
             this.handsontableSettings.colHeaders.push(this.input.col_fk_1_n);
             this.mainPivot = this.entityInfo.columns.find(
                 (eInfo) => eInfo.col_name === this.input.col_fk_1_n
@@ -191,11 +207,32 @@ export default {
                     column.show_in_edit_form > 0 &&
                     column.col_name !== this.input.col_fk_1_n
                 ) {
-                    this.handsontableSettings.colHeaders.push(
-                        column.col_name !== this.input.col_fk_n_1
-                            ? column.name
-                            : `${column.name} <b style="color: red;">*</b>`
-                    );
+                    if (selectorsFormats.indexOf(column.format) > -1) {
+                        const options = this.entityInfo.entities_fk[column.entity_type_fk];
+                        let longestOption = column.name;
+                        options.forEach((option) => {
+                            if (option.name.length > longestOption.length) {
+                                longestOption = option.name;
+                            }
+                        });
+                        this.handsontableSettings.colHeaders.push(
+                            column.col_name !== this.input.col_fk_n_1
+                                ? `<div style="width: ${
+                                      longestOption.length * 10
+                                  }px; text-align: center;">${column.name}</div>`
+                                : `<div style="width: ${
+                                      longestOption.length * 10
+                                  }px; text-align: center;">${
+                                      column.name
+                                  } <b style="color: red;">*</b></div>`
+                        );
+                    } else {
+                        this.handsontableSettings.colHeaders.push(
+                            column.col_name !== this.input.col_fk_n_1
+                                ? column.name
+                                : `${column.name} <b style="color: red;">*</b>`
+                        );
+                    }
                     if (column.col_name === this.input.col_fk_n_1) {
                         this.$store.commit(`${this.state}/SMAREQUIREDFIELDS`, {
                             fieldId: this.input.id,
@@ -224,6 +261,8 @@ export default {
             // eslint-disable-next-line array-callback-return
             this.columnsIds.map((column) => {
                 const columnToPush = {};
+                let options;
+                let selectOptions;
                 if (column.column) {
                     switch (column.column.format) {
                         case 'CLP':
@@ -244,10 +283,9 @@ export default {
                             break;
                         case 'SELECTOR':
                             // eslint-disable-next-line no-case-declarations
-                            const options =
-                                this.entityInfo.entities_fk[column.column.entity_type_fk];
+                            options = this.entityInfo.entities_fk[column.column.entity_type_fk];
                             // eslint-disable-next-line no-case-declarations
-                            const selectOptions = [];
+                            selectOptions = [];
                             // eslint-disable-next-line array-callback-return
                             options.map((option) => {
                                 selectOptions.push({
@@ -258,6 +296,35 @@ export default {
                             columnToPush.data = column.id;
                             columnToPush.editor = KeyValueSelect;
                             columnToPush.renderer = customSelectRenderer;
+                            columnToPush.selectOptions = selectOptions;
+                            columnToPush.readOnly = column.readonly;
+                            columnToPush.isRequired = column.isRequired;
+                            break;
+                        case 'SELECTOR[MULTIPLE]':
+                        case 'SELECTOR[1XN][ALL]':
+                        case 'SELECTOR[1XN][AVAILABLES]':
+                            // eslint-disable-next-line no-case-declarations
+                            options = this.entityInfo.entities_fk[column.column.entity_type_fk];
+                            // eslint-disable-next-line no-case-declarations
+                            selectOptions = [];
+                            // eslint-disable-next-line array-callback-return
+                            options.map((option) => {
+                                selectOptions.push({
+                                    value: option.id,
+                                    label: option.name,
+                                });
+                            });
+                            columnToPush.data = column.id;
+                            columnToPush.editor = CustomMultiSelectEditor;
+                            columnToPush.renderer = customMultiSelectRenderer;
+                            columnToPush.select = {
+                                config: {
+                                    separator: ';',
+                                    valueKey: 'value',
+                                    labelKey: 'label',
+                                },
+                                options: selectOptions,
+                            };
                             columnToPush.selectOptions = selectOptions;
                             columnToPush.readOnly = column.readonly;
                             columnToPush.isRequired = column.isRequired;
@@ -330,10 +397,13 @@ export default {
                             // eslint-disable-next-line no-param-reassign
                             element[key] = val === 1;
                         }
-                        // if (column.id === key && column.column.format === 'DATE') {
-                        //     let date = val.split(' ');
-                        //     val = date[0];
-                        // }
+                        if (
+                            column.id === key &&
+                            this.multipleSelectorsFormats.indexOf(column.column.format) > -1
+                        ) {
+                            // eslint-disable-next-line no-param-reassign
+                            element[key] = JSON.parse(val).join(', ');
+                        }
                     });
                 });
             });
@@ -342,9 +412,10 @@ export default {
             // En caso de que la llegada de la data fue tardía y ya el componente se renderizó
             // cargar la data mediante el método loadData.
             // Esto puede pasar si los pivotes llegan tarde
-            if (this.$refs.hotTableComponent)
+            if (this.$refs.hotTableComponent) {
                 // eslint-disable-next-line no-console
-                console.log(this.$refs.hotTableComponent.hotInstance.loadData(data));
+                console.log('SMA 406', this.$refs.hotTableComponent.hotInstance.loadData(data));
+            }
         },
         addHooks() {
             // eslint-disable-next-line func-names
@@ -369,10 +440,15 @@ export default {
                 if (column.column.default_value !== null && column.id !== 'id') {
                     if (column.column.format === 'SiNo') {
                         newRow[column.id] = column.column.default_value === 1;
+                    } else if (column.column.format.indexOf('SELECTOR') > -1) {
+                        newRow[column.id] = column.column.default_value || [];
                     } else {
                         newRow[column.id] = column.column.default_value;
                     }
                 } else if (column.column.default_value === null) {
+                    if (column.column.format.indexOf('SELECTOR') > -1) {
+                        newRow[column.id] = [];
+                    }
                     newRow[column.id] = '';
                 }
             });
@@ -390,9 +466,25 @@ export default {
             // eslint-disable-next-line array-callback-return
             this.handsontableData.map((hotData) => {
                 const dataToPush = {};
+                const multipleFormats = [
+                    'SELECTOR[MULTIPLE]',
+                    'SELECTOR[1XN][ALL]',
+                    'SELECTOR[1XN][AVAILABLES]',
+                ];
                 Object.keys(hotData).forEach((key) => {
                     if (this.sendingIds.indexOf(key) >= 0) {
-                        dataToPush[key] = hotData[key];
+                        const formatFinder = this.columnsIds.find(
+                            (column) => column.column.id === key
+                        );
+                        if (formatFinder) {
+                            if (multipleFormats.indexOf(formatFinder.column.format) > -1) {
+                                dataToPush[key] = hotData[key].split(',');
+                            } else {
+                                dataToPush[key] = hotData[key];
+                            }
+                        } else {
+                            dataToPush[key] = hotData[key];
+                        }
                     }
                 });
                 if (Object.keys(dataToPush).length > 0) {
@@ -409,7 +501,7 @@ export default {
 </script>
 <style>
 .min-height-150 {
-    min-height: 150px;
+    min-height: 350px;
 }
 .selector-advanced-label {
     font-size: 1rem;
@@ -422,5 +514,52 @@ export default {
 .handsontable td.htInvalid {
     border: 2px solid #ff0000 !important;
     background-color: #ffbebe !important;
+}
+.multi-select__choices {
+    z-index: 999;
+    overflow-y: visible;
+}
+.multi-select__choices__list--multiple .multi-select__choices__item:after {
+    content: '';
+    background-image: '';
+    background-size: cover;
+    color: white;
+    height: 0px;
+    width: 0px;
+    display: inline-block;
+    margin-left: 0px;
+}
+.multi-select__choices__button {
+    text-indent: -9999px;
+    appearance: none;
+    border: 0;
+    background-color: transparent;
+    background-image: url('/images/timesicon.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    cursor: pointer;
+    width: 5px;
+    height: 8px;
+    position: relative;
+    top: 6px;
+    left: 2px;
+}
+.selector-advanced-container > .handsontable {
+    overflow-y: auto !important;
+}
+.multi-select__choices__list--multiple .multi-select__choices__item {
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 3px;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-weight: inherit;
+    margin-right: 3.75px;
+    margin-bottom: 3.75px;
+    background-color: hsl(212deg 100% 98%);
+    border: 1px solid hsl(212deg 30% 90%);
+    color: #000;
+    word-break: break-all;
+    box-sizing: border-box;
 }
 </style>
