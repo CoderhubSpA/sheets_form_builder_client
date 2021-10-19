@@ -1,5 +1,5 @@
 <template>
-  <div :class="`${sm} ${md} ${xl}`">
+  <div :class="`${sm} ${md} ${xl}`" v-if="show_section">
     <h5 class="sheets-section-title">
       {{ name }}
     </h5>
@@ -70,7 +70,27 @@ export default {
       return this.section.fields || [];
     },
     img() {
-      return 'https://picsum.photos/200/300?random=1';
+      let path = '';
+      if (this.section.image) {
+        path = new URL(this.section.image, process.env.MIX_SHEETS_STORAGE_URL).toString();
+      }
+      return path;
+    },
+    show_by_field_id() {
+      return this.section.show_by_field_id;
+    },
+    show_by_field_value() {
+      return this.section.show_by_field_value;
+    },
+    show_section() {
+      const fields = this.$store.getters[`${this.state}/field_section_show_hide`];
+      let show_section = false;
+      if (this.show_by_field_id) {
+        if (fields[this.show_by_field_id] === this.show_by_field_value) {
+          show_section = true;
+        }
+      } else show_section = true;
+      return show_section;
     },
   },
 };

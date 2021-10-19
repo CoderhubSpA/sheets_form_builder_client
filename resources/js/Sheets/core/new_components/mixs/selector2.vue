@@ -105,6 +105,9 @@ export default {
     entity_type_permission_fk() {
       return this.input.entity_type_permission_fk;
     },
+    form_field_id() {
+      return this.input.form_field_id;
+    },
   },
   watch: {
     /**
@@ -124,6 +127,12 @@ export default {
         }
 
         this.$emit('input', data);
+        /**
+         * mostrar/ocultar section
+         */
+        const field_section_show_hide = {};
+        field_section_show_hide[this.form_field_id] = val;
+        this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
       }
     },
     /**
@@ -134,7 +143,7 @@ export default {
        * Manejo del observador
        */
       handler: function (val) {
-        console.log(this.input.format, this.input.name, val);
+        // console.log(this.input.format, this.input.name, val);
         if (val) this.selected = val;
       },
       /**

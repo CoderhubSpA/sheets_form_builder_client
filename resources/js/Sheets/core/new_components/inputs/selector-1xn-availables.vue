@@ -117,6 +117,12 @@ export default {
       const store = {};
       store[this.input.col_fk_1_n] = val;
       this.$store.commit(`${this.state}/COL_FK_1_N_COMMON`, store);
+      /**
+       * mostrar/ocultar section
+       */
+      const field_section_show_hide = {};
+      field_section_show_hide[this.form_field_id] = val;
+      this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
     },
   },
   methods: {

@@ -88,6 +88,7 @@ export default {
         },
     },
     data: () => ({
+        rebuildCount: 0, // validador de reconstrucción de tabla
         multipleSelectorsFormats: [
             'SELECTOR[MULTIPLE]',
             'SELECTOR[1XN][ALL]',
@@ -257,6 +258,9 @@ export default {
             });
         },
         buildHotTableColumns() {
+            /* Solo para validar si se están reconstruyendo las columnas */
+            this.rebuildCount += 1;
+            /* -------------------------------------------------------- */
             const columns = [];
             // eslint-disable-next-line array-callback-return
             this.columnsIds.map((column) => {
@@ -286,6 +290,14 @@ export default {
                             options = this.entityInfo.entities_fk[column.column.entity_type_fk];
                             // eslint-disable-next-line no-case-declarations
                             selectOptions = [];
+                            /* Solo para validar si se están reconstruyendo las columnas */
+                            selectOptions = [
+                                {
+                                    value: this.rebuildCount,
+                                    label: this.rebuildCount,
+                                },
+                            ];
+                            /* --------------------------------------------------------- */
                             // eslint-disable-next-line array-callback-return
                             options.map((option) => {
                                 selectOptions.push({
@@ -307,6 +319,14 @@ export default {
                             options = this.entityInfo.entities_fk[column.column.entity_type_fk];
                             // eslint-disable-next-line no-case-declarations
                             selectOptions = [];
+                            /* Solo para validar si se están reconstruyendo las columnas */
+                            selectOptions = [
+                                {
+                                    value: this.rebuildCount,
+                                    label: this.rebuildCount,
+                                },
+                            ];
+                            /* --------------------------------------------------------- */
                             // eslint-disable-next-line array-callback-return
                             options.map((option) => {
                                 selectOptions.push({
@@ -492,6 +512,7 @@ export default {
                 }
             });
             this.$emit('input', dataToSend);
+            this.buildHotTableColumns();
         },
         sleep(ms) {
             return new Promise((resolve) => setTimeout(resolve, ms));

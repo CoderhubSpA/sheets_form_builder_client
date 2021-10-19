@@ -20,7 +20,6 @@
 
 <script>
 import mix from '../mixs/input.vue';
-// import mixSelector from '../mixs/selector.vue';
 import mixSelector from '../mixs/selector2.vue';
 import FormGroup from '../templates/form-group.vue';
 import NestedForm from '../nested.vue';

@@ -39,7 +39,6 @@ export default {
     'nested-form': NestedForm,
   },
   data: () => ({
-    defaultEmpty: [],
     selected: [],
   }),
 };
