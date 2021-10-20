@@ -88,7 +88,6 @@ export default {
         },
     },
     data: () => ({
-        rebuildCount: 0, // validador de reconstrucción de tabla
         multipleSelectorsFormats: [
             'SELECTOR[MULTIPLE]',
             'SELECTOR[1XN][ALL]',
@@ -258,9 +257,6 @@ export default {
             });
         },
         buildHotTableColumns() {
-            /* Solo para validar si se están reconstruyendo las columnas */
-            this.rebuildCount += 1;
-            /* -------------------------------------------------------- */
             const columns = [];
             // eslint-disable-next-line array-callback-return
             this.columnsIds.map((column) => {
@@ -290,14 +286,6 @@ export default {
                             options = this.entityInfo.entities_fk[column.column.entity_type_fk];
                             // eslint-disable-next-line no-case-declarations
                             selectOptions = [];
-                            /* Solo para validar si se están reconstruyendo las columnas */
-                            selectOptions = [
-                                {
-                                    value: this.rebuildCount,
-                                    label: this.rebuildCount,
-                                },
-                            ];
-                            /* --------------------------------------------------------- */
                             // eslint-disable-next-line array-callback-return
                             options.map((option) => {
                                 selectOptions.push({
@@ -314,19 +302,10 @@ export default {
                             break;
                         case 'SELECTOR[MULTIPLE]':
                         case 'SELECTOR[1XN][ALL]':
-                        case 'SELECTOR[1XN][AVAILABLES]':
                             // eslint-disable-next-line no-case-declarations
                             options = this.entityInfo.entities_fk[column.column.entity_type_fk];
                             // eslint-disable-next-line no-case-declarations
                             selectOptions = [];
-                            /* Solo para validar si se están reconstruyendo las columnas */
-                            selectOptions = [
-                                {
-                                    value: this.rebuildCount,
-                                    label: this.rebuildCount,
-                                },
-                            ];
-                            /* --------------------------------------------------------- */
                             // eslint-disable-next-line array-callback-return
                             options.map((option) => {
                                 selectOptions.push({
@@ -344,6 +323,40 @@ export default {
                                     labelKey: 'label',
                                 },
                                 options: selectOptions,
+                                availables: false,
+                                currentData: this.handsontableData,
+                                columnId: column.column.id,
+                            };
+                            columnToPush.selectOptions = selectOptions;
+                            columnToPush.readOnly = column.readonly;
+                            columnToPush.isRequired = column.isRequired;
+                            break;
+                        case 'SELECTOR[1XN][AVAILABLES]':
+                            // eslint-disable-next-line no-case-declarations
+                            options = this.entityInfo.entities_fk[column.column.entity_type_fk];
+                            // eslint-disable-next-line no-case-declarations
+                            selectOptions = [];
+                            // eslint-disable-next-line array-callback-return
+                            options.map((option) => {
+                                selectOptions.push({
+                                    value: option.id,
+                                    label: option.name,
+                                    validator: option[column.column.col_fk_1_n],
+                                });
+                            });
+                            columnToPush.data = column.id;
+                            columnToPush.editor = CustomMultiSelectEditor;
+                            columnToPush.renderer = customMultiSelectRenderer;
+                            columnToPush.select = {
+                                config: {
+                                    separator: ';',
+                                    valueKey: 'value',
+                                    labelKey: 'label',
+                                },
+                                options: selectOptions,
+                                availables: true,
+                                currentData: this.handsontableData,
+                                columnId: column.column.id,
                             };
                             columnToPush.selectOptions = selectOptions;
                             columnToPush.readOnly = column.readonly;
@@ -421,8 +434,13 @@ export default {
                             column.id === key &&
                             this.multipleSelectorsFormats.indexOf(column.column.format) > -1
                         ) {
-                            // eslint-disable-next-line no-param-reassign
-                            element[key] = JSON.parse(val).join(', ');
+                            if (val) {
+                                // eslint-disable-next-line no-param-reassign
+                                element[key] = JSON.parse(val).join(', ');
+                            } else {
+                                // eslint-disable-next-line no-param-reassign
+                                element[key] = '';
+                            }
                         }
                     });
                 });
@@ -555,7 +573,7 @@ export default {
     appearance: none;
     border: 0;
     background-color: transparent;
-    background-image: url('/images/timesicon.png');
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAMAAACahl6sAAABFFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABIEvRKAAAAW3RSTlMAAgMEBggKERMVFxgZGiQlJygsLi80Njc4OTs8P0BBQkpPU1pbXGFiY2dpbG1ub3qAg4eJjo+TmKOlp6usrbC/xMXGyMrM19jZ3eHq6+zt7vDx8vP09fb4+/z+BeiT2AAAApBJREFUeNrswYEAAAAAw6D7Ux9k1QAAAAAAAAAAAICgU2sXyFVFQRCGJ2jc3YPDfXgUh7jnucz+14FDWVc1MkzR/w6+q8cGnu6en+086bXIrhVvjyt7G2OJjrs1/1rltsU1c+Rf66xdynKU/GePLKqluv9oK8kx3vI4CXC438mBvHQPlACHH3VlOK42PVICHO6TGZBR91AJcPi9DMiEx0qAw4sMSL/HSoDDVyyj/VgJcLS6UyCFR0qAwzctpcvbgZJF4DgesJx694DkYZjjYtKy6tsPkkDHlJmaJN4RJBFyEImQg0iEHEQi5CASIQeR6DiIpGS8BeAoY0dO/VAi5CASIQeRCDmIRMhBJEIOIhFyEImQg0iEHESi5gASvDo1//85gOSASqBj2kxCIuQgEiEHkQg5iETIQSRCDiLRcRDJuo6DSAQdZgNM8tUxYyYgEXUAiagDSEQdQCLqABJRB5CIOoBE0wEkh8DR0HPYfM1BhaRDUgIckhLgkJQAh6QEOCQlwCEpAQ5JCXCISoBDX4IcFyt7chLomML78YWew2QkxCEjIQ4ZCXHISIhDRkIcMhLiUJMgR/mnQ0VCHHwXW8AhIiEOGQlxyEiIQ0ZCHDIS4pCREIeMhDjUJNAxHXACR8BBJHKOeEm8Q0ZCHDIS4pCREIeMhDjUJHN/6yCSB0mOnpMwB5a0Z3Iga8AxE3qy4EOKo+s00oElgxmQoVgHlNzKgEwFO5CklAEZinYAyc2cdyTYASSDltFqrANI3ltKPceRDiBpT1tOs1X/3sWMRTWw79/r3LesRnf8a++GLa7rWx3/0tGyJbbw/PWrZ3MW28jjF2/Wb1yxf96n9uBAAAAAAADI/7URVFVVVVVVVVVVFZ13/lBHEGxnAAAAAElFTkSuQmCC);
     background-repeat: no-repeat;
     background-size: cover;
     cursor: pointer;

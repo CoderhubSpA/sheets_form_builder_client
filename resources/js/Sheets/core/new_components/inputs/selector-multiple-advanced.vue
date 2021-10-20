@@ -3,25 +3,24 @@
         <div class="row p-1 mb-2">
             <div class="col-12">
                 <div class="row">
-                    <div class="col-8">
-                        <label :for="id" @click="logData()">{{ this.input.name }}</label>
-                        <span v-if="required" class="text-danger">*</span>
-                        <span class="tooltip-custom" v-if="this.input.description">
-                            <img src="/images/infoicon.png" />
-                            <span class="tooltiptext">
-                                {{ this.input.description }}
-                            </span>
-                        </span>
-                    </div>
-                    <div class="col-4" v-if="this.input.link_url">
+                    <div :class="getClass()">
                         <a
                             class="float-right sheet-field-info-link"
                             :href="this.input.link_url"
                             target="_blank"
                             rel="noopener noreferrer"
+                            v-if="this.input.link_url"
                         >
                             {{ this.input.link_name }}
                         </a>
+                        <label :for="id" @click="logData()">{{ this.input.name }}</label>
+                        <span v-if="required" class="text-danger">*</span>
+                        <span class="tooltip-custom" v-if="this.input.description">
+                            <span class="icon">&#9432;</span>
+                            <span class="tooltiptext">
+                                {{ this.input.description }}
+                            </span>
+                        </span>
                     </div>
                 </div>
                 <button class="btn btn-primary btn-sm" @click="addRow">&plus;</button>
@@ -56,6 +55,14 @@ export default {
         HotTable,
     },
     data: () => ({}),
+    methods: {
+        getClass() {
+            if (this.linkTarget !== null && this.linkTarget !== undefined) {
+                return this.linkTarget.length > 0 ? 'col has-more-info' : 'col';
+            }
+            return 'col';
+        },
+    },
 };
 </script>
 <style scoped>

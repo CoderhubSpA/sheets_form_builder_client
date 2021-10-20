@@ -1,24 +1,23 @@
 <template>
     <div>
         <div class="row">
-            <div class="col-8">
-                <label>{{ label }}</label> <span v-if="required" class="text-danger">*</span>
-                <span class="tooltip-custom" v-if="tooltipInfo.length > 0">
-                    <img src="/images/infoicon.png" />
-                    <span class="tooltiptext">
-                        {{ tooltipInfo }}
-                    </span>
-                </span>
-            </div>
-            <div class="col-4" v-if="linkTarget.length > 0">
+            <div :class="getClass()">
                 <a
                     class="float-right sheet-field-info-link"
                     :href="linkTarget"
                     target="_blank"
                     rel="noopener noreferrer"
+                    v-if="linkTarget"
                 >
                     {{ linkDescription }}
                 </a>
+                <label>{{ label }}</label> <span v-if="required" class="text-danger">*</span>
+                <span class="tooltip-custom" v-if="tooltipInfo.length > 0">
+                    <span class="icon">&#9432;</span>
+                    <span class="tooltiptext">
+                        {{ tooltipInfo }}
+                    </span>
+                </span>
             </div>
         </div>
         <div class="input-group mb-3">
@@ -56,6 +55,14 @@ export default {
         tooltipInfo: {
             type: String,
             default: '',
+        },
+    },
+    methods: {
+        getClass() {
+            if (this.linkTarget !== null && this.linkTarget !== undefined) {
+                return this.linkTarget.length > 0 ? 'col has-more-info' : 'col';
+            }
+            return 'col';
         },
     },
 };

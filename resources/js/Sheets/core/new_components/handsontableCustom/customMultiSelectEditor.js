@@ -63,6 +63,7 @@ export default class CustomMultiSelectEditor extends TextEditor {
      */
     prepare(row, col, prop, td, originalValue, cellProperties) {
         super.prepare(row, col, prop, td, originalValue, cellProperties);
+        this.row = row;
         const { type } = cellProperties;
         this.type = type;
 
@@ -144,8 +145,36 @@ export default class CustomMultiSelectEditor extends TextEditor {
         this.instance.addHook('beforeKeyDown', (event) => this.onBeforeKeyDown(event));
         this.createChoices();
         const getOptions = () => {
-            const { options } = this.selectOptions;
-            const toResolve = typeof options === 'function' ? options() : options;
+            const { options, currentData, columnId } = this.selectOptions;
+            // const toResolve = typeof options === 'function' ? options() : options;
+            let toResolve;
+            const isAvailable = !!this.selectOptions.availables;
+            if (isAvailable) {
+                const newOptions = [];
+                options.forEach((opt) => {
+                    if (currentData[this.row][columnId].indexOf(opt.value) >= 0) {
+                        newOptions.push(opt);
+                    } else if (opt.validator === null) {
+                        newOptions.push(opt);
+                    }
+                });
+                const validate = [];
+                currentData.forEach((cData, index) => {
+                    if (index !== this.row) {
+                        newOptions.forEach((newOpt, jndex) => {
+                            if (cData[columnId].indexOf(newOpt.value) >= 0) {
+                                validate.push(jndex);
+                            }
+                        });
+                    }
+                });
+                validate.forEach((indexToDelete) => {
+                    newOptions.splice(indexToDelete, 1);
+                });
+                toResolve = newOptions;
+            } else {
+                toResolve = options;
+            }
             return Promise.resolve(toResolve).then((availableOptions) => {
                 const { originalValue } = this;
                 if (R.isEmpty(originalValue) || R.isNil(originalValue)) {
