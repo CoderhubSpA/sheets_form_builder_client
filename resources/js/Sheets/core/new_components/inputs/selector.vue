@@ -6,6 +6,7 @@
     :linkTarget="this.input.link_url"
     :linkDescription="this.input.link_name"
     :tooltipInfo="this.input.description"
+    v-if="show_field"
   >
     <v-select label="name" :id="id" :options="options" :disabled="disabled" v-model="selected">
     </v-select>

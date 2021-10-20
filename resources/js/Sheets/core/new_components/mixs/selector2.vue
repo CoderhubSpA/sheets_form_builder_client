@@ -108,6 +108,23 @@ export default {
     form_field_id() {
       return this.input.form_field_id;
     },
+    show_field() {
+      const fields = this.$store.getters[`${this.state}/field_show_hide`];
+      let show_field = false;
+      if (this.show_by_field_id) {
+        if ( (fields[this.show_by_field_id] || false) == this.show_by_field_value) {
+          show_field = true;
+        }
+        try{
+          // Permite validar si entre un selector multiple existe el 
+          // valor que condiciona que el elemento se vea o no
+          if(Array.isArray(fields[this.show_by_field_id]) && fields[this.show_by_field_id].map(d=>d.id).includes(this.show_by_field_value)){
+            show_section = true;
+          }
+        }catch(e){console.warn(e);}
+      } else show_field = true;
+      return show_field;
+    },
   },
   watch: {
     /**
@@ -135,7 +152,7 @@ export default {
         this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
         const field_show_hide = {};
         field_show_hide[this.form_field_id] = data[this.id];
-        this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_section_show_hide);
+        this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
       }
     },
     /**
