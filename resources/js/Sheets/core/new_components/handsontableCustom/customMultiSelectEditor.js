@@ -40,6 +40,11 @@ function numberComparator(a, b) {
 const isNumber = (value) => typeof value === 'number';
 
 export default class CustomMultiSelectEditor extends TextEditor {
+    // eslint-disable-next-line class-methods-use-this
+    replaceAll(str, find, replace) {
+        return str.replace(new RegExp(find, 'g'), replace);
+    }
+
     /**
      * Gets current value from editable element.
      *
@@ -47,7 +52,8 @@ export default class CustomMultiSelectEditor extends TextEditor {
      */
     getValue() {
         const valueArray = this.choices.getValue();
-        const formattedValues = R.pluck('value', valueArray).toString();
+        const values = R.pluck('value', valueArray).toString();
+        const formattedValues = this.replaceAll(values, ',', this.separator);
         return formattedValues;
     }
 
@@ -78,7 +84,7 @@ export default class CustomMultiSelectEditor extends TextEditor {
             this.maxItemCount = 1;
             this.originalValue = isNumber(originalValue) ? originalValue.toString() : originalValue;
         } else {
-            this.separator = getSeparator(this.selectOptions) || ',';
+            this.separator = getSeparator(this.selectOptions) || ';';
             this.maxItemCount = getMaxItemCount(this.selectOptions) || -1;
         }
     }

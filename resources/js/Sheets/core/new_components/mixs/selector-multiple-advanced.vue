@@ -290,7 +290,10 @@ export default {
                             options.map((option) => {
                                 selectOptions.push({
                                     value: option.id,
-                                    label: option.name,
+                                    label:
+                                        column.column.col_name_fk === null
+                                            ? option.name
+                                            : option[column.column.col_name_fk],
                                 });
                             });
                             columnToPush.data = column.id;
@@ -310,7 +313,10 @@ export default {
                             options.map((option) => {
                                 selectOptions.push({
                                     value: option.id,
-                                    label: option.name,
+                                    label:
+                                        column.column.col_name_fk === null
+                                            ? option.name
+                                            : option[column.column.col_name_fk],
                                 });
                             });
                             columnToPush.data = column.id;
@@ -340,7 +346,10 @@ export default {
                             options.map((option) => {
                                 selectOptions.push({
                                     value: option.id,
-                                    label: option.name,
+                                    label:
+                                        column.column.col_name_fk === null
+                                            ? option.name
+                                            : option[column.column.col_name_fk],
                                     validator: option[column.column.col_fk_1_n],
                                 });
                             });
@@ -436,7 +445,7 @@ export default {
                         ) {
                             if (val) {
                                 // eslint-disable-next-line no-param-reassign
-                                element[key] = JSON.parse(val).join(', ');
+                                element[key] = JSON.parse(val).join('; ');
                             } else {
                                 // eslint-disable-next-line no-param-reassign
                                 element[key] = '';
@@ -516,7 +525,7 @@ export default {
                         );
                         if (formatFinder) {
                             if (multipleFormats.indexOf(formatFinder.column.format) > -1) {
-                                dataToPush[key] = hotData[key].split(',');
+                                dataToPush[key] = hotData[key].split(';');
                             } else {
                                 dataToPush[key] = hotData[key];
                             }

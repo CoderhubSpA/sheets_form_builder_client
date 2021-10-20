@@ -68,7 +68,7 @@ export function customMultiSelectRenderer(instance, td, row, col, prop, value, c
     const span = document.createElement('SPAN');
     let selectedId;
     const optionsList = cellProperties.selectOptions;
-    const valuesSplit = `${value}`.split(',');
+    const valuesSplit = `${value}`.split(';');
     const values = valuesSplit.map((string) => string.trim());
     // eslint-disable-next-line no-param-reassign
     value = [];
