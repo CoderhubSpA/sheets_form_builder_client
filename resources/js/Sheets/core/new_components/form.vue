@@ -59,6 +59,10 @@ export default {
     value: {
       require: false,
     },
+    base_url: {
+      type: String,
+      default: '',
+    },
   },
   components: {
     // "sheets-loading": Loading,
@@ -126,7 +130,9 @@ export default {
     this.namespace = namespace;
   },
   created() {
-    // this.get_record();
+    if (this.base_url) {
+      this.$store.commit(`${this.namespace}/BASE_URL`, this.base_url);
+    }
   },
   mounted() {
     window.name = this.windowName;

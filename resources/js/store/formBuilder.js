@@ -69,7 +69,8 @@ export default {
          * Muestra/Oculta campos
          * segun el valor de otro campo
          */
-        field_show_hide: {}
+        field_show_hide: {},
+        base_url: ''
     }),
     getters: {
         loading: (state) => state.loading,
@@ -118,7 +119,9 @@ export default {
          * Entrega los valores seleccionado en los field
          * para ser evaluados y determinar si debe mostrarse o no
          */
-        field_show_hide: (state) => state.field_show_hide
+        field_show_hide: (state) => state.field_show_hide,
+        // url base
+        base_url: (state) => state.base_url
     },
     mutations: {
         LOADING(state, val) {
@@ -239,6 +242,9 @@ export default {
                 const key = Object.keys(val)
                 Vue.set(state.field_show_hide, key, val[key])
             }
+        },
+        BASE_URL(state, val) {
+            state.base_url = val
         }
     },
     actions: {
