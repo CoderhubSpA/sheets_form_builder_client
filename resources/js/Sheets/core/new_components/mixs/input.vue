@@ -65,7 +65,7 @@ export default {
       const fields = this.$store.getters[`${this.state}/field_show_hide`];
       let show_field = false;
       if (this.show_by_field_id) {
-        if (fields[this.show_by_field_id] === this.show_by_field_value) {
+        if (fields[this.show_by_field_id] == this.show_by_field_value) {
           show_field = true;
         }
       } else show_field = true;
