@@ -4,7 +4,7 @@
     <div v-if="isPoll === false">
       <sheets-form
         :entityId="id"
-        :record_id="recordid"
+        :record_id="record_id"
         :params="params"
         :base_url="base_url"
       ></sheets-form>
@@ -32,7 +32,7 @@ export default {
       type: String,
       default: '',
     },
-    recordid: {
+    record_id: {
       type: String,
       default: '',
     },
@@ -55,7 +55,7 @@ export default {
     this.$store
       .dispatch('form/get_form', {
         id: this.id,
-        recordid: this.recordid,
+        recordid: this.record_id,
         params: this.params,
       })
       .then((response) => {
