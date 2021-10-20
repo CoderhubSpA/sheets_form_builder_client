@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="row" v-if="hotTableLoaded">
-            <div class="col-12 min-height-150 selector-advanced-container">
+            <div class="col-12 min-height-handsontable selector-advanced-container">
                 <hot-table
                     ref="hotTableComponent"
                     :settings="handsontableSettings"
@@ -66,7 +66,7 @@ export default {
 };
 </script>
 <style scoped>
-.min-height-150 {
+.min-height-handsontable {
     min-height: 150px;
 }
 .selector-advanced-label {
