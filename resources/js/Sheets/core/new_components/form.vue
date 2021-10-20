@@ -421,7 +421,7 @@ export default {
           const finded = this.formAnswer.find((ans) => !!ans.id);
           // eslint-disable-next-line no-console
           console.log(finded, !finded, resp[index], resp[index].data.entity_type_fk === 'document');
-          if (!finded && resp[index].data.entity_type_fk === 'document') {
+          if (!finded && resp[index].data.col_name === 'id' && resp[index].data.entity_type_fk === 'document') {
             // eslint-disable-next-line no-console
             console.log('agregando id');
             this.formAnswer.push({ id: resp[index].id });
