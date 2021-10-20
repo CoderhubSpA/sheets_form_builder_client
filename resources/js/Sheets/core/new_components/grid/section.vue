@@ -88,9 +88,16 @@ export default {
       const fields = this.$store.getters[`${this.state}/field_section_show_hide`];
       let show_section = false;
       if (this.show_by_field_id) {
-        if (fields[this.show_by_field_id] == this.show_by_field_value) {
+        if ( (fields[this.show_by_field_id] || false) == this.show_by_field_value) {
           show_section = true;
         }
+        try{
+          // Permite validar si entre un selector multiple existe el 
+          // valor que condiciona que el elemento se vea o no
+          if(Array.isArray(fields[this.show_by_field_id]) && fields[this.show_by_field_id].map(d=>d.id).includes(this.show_by_field_value)){
+            show_section = true;
+          }
+        }catch(e){console.warn(e);}
       } else show_section = true;
       return show_section;
     },

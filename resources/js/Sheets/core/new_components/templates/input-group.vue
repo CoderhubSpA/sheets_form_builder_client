@@ -12,7 +12,7 @@
                     {{ linkDescription }}
                 </a>
                 <label>{{ label }}</label> <span v-if="required" class="text-danger">*</span>
-                <span class="tooltip-custom" v-if="tooltipInfo.length > 0">
+                <span class="tooltip-custom" v-if="tooltipInfo && tooltipInfo.length > 0">
                     <span class="icon">&#9432;</span>
                     <span class="tooltiptext">
                         {{ tooltipInfo }}
