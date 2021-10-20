@@ -83,6 +83,9 @@ export default {
         const field_section_show_hide = {};
         field_section_show_hide[this.form_field_id] = val;
         this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
+        const field_show_hide = {};
+        field_show_hide[this.form_field_id] = data[this.id];
+        this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
       }
     },
     clear(val) {
