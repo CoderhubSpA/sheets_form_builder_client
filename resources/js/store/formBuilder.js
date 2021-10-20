@@ -14,25 +14,6 @@ const DEFAULT_ACTION = {
     save_form: 1,
     text_color: null,
 };
-const test_section = {
-    id: "11c92553-8841-4338-8bcd-aebdd661063d",
-    order: 3,
-    form_id: "3199dd24-f524-4605-b632-c88502771fba",
-    form_row_id: "5e96fa98-585f-47ee-8988-debd288b4e18",
-    name: "Show/Hide section",
-    color: null,
-    text_color: null,
-    area_id: "d2e7af65-2527-11eb-8dfb-f23c920f9a68",
-    owner_id: "d5f14e37-2527-11eb-8dfb-f23c920f9a68",
-    show_by_field_id: "b69c2a71-8a8d-11eb-965c-ed7fb50d217e",
-    show_by_field_value: "cb04724b-5ae3-4568-980b-6fe994a289f3",
-    valid: 1,
-    col_md: 6,
-    col_xl: 6,
-    col_sm: 12,
-    visible_on_load: 1,
-    default_next_form_section: null
-}
 
 export default {
     namespaced: true,
@@ -83,7 +64,12 @@ export default {
          * Manipula el mostrar/ocultar
          * secciones segun su valor
          */
-        field_section_show_hide: {}
+        field_section_show_hide: {},
+        /**
+         * Muestra/Oculta campos
+         * segun el valor de otro campo
+         */
+        field_show_hide: {}
     }),
     getters: {
         loading: (state) => state.loading,
@@ -127,7 +113,12 @@ export default {
          * @param {*} state
          * @returns {Object}
          */
-        field_section_show_hide: (state) => state.field_section_show_hide
+        field_section_show_hide: (state) => state.field_section_show_hide,
+        /**
+         * Entrega los valores seleccionado en los field
+         * para ser evaluados y determinar si debe mostrarse o no
+         */
+        field_show_hide: (state) => state.field_show_hide
     },
     mutations: {
         LOADING(state, val) {
@@ -242,6 +233,12 @@ export default {
                 const key = Object.keys(val)
                 Vue.set(state.field_section_show_hide, key, val[key])
             }
+        },
+        FIELD_SHOW_HIDE(state, val) {
+            if (val) {
+                const key = Object.keys(val)
+                Vue.set(state.field_show_hide, key, val[key])
+            }
         }
     },
     actions: {
@@ -262,6 +259,7 @@ export default {
                     .get(URL)
                     .then((response) => {
                         const data = response.data.content;
+
                         // asignacion del titulo de formulario
                         commit('FORM_NAME', data.name)
                         commit('RAW', data);
@@ -296,11 +294,6 @@ export default {
                             const sections = data.sections.filter(
                                 (sect) => sect.form_row_id === row.id
                             );
-                            //-------------------------------
-                            const find = sections.find(s => s.id === test_section.id)
-                            const index = sections.indexOf(find)
-                            sections[index] = test_section
-                            //-------------------------------
 
                             sections.sort((a, b) => (a.order > b.order ? 1 : -1));
 

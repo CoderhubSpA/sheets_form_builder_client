@@ -55,6 +55,22 @@ export default {
     form_field_id() {
       return this.input.form_field_id;
     },
+    show_by_field_id() {
+      return this.input.show_by_field_id;
+    },
+    show_by_field_value() {
+      return this.input.show_by_field_value;
+    },
+    show_field() {
+      const fields = this.$store.getters[`${this.state}/field_show_hide`];
+      let show_field = false;
+      if (this.show_by_field_id) {
+        if (fields[this.show_by_field_id] === this.show_by_field_value) {
+          show_field = true;
+        }
+      } else show_field = true;
+      return show_field;
+    },
   },
   mounted() {
     this.readInputValue();
@@ -80,8 +96,14 @@ export default {
        * mostrar/ocultar section
        */
       const field_section_show_hide = {};
-      field_section_show_hide[this.form_field_id] = val;
+      field_section_show_hide[this.form_field_id] = e.target.value;
       this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
+      /**
+       * mostrar/ocultar field
+       */
+      const field_show_hide = {};
+      field_show_hide[this.form_field_id] = e.target.value;
+      this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
     },
     // evitar pegado de informacion en el componente
     onPaste(event) {

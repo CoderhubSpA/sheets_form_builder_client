@@ -1,19 +1,15 @@
 <template>
-    <form-group
-        :label="label"
-        :id="id"
-        :required="required"
-        :linkTarget="this.input.link_url"
-        :linkDescription="this.input.link_name"
-        :tooltipInfo="this.input.description"
-    >
-        <date-picker
-            type="date"
-            :format="dateFormat"
-            @input="onInput"
-            v-model="picker"
-        ></date-picker>
-    </form-group>
+  <form-group
+    :label="label"
+    :id="id"
+    :required="required"
+    :linkTarget="this.input.link_url"
+    :linkDescription="this.input.link_name"
+    :tooltipInfo="this.input.description"
+    v-if="show_field"
+  >
+    <date-picker type="date" :format="dateFormat" @input="onInput" v-model="picker"></date-picker>
+  </form-group>
 </template>
 <script>
 import DatePicker from 'vue2-datepicker';
@@ -22,11 +18,11 @@ import mixDate from '../mixs/dates.vue';
 import FormGroup from '../templates/form-group.vue';
 
 export default {
-    mixins: [mix, mixDate],
-    components: {
-        'form-group': FormGroup,
-        'date-picker': DatePicker,
-    },
+  mixins: [mix, mixDate],
+  components: {
+    'form-group': FormGroup,
+    'date-picker': DatePicker,
+  },
 };
 </script>
 

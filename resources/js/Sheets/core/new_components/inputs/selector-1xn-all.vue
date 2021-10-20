@@ -15,6 +15,7 @@
       :multiple="multiple"
       v-model="selected"
       :searchable="searchable"
+      v-if="show_field"
     >
     </v-select>
     <nested-form
