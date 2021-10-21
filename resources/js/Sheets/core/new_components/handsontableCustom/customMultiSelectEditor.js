@@ -101,6 +101,8 @@ export default class CustomMultiSelectEditor extends TextEditor {
             position: 'bottom',
             itemSelectText: '',
             maxItemCount: this.maxItemCount,
+            noResultsText: 'Sin resultados',
+            noChoicesText: 'Sin opciones disponibles',
         };
 
         if (this.type === 'numeric') {
@@ -152,7 +154,6 @@ export default class CustomMultiSelectEditor extends TextEditor {
         this.createChoices();
         const getOptions = () => {
             const { options, currentData, columnId } = this.selectOptions;
-            // const toResolve = typeof options === 'function' ? options() : options;
             let toResolve;
             const isAvailable = !!this.selectOptions.availables;
             if (isAvailable) {
@@ -164,6 +165,7 @@ export default class CustomMultiSelectEditor extends TextEditor {
                         newOptions.push(opt);
                     }
                 });
+                const newOptionsFilteredAvailable = [...newOptions];
                 const validate = [];
                 currentData.forEach((cData, index) => {
                     if (index !== this.row) {
@@ -174,10 +176,12 @@ export default class CustomMultiSelectEditor extends TextEditor {
                         });
                     }
                 });
-                validate.forEach((indexToDelete) => {
-                    newOptions.splice(indexToDelete, 1);
-                });
-                toResolve = newOptions;
+                const newOptionsFilteredAvailableAndNotTaken = [
+                    ...newOptionsFilteredAvailable.filter(
+                        (nopt, index) => validate.indexOf(index) < 0
+                    ),
+                ];
+                toResolve = newOptionsFilteredAvailableAndNotTaken;
             } else {
                 toResolve = options;
             }

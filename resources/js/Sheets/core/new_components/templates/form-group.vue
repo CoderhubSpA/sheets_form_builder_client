@@ -7,7 +7,7 @@
                     :href="linkTarget"
                     target="_blank"
                     rel="noopener noreferrer"
-                    v-if="linkTarget"
+                    v-if="linkTarget && linkTarget.length > 0"
                 >
                     {{ linkDescription }}
                 </a>

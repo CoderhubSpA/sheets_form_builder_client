@@ -57,8 +57,8 @@ export default {
     data: () => ({}),
     methods: {
         getClass() {
-            if (this.linkTarget !== null && this.linkTarget !== undefined) {
-                return this.linkTarget.length > 0 ? 'col has-more-info' : 'col';
+            if (this.input.link_url !== null && this.input.link_url !== undefined) {
+                return this.input.link_url.length > 0 ? 'col has-more-info' : 'col';
             }
             return 'col';
         },

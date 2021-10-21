@@ -1,7 +1,7 @@
 <template>
     <div class="form-check">
-        <div class="row">
-            <div class="col-12" v-if="linkTarget && linkTarget.length > 0">
+        <div class="row" v-if="linkTarget && linkTarget.length > 0">
+            <div class="col has-more-info">
                 <a
                     class="float-right sheet-field-info-link"
                     :href="linkTarget"
