@@ -1,7 +1,7 @@
 <template>
     <div
         class="sheets-field-wrapper"
-        :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl}`"
+        :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl} ${hidden_class}`"
     >
         <component
             :is="fieldInput"
@@ -53,6 +53,14 @@ export default {
         },
         md() {
             return this.field.col_md || 12;
+        },
+        hidden_class() {
+            if (this.field.visible !== null && this.field.visible !== undefined) {
+                return this.field.visible.toString() === '0'
+                    ? 'not-visible-field'
+                    : 'visible-field';
+            }
+            return 'visible-field';
         },
         error_messages() {
             const errors = this.$store.getters[`${this.state}/errors_fields`];
@@ -127,5 +135,13 @@ export default {
 
 .tooltip-custom:hover .tooltiptext {
     visibility: visible;
+}
+
+.not-visible-field {
+    display: none;
+    max-width: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
 }
 </style>

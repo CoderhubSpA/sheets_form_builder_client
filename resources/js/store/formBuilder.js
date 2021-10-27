@@ -15,6 +15,44 @@ const DEFAULT_ACTION = {
     text_color: null,
 };
 
+
+const DOCUMENT_EXCEL = {
+    form_field_id: "b69c2ddf-8a8d-11eb-965c-ed7fb50d217e",
+    order: 2,
+    name: "Descuento contrato",
+    permission: 2,
+    form_section_id: "4069f12f-56b8-4ac9-864c-41a4980a547b",
+    required: 0,
+    format: "DOCUMENT[EXCEL]",
+    col_md: 3,
+    col_xl: 3,
+    col_sm: 6,
+    link_url: "https://www.lipsum.com/",
+    link_name: "Más sobre Descuento contrato",
+    description: "Este es el campo de Descuento contrato",
+    show_by_field_id: null,
+    show_by_field_value: null,
+    id: "b34fbc17-89f1-11eb-965c-ed7fb50d217e",
+    column_group_id: null,
+    entity_type_id: "2168fdd5-840f-11eb-965c-ed7fb50d217e",
+    col_name: "contract_discount",
+    entity_type_fk: null,
+    entity_type_permission_fk: null,
+    col_name_fk: null,
+    pivot_table: null,
+    entity_type_pivot_fk: null,
+    default_value: null,
+    col_fk_1_n: null,
+    col_fk_n_1: null,
+    col_fk_filter: null,
+    col_filter_by: null,
+    options: null,
+    created_by: null,
+    width: null,
+    filter: null,
+    color: null,
+    text_color: null
+}
 export default {
     namespaced: true,
     state: () => ({
@@ -219,7 +257,6 @@ export default {
                 Vue.set(state.col_fk_1_n, key, val[key])
             } else {
                 state.col_fk_1_n[key] = val[key];
-                console.log(state.col_fk_1_n[key].includes(val[key]))
             }
         },
         FORM_NAME(state, val) {
@@ -322,6 +359,8 @@ export default {
                             return row;
                         });
                         rows.sort((a, b) => (a.order > b.order ? 1 : -1));
+                        // rows[rows.length - 1].sections[0].fields.push(DOCUMENT_EXCEL)
+
                         const form = {
                             rows,
                             actions: actions.sort((a, b) => (a.save_form > b.save_form ? 1 : -1)),
@@ -446,10 +485,8 @@ export default {
                         'Content-Type': 'multipart/form-data',
                     },
                 };
-                console.log(data.form)
                 axios.post(`/api/sheets/save/file`, data.form, headers)
                     .then((response) => {
-                        console.log(response.data)
                         const id = response.data.content.content.inserted_id;
                         resolve({ id: id, data: data.file });
                     }).catch((error) => {
