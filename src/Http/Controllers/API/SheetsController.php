@@ -43,7 +43,7 @@ class SheetsController extends Controller
         }
     }
 
-    public function index($id, $recordid = null, Request $request)
+    public function index(Request $request, $id, $recordid = null)
     {
         $this->init($request);
 
@@ -60,7 +60,7 @@ class SheetsController extends Controller
         return $response->getBody()->getContents();
     }
 
-    public function getrecord($entityname, $recordid, Request $request)
+    public function getrecord(Request $request, $entityname, $recordid)
     {
         $this->init($request);
 
@@ -74,6 +74,7 @@ class SheetsController extends Controller
 
     public function saveFile(Request $request)
     {
+
         $this->init($request);
 
         try {
@@ -88,7 +89,7 @@ class SheetsController extends Controller
             $this->clientBuilder['headers']["Content-Type"] = "multipart/form-data";
             $client = new GuzzleClient($this->clientBuilder);
 
-            $r = $client->request('POST', $endpoint, [
+            $body = [
                 'multipart' => [
                     [
                         'contents' => file_get_contents($path),
@@ -96,7 +97,15 @@ class SheetsController extends Controller
                         'filename' => $name
                     ]
                 ]
-            ]);
+            ];
+            if ($request['metadata']) {
+                $body['multipart'][] = [
+                    'name' => 'metadata',
+                    'contents' => $request['metadata']
+                ];
+            }
+
+            $r = $client->request('POST', $endpoint, $body);
             $res          = new \stdClass();
             $res->success = $r->getStatusCode() === 200;
             $res->content = json_decode($r->getBody()->getContents());
