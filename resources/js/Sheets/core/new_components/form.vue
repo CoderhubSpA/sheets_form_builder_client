@@ -406,7 +406,7 @@ export default {
         form.append('file', file[1].file);
         form.append('fileid', file[1].id);
         if (file[1].metadata) {
-          form.append('metadata', JSON.stringify({ sheets: file[1].metadata }));
+          form.append('metadata', JSON.stringify({ sheets: [file[1].metadata] }));
           //   form.append('metadata', JSON.stringify({ sheets: file[1].metadata }));
         }
         const data = {
