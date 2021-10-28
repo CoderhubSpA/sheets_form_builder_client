@@ -15,6 +15,9 @@ export default {
             required: true,
         },
     },
+    data: () => ({
+        vmodelcurrentvalue: {},
+    }),
     computed: {
         label() {
             return this.input.name;
@@ -112,6 +115,10 @@ export default {
             this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
             const data = {};
             data[this.id] = e.target.value;
+
+            // eslint-disable-next-line no-undef
+            this.vmodelcurrentvalue = data;
+
             this.$emit('input', data);
             /**
              * mostrar/ocultar section

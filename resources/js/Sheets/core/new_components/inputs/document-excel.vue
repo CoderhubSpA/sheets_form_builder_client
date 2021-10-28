@@ -1,13 +1,5 @@
 <template>
   <div>
-    <v-select
-      label="name"
-      :id="id"
-      :options="options"
-      :disabled="disabled"
-      v-model="selected"
-      :multiple="multiple"
-    />
     <file-template :label="label" :id="id" :required="required" :placeholder="ph">
       <input
         type="file"
@@ -18,6 +10,17 @@
         @change="onChange"
       />
     </file-template>
+    <div class="form-group">
+      <label :for="id"> Página del Excel </label>
+      <v-select
+        label="name"
+        :id="id"
+        :options="options"
+        :disabled="disabled"
+        v-model="selected"
+        :multiple="multiple"
+      />
+    </div>
   </div>
 </template>
 
@@ -45,7 +48,7 @@ export default {
       return this.options.length < 1;
     },
     multiple() {
-      return true;
+      return false;
     },
   },
   watch: {
@@ -56,7 +59,7 @@ export default {
     },
     selected(val) {
       const data = {};
-      data[this.id] = val.map((v) => v.id);
+      data[this.id] = val.id;
       this.$emit('input', data);
       //
       const store = { id: this.id, file: this.file, metadata: data[this.id] };
