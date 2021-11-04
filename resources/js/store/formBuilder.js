@@ -15,27 +15,27 @@ const DEFAULT_ACTION = {
     text_color: null,
 };
 
-
+// eslint-disable-next-line no-unused-vars
 const DOCUMENT_EXCEL = {
-    form_field_id: "b69c2ddf-8a8d-11eb-965c-ed7fb50d217e",
+    form_field_id: 'b69c2ddf-8a8d-11eb-965c-ed7fb50d217e',
     order: 2,
-    name: "Descuento contrato",
+    name: 'Descuento contrato',
     permission: 2,
-    form_section_id: "4069f12f-56b8-4ac9-864c-41a4980a547b",
+    form_section_id: '4069f12f-56b8-4ac9-864c-41a4980a547b',
     required: 0,
-    format: "DOCUMENT[EXCEL]",
+    format: 'DOCUMENT[EXCEL]',
     col_md: 3,
     col_xl: 3,
     col_sm: 6,
-    link_url: "https://www.lipsum.com/",
-    link_name: "Más sobre Descuento contrato",
-    description: "Este es el campo de Descuento contrato",
+    link_url: 'https://www.lipsum.com/',
+    link_name: 'Más sobre Descuento contrato',
+    description: 'Este es el campo de Descuento contrato',
     show_by_field_id: null,
     show_by_field_value: null,
-    id: "b34fbc17-89f1-11eb-965c-ed7fb50d217e",
+    id: 'b34fbc17-89f1-11eb-965c-ed7fb50d217e',
     column_group_id: null,
-    entity_type_id: "2168fdd5-840f-11eb-965c-ed7fb50d217e",
-    col_name: "contract_discount",
+    entity_type_id: '2168fdd5-840f-11eb-965c-ed7fb50d217e',
+    col_name: 'contract_discount',
     entity_type_fk: null,
     entity_type_permission_fk: null,
     col_name_fk: null,
@@ -51,8 +51,8 @@ const DOCUMENT_EXCEL = {
     width: null,
     filter: null,
     color: null,
-    text_color: null
-}
+    text_color: null,
+};
 export default {
     namespaced: true,
     state: () => ({
@@ -108,7 +108,7 @@ export default {
          * segun el valor de otro campo
          */
         field_show_hide: {},
-        base_url: ''
+        base_url: '',
     }),
     getters: {
         loading: (state) => state.loading,
@@ -159,7 +159,7 @@ export default {
          */
         field_show_hide: (state) => state.field_show_hide,
         // url base
-        base_url: (state) => state.base_url
+        base_url: (state) => state.base_url,
     },
     mutations: {
         LOADING(state, val) {
@@ -194,7 +194,7 @@ export default {
             state.files[val.id] = val;
         },
         FIELDS(state, val) {
-            Vue.set(state.fields, state.fields.length, val)
+            Vue.set(state.fields, state.fields.length, val);
             // state.fields.push(val);
 
             // const newKey = Object.keys(val)[0];
@@ -252,15 +252,15 @@ export default {
             state.name = val;
         },
         COL_FK_1_N_COMMON(state, val) {
-            const key = Object.keys(val)[0]
+            const key = Object.keys(val)[0];
             if (!state.col_fk_1_n[key]) {
-                Vue.set(state.col_fk_1_n, key, val[key])
+                Vue.set(state.col_fk_1_n, key, val[key]);
             } else {
                 state.col_fk_1_n[key] = val[key];
             }
         },
         FORM_NAME(state, val) {
-            state.form_name = val
+            state.form_name = val;
         },
         /**
          * Registra el Objeto en forma {id: value}
@@ -270,19 +270,19 @@ export default {
          */
         FIELD_SECTION_SHOW_HIDE(state, val) {
             if (val) {
-                const key = Object.keys(val)
-                Vue.set(state.field_section_show_hide, key, val[key])
+                const key = Object.keys(val);
+                Vue.set(state.field_section_show_hide, key, val[key]);
             }
         },
         FIELD_SHOW_HIDE(state, val) {
             if (val) {
-                const key = Object.keys(val)
-                Vue.set(state.field_show_hide, key, val[key])
+                const key = Object.keys(val);
+                Vue.set(state.field_show_hide, key, val[key]);
             }
         },
         BASE_URL(state, val) {
-            state.base_url = val
-        }
+            state.base_url = val;
+        },
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -291,9 +291,9 @@ export default {
             const { id } = payload;
             const { params } = payload;
             const { recordid } = payload;
-            let record = {
+            const record = {
                 entity_name: '',
-                id: recordid
+                id: recordid,
             };
             const URL = recordid ? `/api/sheets/form/${id}/${recordid}` : `/api/sheets/form/${id}`;
             // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
@@ -304,7 +304,7 @@ export default {
                         const data = response.data.content;
 
                         // asignacion del titulo de formulario
-                        commit('FORM_NAME', data.name)
+                        commit('FORM_NAME', data.name);
                         commit('RAW', data);
                         // const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
                         let actions = [];
@@ -329,7 +329,7 @@ export default {
                         commit('ENTITY_ID', data.entity_type_id);
 
                         commit('ENTITY_NAME', data.entity_type_name);
-                        record.entity_name = data.entity_type_name
+                        record.entity_name = data.entity_type_name;
                         commit('DEFAULT_FORM', data.default === 1);
                         commit('NAME', data.name);
 
@@ -374,8 +374,7 @@ export default {
                         if (content) {
                             dispatch('info', content.entity_type_id);
 
-                            if (record.id)
-                                dispatch('get_record', record)
+                            if (record.id) dispatch('get_record', record);
                         }
                     })
                     .catch((error) => {
@@ -485,11 +484,13 @@ export default {
                         'Content-Type': 'multipart/form-data',
                     },
                 };
-                axios.post(`/api/sheets/save/file`, data.form, headers)
+                axios
+                    .post(`/api/sheets/save/file`, data.form, headers)
                     .then((response) => {
                         const id = response.data.content.content.inserted_id;
-                        resolve({ id: id, data: data.file });
-                    }).catch((error) => {
+                        resolve({ id, data: data.file });
+                    })
+                    .catch((error) => {
                         reject(error);
                     })
                     .finally(() => {

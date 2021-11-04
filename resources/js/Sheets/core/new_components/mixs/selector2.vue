@@ -18,6 +18,10 @@ export default {
          * formulario anidado
          */
         inserted: '',
+        /**
+         * Descriptor del estado acutal del vmodel para unit test
+         */
+        selectorvmodelsample: null,
     }),
     computed: {
         /**
@@ -121,9 +125,12 @@ export default {
         },
         show_field() {
             const fields = this.$store.getters[`${this.state}/field_show_hide`];
+            // eslint-disable-next-line camelcase
             let show_field = false;
             if (this.show_by_field_id) {
+                // eslint-disable-next-line eqeqeq
                 if ((fields[this.show_by_field_id] || false) == this.show_by_field_value) {
+                    // eslint-disable-next-line camelcase
                     show_field = true;
                 }
                 try {
@@ -135,12 +142,16 @@ export default {
                             .map((d) => d.id)
                             .includes(this.show_by_field_value)
                     ) {
+                        // eslint-disable-next-line camelcase, no-undef
                         show_section = true;
                     }
                 } catch (e) {
+                    // eslint-disable-next-line no-console
                     console.warn(e);
                 }
+                // eslint-disable-next-line camelcase
             } else show_field = true;
+            // eslint-disable-next-line camelcase
             return show_field;
         },
     },
@@ -161,16 +172,20 @@ export default {
                     data[this.id] = val.id;
                 }
 
+                // eslint-disable-next-line prefer-object-spread
+                this.selectorvmodelsample = Object.assign({}, data);
                 this.$emit('input', data);
                 /**
                  * mostrar/ocultar section
                  */
+                // eslint-disable-next-line camelcase
                 const field_section_show_hide = {};
                 field_section_show_hide[this.form_field_id] = data[this.id];
                 this.$store.commit(
                     `${this.state}/FIELD_SECTION_SHOW_HIDE`,
                     field_section_show_hide
                 );
+                // eslint-disable-next-line camelcase
                 const field_show_hide = {};
                 field_show_hide[this.form_field_id] = data[this.id];
                 this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
@@ -183,6 +198,7 @@ export default {
             /**
              * Manejo del observador
              */
+            // eslint-disable-next-line func-names, object-shorthand
             handler: function (val) {
                 // console.log(this.input.format, this.input.name, val);
                 if (val) this.selected = val;
@@ -212,9 +228,13 @@ export default {
             }
         },
     },
+    mounted() {
+        // console.log('selector', this.input);
+    },
     methods: {
         createdOption(id) {
             const optionToSelect = this.options.find((option) => option.id === id);
+            // eslint-disable-next-line no-console
             console.log(this.selected, optionToSelect);
             if (this.multiple) {
                 if (this.selected) this.selected.push(optionToSelect);

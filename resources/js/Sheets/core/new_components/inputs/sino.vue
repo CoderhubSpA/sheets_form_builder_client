@@ -74,6 +74,7 @@ export default {
         onInput(e) {
             const data = {};
             data[this.id] = e.target.checked;
+            this.vmodelcurrentvalue = data;
             const dataToSelectorFilters = {
                 key: this.input.col_name,
                 value: data[this.id].toString(),
@@ -83,12 +84,14 @@ export default {
             /**
              * mostrar/ocultar section
              */
+            // eslint-disable-next-line camelcase
             const field_section_show_hide = {};
             field_section_show_hide[this.form_field_id] = data[this.id];
             this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
             /**
              * mostrar/ocultar field
              */
+            // eslint-disable-next-line camelcase
             const field_show_hide = {};
             field_show_hide[this.form_field_id] = data[this.id];
             this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);

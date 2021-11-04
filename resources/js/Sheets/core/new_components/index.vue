@@ -1,7 +1,5 @@
 <template>
-    <div>
-        root
-    </div>
+    <div>root</div>
 </template>
 
 <script>
@@ -9,16 +7,14 @@ export default {
     props: {
         id: {
             type: String,
-            require: true
+            require: true,
         },
         record_id: {
             type: String,
-            default: ''
-        }
-    }
-}
+            default: '',
+        },
+    },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

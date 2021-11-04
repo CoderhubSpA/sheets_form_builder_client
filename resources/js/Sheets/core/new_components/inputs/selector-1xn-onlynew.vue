@@ -1,32 +1,32 @@
 <template>
-  <div>
-    <form-group
-      :id="id"
-      :label="label"
-      :required="required"
-      :linkTarget="this.input.link_url"
-      :linkDescription="this.input.link_name"
-      :tooltipInfo="this.input.description"
-      v-if="show_field"
-    >
-      <v-select
-        label="name"
-        :id="id"
-        :options="options"
-        :no-drop="true"
-        :multiple="multiple"
-        v-model="selected"
-        @option:deselected="deselected"
-      >
-      </v-select>
-      <nested-form
-        v-if="has_entity_type_permission_fk"
-        :entity_type_permission_fk="entity_type_permission_fk"
-        :state="state"
-        @inserted="createdOption"
-      />
-    </form-group>
-  </div>
+    <div>
+        <form-group
+            :id="id"
+            :label="label"
+            :required="required"
+            :linkTarget="this.input.link_url"
+            :linkDescription="this.input.link_name"
+            :tooltipInfo="this.input.description"
+            v-if="show_field"
+        >
+            <v-select
+                label="name"
+                :id="id"
+                :options="options"
+                :no-drop="true"
+                :multiple="multiple"
+                v-model="selected"
+                @option:deselected="deselected"
+            >
+            </v-select>
+            <nested-form
+                v-if="has_entity_type_permission_fk"
+                :entity_type_permission_fk="entity_type_permission_fk"
+                :state="state"
+                @inserted="createdOption"
+            />
+        </form-group>
+    </div>
 </template>
 
 <script>
@@ -36,25 +36,25 @@ import FormGroup from '../templates/form-group.vue';
 import NestedForm from '../nested.vue';
 
 export default {
-  components: {
-    FormGroup,
-    NestedForm,
-  },
-  mixins: [mix, mixSelector],
-  data: () => ({
-    selected: [],
-  }),
-  computed: {
-    multiple() {
-      return true;
+    components: {
+        FormGroup,
+        NestedForm,
     },
-  },
-  methods: {
-    deselected(val) {
-      const item = this.selected.find((option) => option.id === val.id);
-      const index = this.selected.indexOf(item);
-      this.selected.splice(index, 1);
+    mixins: [mix, mixSelector],
+    data: () => ({
+        selected: [],
+    }),
+    computed: {
+        multiple() {
+            return true;
+        },
     },
-  },
+    methods: {
+        deselected(val) {
+            const item = this.selected.find((option) => option.id === val.id);
+            const index = this.selected.indexOf(item);
+            this.selected.splice(index, 1);
+        },
+    },
 };
 </script>

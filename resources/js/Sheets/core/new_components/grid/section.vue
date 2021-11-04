@@ -90,7 +90,7 @@ export default {
             // eslint-disable-next-line camelcase
             let show_section = false;
             // eslint-disable-next-line no-console
-            console.log(this.section.name, fields[this.show_by_field_id]);
+            console.log(`section.vue ${this.section.name}`, fields[this.show_by_field_id]);
             if (this.show_by_field_id) {
                 // eslint-disable-next-line eqeqeq
                 if ((fields[this.show_by_field_id] || false) == this.show_by_field_value) {

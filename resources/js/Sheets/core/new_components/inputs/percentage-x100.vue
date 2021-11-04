@@ -10,6 +10,7 @@
     >
         <input
             type="number"
+            :id="id"
             class="form-control"
             aria-label="Username"
             aria-describedby="basic-addon1"
@@ -40,6 +41,7 @@ export default {
                     /**
                      * mostrar/ocultar section
                      */
+                    // eslint-disable-next-line camelcase
                     const field_section_show_hide = {};
                     field_section_show_hide[this.form_field_id] = val;
                     this.$store.commit(
@@ -56,6 +58,7 @@ export default {
         onInput(e) {
             const data = {};
             data[this.id] = parseFloat(e.target.value) / 100;
+            this.vmodelcurrentvalue = data;
             const dataToSelectorFilters = {
                 key: this.input.col_name,
                 value: data[this.id].toString(),

@@ -10,6 +10,7 @@
     >
         <input
             type="number"
+            :id="id"
             class="form-control"
             aria-label="Username"
             aria-describedby="basic-addon1"

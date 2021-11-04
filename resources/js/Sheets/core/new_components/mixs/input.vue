@@ -16,6 +16,7 @@ export default {
         },
     },
     data: () => ({
+        // VERIFICACIÓN DEL MODEL PARA LOS TEST
         vmodelcurrentvalue: {},
     }),
     computed: {
@@ -116,7 +117,6 @@ export default {
             const data = {};
             data[this.id] = e.target.value;
 
-            // eslint-disable-next-line no-undef
             this.vmodelcurrentvalue = data;
 
             this.$emit('input', data);
