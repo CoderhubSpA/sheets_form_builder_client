@@ -15,11 +15,11 @@ class SheetsController extends Controller
 
     public function init(Request $request)
     {
-        $bearer = config('formbuilder.bearer');
+        $bearer   = config('formbuilder.bearer');
         $external = config('formbuilder.external');
-        $base_uri = config('formbuilder.api_url');
-        if ($external || !Auth::user()) {
+        if ($external && !Auth::user()) {
 
+            $base_uri = config('formbuilder.api_url');
             $this->clientBuilder = [
                 'http_errors' => false,
                 'verify' => false,
@@ -32,10 +32,12 @@ class SheetsController extends Controller
             ];
         } else {
 
+            $base_uri = (config('formbuilder.base_url'))?config('formbuilder.base_url'):url('');
+            
             $this->clientBuilder = [
                 'http_errors' => false,
                 'verify' => false,
-                'base_uri' => url(''),
+                'base_uri' => $base_uri,
             ];
             $this->clientBuilder['headers'] = collect($request->header())->transform(function ($item) {
                 return $item[0];
