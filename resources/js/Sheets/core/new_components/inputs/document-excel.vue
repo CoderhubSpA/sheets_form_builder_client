@@ -10,7 +10,7 @@
         @change="onChange"
       />
     </file-template>
-    <div class="form-group">
+    <div class="form-group" v-if="can_select_sheets">
       <label :for="id"> Página del Excel </label>
       <v-select
         label="name"
@@ -39,10 +39,12 @@ export default {
     file: null,
     options: [],
     ph: '',
+    can_select_sheets: true,
+    extension: '',
   }),
   computed: {
     accept() {
-      return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      return '.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,vnd.ms-excel';
     },
     disabled() {
       return this.options.length < 1;
@@ -54,19 +56,20 @@ export default {
   watch: {
     file(val) {
       if (val) {
-        this.handleImport();
+        if (this.extension === 'xlsx') {
+          this.handleImport();
+        }
       }
     },
     selected(val) {
-      const data = {};
-      data[this.id] = val.id;
-      this.$emit('input', data);
-      //
-      const store = { id: this.id, file: this.file, metadata: data[this.id] };
+      if (val) {
+        const data = {};
+        data[this.id] = val.id;
+        this.$emit('input', data);
 
-      //   if (this.input.permission === 2) {
-      this.$store.commit(`${this.state}/FILES`, store);
-      //   }
+        const store = { id: this.id, file: this.file, metadata: data[this.id] };
+        this.$store.commit(`${this.state}/FILES`, store);
+      }
     },
   },
   methods: {
@@ -81,12 +84,20 @@ export default {
           this.options = workbook.worksheets.map((sheet) => {
             return { id: sheet.name, name: sheet.name };
           });
+
           this.selected.push(this.options[0]);
         });
       };
     },
     onChange(event) {
       const f = event.target.files[0];
+      const splited = f.name.split('.');
+      this.extension = splited[splited.length - 1];
+      this.options = [];
+      if (this.extension !== 'xlsx') {
+        this.can_select_sheets = false;
+        this.selected = [];
+      } else this.can_select_sheets = true;
       this.file = f;
       if (event.target.files.lenght > 1) {
         this.ph = `${event.target.files.lenght} archivos seleccionados`;
