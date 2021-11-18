@@ -3,16 +3,16 @@ export default {
     props: {
         label: {
             type: String,
-            default: ''
+            default: '',
         },
         id: {
             type: String,
-            default: ''
+            default: '',
         },
         required: {
             type: Boolean,
-            default: false
-        }
-    }
-}
+            default: false,
+        },
+    },
+};
 </script>

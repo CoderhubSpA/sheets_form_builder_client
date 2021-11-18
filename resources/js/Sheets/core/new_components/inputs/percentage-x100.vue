@@ -57,7 +57,11 @@ export default {
     methods: {
         onInput(e) {
             const data = {};
-            data[this.id] = parseFloat(e.target.value) / 100;
+            if (Number.isNaN(parseFloat(e.target.value))) {
+                data[this.id] = '';
+            } else {
+                data[this.id] = parseFloat(e.target.value) / 100;
+            }
             this.vmodelcurrentvalue = data;
             const dataToSelectorFilters = {
                 key: this.input.col_name,
