@@ -31,6 +31,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-object-spread */
+/* eslint-disable array-callback-return */
 import mix from '../mixs/input.vue';
 import mixSelector from '../mixs/selector2.vue';
 import FormGroup from '../templates/form-group.vue';
@@ -84,6 +85,7 @@ export default {
         },
         options() {
             let options = [];
+            let returnOptions = [];
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
 
             // eslint-disable-next-line no-unused-vars
@@ -112,7 +114,14 @@ export default {
                     (o) => col_fk_1_n_common[this.input.col_fk_1_n].indexOf(o) < 0
                 );
             }
-            return options;
+            if (this.input.col_name_fk !== null) {
+                options.map((opt) => {
+                    returnOptions.push({ id: opt.id, name: opt[this.input.col_name_fk] });
+                });
+            } else {
+                returnOptions = [...options];
+            }
+            return returnOptions;
         },
     },
     watch: {

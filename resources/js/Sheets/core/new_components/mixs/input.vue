@@ -18,6 +18,13 @@ export default {
     data: () => ({
         // VERIFICACIÓN DEL MODEL PARA LOS TEST
         vmodelcurrentvalue: {},
+        maxlengths: {
+            URL: 250,
+            EMAIL: 250,
+            PASSWORD: 250,
+            RUT: 250,
+            TEXT: 250,
+        },
     }),
     computed: {
         label() {
@@ -109,13 +116,29 @@ export default {
             this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
         },
         onInput(e) {
+            const formatWithMaxLength = Object.keys(this.maxlengths);
+            let valueParsed;
+            if (formatWithMaxLength.indexOf(this.input.format) > -1) {
+                valueParsed = e.target.value.substring(0, this.maxlengths[this.input.format]);
+            } else if (this.input.format === 'TEXT[AREA]') {
+                valueParsed = e.target.value.substring(0, 1000);
+            } else {
+                valueParsed = e.target.value;
+            }
+
+            if (this.input.format === 'EMAIL') {
+                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(valueParsed)) {
+                    this.$emit('input', '');
+                    valueParsed = '';
+                }
+            }
             const dataToSelectorFilters = {
                 key: this.input.col_name,
-                value: e.target.value,
+                value: valueParsed,
             };
             this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
             const data = {};
-            data[this.id] = e.target.value;
+            data[this.id] = valueParsed;
 
             this.vmodelcurrentvalue = data;
 
@@ -125,14 +148,14 @@ export default {
              */
             // eslint-disable-next-line camelcase
             const field_section_show_hide = {};
-            field_section_show_hide[this.form_field_id] = e.target.value;
+            field_section_show_hide[this.form_field_id] = valueParsed;
             this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
             /**
              * mostrar/ocultar field
              */
             // eslint-disable-next-line camelcase
             const field_show_hide = {};
-            field_show_hide[this.form_field_id] = e.target.value;
+            field_show_hide[this.form_field_id] = valueParsed;
             this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
         },
         // evitar pegado de informacion en el componente

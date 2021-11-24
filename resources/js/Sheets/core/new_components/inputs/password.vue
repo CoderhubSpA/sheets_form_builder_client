@@ -8,7 +8,14 @@
         :tooltipInfo="this.input.description"
         v-if="show_field"
     >
-        <input type="password" :id="id" :value="inputValue" @input="onInput" class="form-control" />
+        <input
+            type="password"
+            :id="id"
+            :value="inputValue"
+            @input="onInput"
+            class="form-control"
+            maxlength="250"
+        />
     </form-group>
 </template>
 

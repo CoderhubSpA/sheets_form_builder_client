@@ -15,6 +15,7 @@
             :value="inputValue"
             :disabled="disabled"
             @input="onInput"
+            maxlength="1000"
         >
         </textarea>
     </form-group>

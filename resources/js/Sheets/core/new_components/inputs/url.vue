@@ -16,6 +16,7 @@
             :disabled="disabled"
             @input="onInput"
             class="form-control"
+            maxlength="250"
         />
     </form-group>
 </template>
