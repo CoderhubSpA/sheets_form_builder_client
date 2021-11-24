@@ -42,71 +42,6 @@ export default {
       type: String,
       require: true,
     },
-<<<<<<< HEAD
-  },
-  data: () => ({
-    sectionModel: [],
-  }),
-  watch: {
-    sectionModel() {
-      this.$emit('input', this.sectionModel);
-    },
-  },
-  computed: {
-    id() {
-      return this.section.id;
-    },
-    name() {
-      return this.section.name;
-    },
-    sm() {
-      return `col-sm-${this.section.col_sm}`;
-    },
-    md() {
-      return `col-md-${this.section.col_md}`;
-    },
-    xl() {
-      return `col-xl-${this.section.col_xl}`;
-    },
-    fields() {
-      return this.section.fields || [];
-    },
-    img() {
-      let path = '';
-      if (this.section.image) {
-        const url = `${window.location.protocol}//${window.location.host}/`;
-        // eslint-disable-next-line camelcase
-        const base_url = this.$store.getters[`${this.state}/base_url`] || url;
-        path = new URL(this.section.image, base_url).toString();
-      }
-      return path;
-    },
-    show_by_field_id() {
-      return this.section.show_by_field_id;
-    },
-    show_by_field_value() {
-      return this.section.show_by_field_value;
-    },
-    show_section() {
-      const fields = this.$store.getters[`${this.state}/field_section_show_hide`];
-      // eslint-disable-next-line camelcase
-      let show_section = false;
-      // eslint-disable-next-line no-console
-      console.log(`section.vue ${this.section.name}`, fields[this.show_by_field_id]);
-      if (this.show_by_field_id) {
-        // eslint-disable-next-line eqeqeq
-        if ((fields[this.show_by_field_id] || false) == this.show_by_field_value) {
-          // eslint-disable-next-line camelcase
-          show_section = true;
-        }
-        try {
-          // Permite validar si entre un selector multiple existe el
-          // valor que condiciona que el elemento se vea o no
-          if (
-            Array.isArray(fields[this.show_by_field_id]) &&
-            fields[this.show_by_field_id].map((d) => d.id).includes(this.show_by_field_value)
-          ) {
-=======
     computed: {
         id() {
             return this.section.id;
@@ -170,7 +105,6 @@ export default {
                 }
                 // eslint-disable-next-line camelcase
             } else show_section = true;
->>>>>>> f65245759cedeec8f70c49e439986ac0093d3550
             // eslint-disable-next-line camelcase
             show_section = true;
           }
