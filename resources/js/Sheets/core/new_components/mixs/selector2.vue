@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable camelcase */
 export default {
     /**
      * las props: input, state y value
@@ -152,6 +153,7 @@ export default {
                 // eslint-disable-next-line camelcase
             } else show_field = true;
             // eslint-disable-next-line camelcase
+            this.$emit('tooglefield', show_field);
             return show_field;
         },
     },

@@ -7,6 +7,7 @@
                 :record_id="record_id"
                 :params="params"
                 :base_url="base_url"
+                :is_test="form_test"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true">
@@ -16,9 +17,11 @@
 </template>
 
 <script>
+/* eslint-disable no-console */
 import SheetsForm from '../new_components/form.vue';
 import SheetsPollRender from './poll/render.vue';
 import LoadingMessage from './loading-message.vue';
+import FormTestJson from '../../resources/formtestjson.json';
 
 export default {
     components: {
@@ -44,6 +47,10 @@ export default {
             type: String,
             default: '',
         },
+        form_test: {
+            type: String,
+            default: 'false',
+        },
     },
 
     data: () => ({
@@ -52,44 +59,74 @@ export default {
     }),
     mounted() {
         this.loading = true;
-        this.$store
-            .dispatch('form/get_form', {
-                id: this.id,
-                recordid: this.record_id,
-                params: this.params,
-            })
-            .then((response) => {
-                this.loading = false;
-                if (response.poll === 1) {
-                    this.isPoll = true;
-                    this.$store
-                        .dispatch('poll/load_poll', response.fullResponse.data)
-                        .then(() => {
-                            this.loading = false;
-                        })
-                        .catch((err) => {
-                            // eslint-disable-next-line no-console
-                            console.error('error cargando formulario', err);
-                        });
-                } else {
+        console.log('is test', this.form_test);
+        console.log('json', FormTestJson);
+        if (this.form_test === 'false') {
+            this.$store
+                .dispatch('form/get_form', {
+                    id: this.id,
+                    recordid: this.record_id,
+                    params: this.params,
+                })
+                .then((response) => {
+                    this.loading = false;
+                    if (response.poll === 1) {
+                        this.isPoll = true;
+                        this.$store
+                            .dispatch('poll/load_poll', response.fullResponse.data)
+                            .then(() => {
+                                this.loading = false;
+                            })
+                            .catch((err) => {
+                                // eslint-disable-next-line no-console
+                                console.error('error cargando formulario', err);
+                            });
+                    } else {
+                        this.isPoll = false;
+                        this.$store
+                            .dispatch('form/load_form', response.fullResponse.data)
+                            .then(() => {
+                                this.loading = false;
+                            })
+                            .catch((err) => {
+                                // eslint-disable-next-line no-console
+                                console.error('error cargando formulario', err);
+                            });
+                    }
+                })
+                .catch((err) => {
+                    this.loading = false;
                     this.isPoll = false;
-                    this.$store
-                        .dispatch('form/load_form', response.fullResponse.data)
-                        .then(() => {
-                            this.loading = false;
-                        })
-                        .catch((err) => {
-                            // eslint-disable-next-line no-console
-                            console.error('error cargando formulario', err);
-                        });
-                }
-            })
-            .catch((err) => {
-                this.loading = false;
+                    // eslint-disable-next-line no-console
+                    console.log('error', err);
+                });
+        } else {
+            this.loading = false;
+            const response = FormTestJson;
+            if (response.poll === 1) {
+                this.isPoll = true;
+                this.$store
+                    .dispatch('poll/load_poll', response.fullResponse.data)
+                    .then(() => {
+                        this.loading = false;
+                    })
+                    .catch((err) => {
+                        // eslint-disable-next-line no-console
+                        console.error('error cargando formulario', err);
+                    });
+            } else {
                 this.isPoll = false;
-                // eslint-disable-next-line no-console
-                console.log('error', err);
-            });
+                this.$store
+                    .dispatch('form/load_form', response.fullResponse.data)
+                    .then(() => {
+                        this.loading = false;
+                    })
+                    .catch((err) => {
+                        // eslint-disable-next-line no-console
+                        console.error('error cargando formulario', err);
+                    });
+            }
+        }
     },
     computed: {},
 };

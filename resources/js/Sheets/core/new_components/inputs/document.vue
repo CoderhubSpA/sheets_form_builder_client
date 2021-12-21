@@ -18,6 +18,11 @@
             @input="onInput"
             @change="onChange"
         />
+        <div class="row" v-if="this.input.default_value !== null">
+            <div class="col">
+                <p class="input-placeholder">{{ this.input.default_value }}</p>
+            </div>
+        </div>
     </file-template>
 </template>
 

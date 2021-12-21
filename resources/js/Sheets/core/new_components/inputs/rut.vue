@@ -12,6 +12,7 @@
             type="text"
             :id="id"
             :value="inputValue"
+            :placeholder="this.input.default_value"
             @input="onInput"
             class="form-control"
             maxlength="250"

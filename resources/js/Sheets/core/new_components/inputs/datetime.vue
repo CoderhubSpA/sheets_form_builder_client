@@ -14,6 +14,7 @@
             :hour-step="hourStep"
             :minute-step="minuteStep"
             :secondStep="secondStep"
+            :placeholder="this.input.default_value"
             @input="onInput"
             v-model="picker"
         ></date-picker>

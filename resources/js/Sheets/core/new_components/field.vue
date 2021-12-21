@@ -8,6 +8,7 @@
             :input="field"
             v-model="data"
             @poll-entry="handlePollEntry($event, field.id, field.col_name)"
+            @tooglefield="handleToogleField"
             disabled
             :state="state"
         >
@@ -38,6 +39,7 @@ export default {
     },
     data: () => ({
         data: {},
+        hidden_class: 'visible-field',
     }),
     computed: {
         fieldInput() {
@@ -53,14 +55,6 @@ export default {
         },
         md() {
             return this.field.col_md || 12;
-        },
-        hidden_class() {
-            if (this.field.visible !== null && this.field.visible !== undefined) {
-                return this.field.visible.toString() === '0'
-                    ? 'not-visible-field'
-                    : 'visible-field';
-            }
-            return 'visible-field';
         },
         error_messages() {
             const errors = this.$store.getters[`${this.state}/errors_fields`];
@@ -90,6 +84,13 @@ export default {
     methods: {
         handlePollEntry(val, id, colName) {
             this.$emit('sheets-input-change', val, id, colName);
+        },
+        handleToogleField(hide) {
+            if (hide) {
+                this.hidden_class = 'visible-field';
+            } else {
+                this.hidden_class = 'not-visible-field';
+            }
         },
     },
 };

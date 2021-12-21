@@ -14,6 +14,7 @@
             class="form-control"
             aria-label="Username"
             aria-describedby="basic-addon1"
+            :placeholder="this.input.default_value"
             :value="inputValue"
             @input="onInput"
             @paste="onPaste"

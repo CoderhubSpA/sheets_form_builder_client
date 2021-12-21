@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import axios from 'axios';
@@ -383,6 +385,70 @@ export default {
                     .finally(() => {
                         commit('LOADING', false);
                     });
+            });
+        },
+        async get_mock({ commit, dispatch }, payload) {
+            commit('LOADING', true);
+            const { response, contentinfo } = payload;
+            const { recordid } = payload;
+            const record = {
+                entity_name: '',
+                id: recordid,
+            };
+            return new Promise((resolve, reject) => {
+                const data = response.data.content;
+                commit('FORM_NAME', data.name);
+                commit('RAW', data);
+
+                let actions = [];
+                if (data.actions.length > 0) {
+                    actions = data.actions.filter((action) => action.valid !== 0);
+                } else {
+                    actions = [DEFAULT_ACTION];
+                }
+
+                commit('FORM_ID', data.id);
+
+                commit('ENTITY_ID', data.entity_type_id);
+
+                commit('ENTITY_NAME', data.entity_type_name);
+                record.entity_name = data.entity_type_name;
+                commit('DEFAULT_FORM', data.default === 1);
+                commit('NAME', data.name);
+
+                const rows = data.rows.map((row) => {
+                    const sections = data.sections.filter((sect) => sect.form_row_id === row.id);
+
+                    sections.sort((a, b) => (a.order > b.order ? 1 : -1));
+
+                    sections.forEach((section) => {
+                        let fields = [];
+                        if (Array.isArray(data.fields)) {
+                            fields = data.fields.filter(
+                                (f) =>
+                                    f.form_section_id === section.id &&
+                                    (f.permission !== 0 || (data.default && f.permission === 0))
+                            );
+                        } else {
+                            fields = [...data.fields];
+                        }
+                        fields.sort((a, b) => (a.order > b.order ? 1 : -1));
+                        section.fields = fields;
+                    });
+                    row.sections = sections;
+                    return row;
+                });
+                rows.sort((a, b) => (a.order > b.order ? 1 : -1));
+
+                const form = {
+                    rows,
+                    actions: actions.sort((a, b) => (a.save_form > b.save_form ? 1 : -1)),
+                    success: response.data.success,
+                    message: response.data.message,
+                };
+                commit('CONTENT_INFO', contentinfo.data.content);
+                commit('LOADING', false);
+                resolve(form);
             });
         },
         update({ commit }, data) {

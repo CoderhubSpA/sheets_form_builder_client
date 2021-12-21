@@ -25,6 +25,13 @@
                 :state="state"
                 @inserted="createdOption"
             />
+            <div class="row" v-if="this.input.default_value !== null">
+                <div class="col">
+                    <p class="input-placeholder">
+                        {{ this.input.default_value || `Placeholder: ${this.input.format}` }}
+                    </p>
+                </div>
+            </div>
         </form-group>
     </div>
 </template>

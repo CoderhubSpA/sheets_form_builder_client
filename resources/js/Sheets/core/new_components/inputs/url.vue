@@ -15,6 +15,7 @@
             :value="inputValue"
             :disabled="disabled"
             @input="onInput"
+            :placeholder="this.input.default_value"
             class="form-control"
             maxlength="250"
         />

@@ -36,6 +36,8 @@ import Action from './actions/button.vue';
 import Snackbar from './utils/snackbar.vue';
 import FormBuilderStore from '../../../store/formBuilder';
 import registerStore from './utils/reusabale-store';
+import FormBuilderResponseTest from '../../resources/formbuildertest.json';
+import FormBuilderEntityInfoTest from '../../resources/entityinfotest.json';
 
 export default {
     name: 'sheets-form',
@@ -66,6 +68,10 @@ export default {
         base_url: {
             type: String,
             default: '',
+        },
+        is_test: {
+            type: String,
+            default: 'false',
         },
     },
     components: {
@@ -159,34 +165,69 @@ export default {
             }
         },
         initForm() {
-            this.$store
-                .dispatch(`${this.namespace}/get`, {
-                    id: this.entityId,
-                    recordid: this.record_id,
-                    params: this.params,
-                })
-                .then((form) => {
-                    if (form.success) {
-                        this.formRows = form.rows;
-                        this.formActions = form.actions;
-                    } else {
+            if (this.is_test === 'false') {
+                this.$store
+                    .dispatch(`${this.namespace}/get`, {
+                        id: this.entityId,
+                        recordid: this.record_id,
+                        params: this.params,
+                    })
+                    .then((form) => {
+                        if (form.success) {
+                            this.formRows = form.rows;
+                            this.formActions = form.actions;
+                        } else {
+                            this.snackbar = {
+                                message: form.message,
+                                success: form.success,
+                                show: true,
+                            };
+                        }
+                    })
+                    .then(() => {
+                        // this.get_record();
+                    })
+                    .catch((error) => {
                         this.snackbar = {
-                            message: form.message,
-                            success: form.success,
+                            message: error.message,
+                            success: false,
                             show: true,
                         };
-                    }
-                })
-                .then(() => {
-                    // this.get_record();
-                })
-                .catch((error) => {
-                    this.snackbar = {
-                        message: error.message,
-                        success: false,
-                        show: true,
-                    };
-                });
+                    });
+            } else {
+                const responseTest = FormBuilderResponseTest;
+                const entityinfoTest = FormBuilderEntityInfoTest;
+                this.$store
+                    .dispatch(`${this.namespace}/get_mock`, {
+                        id: this.entityId,
+                        recordid: null,
+                        params: null,
+                        response: responseTest,
+                        contentinfo: entityinfoTest,
+                    })
+                    .then((form) => {
+                        if (form.success) {
+                            this.formRows = form.rows;
+                            this.formActions = form.actions;
+                        } else {
+                            this.snackbar = {
+                                message: form.message,
+                                success: form.success,
+                                show: true,
+                            };
+                        }
+                    })
+                    .then(() => {
+                        // this.get_record();
+                    })
+                    .catch((error) => {
+                        this.snackbar = {
+                            message: error.message,
+                            success: false,
+                            show: true,
+                        };
+                    });
+            }
         },
         async get_record() {
             if (this.record_id) {
