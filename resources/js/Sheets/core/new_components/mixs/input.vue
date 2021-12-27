@@ -105,6 +105,12 @@ export default {
             this.$emit('tooglefield', show_field);
             return show_field;
         },
+        defaultValue() {
+            if (this.input.default_value) {
+                return `Por defecto: ${this.input.default_value}`;
+            }
+            return null;
+        },
     },
     mounted() {
         this.readInputValue();

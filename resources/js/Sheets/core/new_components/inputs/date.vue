@@ -11,7 +11,7 @@
         <date-picker
             type="date"
             :format="dateFormat"
-            :placeholder="this.input.default_value"
+            :placeholder="defaultValue"
             @input="onInput"
             v-model="picker"
         ></date-picker>

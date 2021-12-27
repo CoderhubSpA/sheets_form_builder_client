@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable eqeqeq */
 /* eslint-disable camelcase */
 export default {
     /**
@@ -23,6 +24,10 @@ export default {
          * Descriptor del estado acutal del vmodel para unit test
          */
         selectorvmodelsample: null,
+        /**
+         * Valor por defecto
+         */
+        defaultOption: null,
     }),
     computed: {
         /**
@@ -34,7 +39,7 @@ export default {
             const fields = this.$store.getters[`${this.state}/fields`];
 
             if (fields && fields.length > 0) {
-                const field = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                const field = fields.filter((f) => Object.keys(f)[0] == this.id)[0];
 
                 if (field) {
                     const key = Object.keys(field)[0];
@@ -43,10 +48,10 @@ export default {
 
                     if (this.multiple && !!search) {
                         result = Object.entries(search).map((s) =>
-                            this.options.find((o) => o.id === s[1])
+                            this.options.find((o) => o.id == s[1])
                         );
                     } else if (!this.multiple && !!search) {
-                        result = this.options.find((o) => o.id === search);
+                        result = this.options.find((o) => o.id == search);
                     }
                 }
             }
@@ -70,6 +75,13 @@ export default {
 
                     Object.keys(opt).forEach((objKey) => {
                         options.push({ id: objKey, name: opt[objKey] });
+                    });
+                }
+                if (this.input.default_value) {
+                    options.forEach((opt) => {
+                        if (this.input.default_value == opt.id) {
+                            this.defaultOption = opt.name;
+                        }
                     });
                 }
             }

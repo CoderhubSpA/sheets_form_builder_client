@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable eqeqeq */
 /* eslint-disable camelcase */
 import Moment from 'moment';
 
@@ -52,7 +53,7 @@ export default {
             const fields = this.$store.getters[`${this.state}/fields`];
             let result = null;
             if (fields.length > 0) {
-                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                const val = fields.filter((f) => Object.keys(f)[0] == this.id)[0];
                 if (val) {
                     result = val[this.id];
                 }
@@ -69,7 +70,10 @@ export default {
         },
     },
     mounted() {
-        // console.log(this.input);
+        if (this.fieldValue) {
+            this.picker = new Date(this.fieldValue);
+            this.onInput(this.fieldValue);
+        }
     },
     methods: {
         onInput(val) {

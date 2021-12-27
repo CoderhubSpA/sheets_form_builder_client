@@ -26,9 +26,7 @@
         />
         <div class="row" v-if="this.input.default_value !== null">
             <div class="col">
-                <p class="input-placeholder">
-                    {{ this.input.default_value || `Placeholder: ${this.input.format}` }}
-                </p>
+                <p class="input-placeholder">Por defecto: {{ defaultOption }}</p>
             </div>
         </div>
     </form-group>
@@ -127,6 +125,13 @@ export default {
                 });
             } else {
                 returnOptions = [...options];
+            }
+            if (this.input.default_value) {
+                returnOptions.forEach((opt) => {
+                    if (this.input.default_value === opt.id) {
+                        this.defaultOption = opt.name;
+                    }
+                });
             }
             return returnOptions;
         },

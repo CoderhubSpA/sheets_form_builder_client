@@ -20,7 +20,7 @@
         />
         <div class="row" v-if="this.input.default_value !== null">
             <div class="col">
-                <p class="input-placeholder">{{ this.input.default_value }}</p>
+                <p class="input-placeholder">Por defecto: {{ this.input.default_value }}</p>
             </div>
         </div>
     </file-template>
@@ -63,6 +63,9 @@ export default {
             };
             if (this.input.permission === 2) {
                 this.$store.commit(`${this.state}/FILES`, data);
+                const validation = {};
+                validation[this.id] = 'file-pending';
+                this.$emit('input', validation);
             }
         },
         // eslint-disable-next-line no-unused-vars

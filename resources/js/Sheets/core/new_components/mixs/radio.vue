@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable eqeqeq */
 export default {
     props: {
         input: {
@@ -14,6 +15,10 @@ export default {
     },
     data: () => ({
         pickedModel: null,
+        /**
+         * Valor por defecto
+         */
+        defaultOption: null,
     }),
     computed: {
         options() {
@@ -28,24 +33,34 @@ export default {
                 if (entities) {
                     // eslint-disable-next-line arrow-body-style
                     return entities.map((e) => {
+                        if (this.input.default_value == e.id) {
+                            this.defaultOption = e.name;
+                        }
                         return { id: e.id, name: e.name };
                     });
                 }
                 const opt = JSON.parse(this.input.options);
 
-                const options = [];
+                const optionsReturn = [];
 
                 Object.keys(opt).forEach((key) => {
-                    options.push({ id: key, name: opt[key] });
+                    optionsReturn.push({ id: key, name: opt[key] });
                 });
-                return options;
+                if (this.input.default_value) {
+                    optionsReturn.forEach((optV) => {
+                        if (this.input.default_value == optV.id) {
+                            this.defaultOption = optV.name;
+                        }
+                    });
+                }
+                return optionsReturn;
             }
             return [];
         },
         picked() {
             const fields = this.$store.getters[`${this.state}/fields`];
             if (fields && fields.length > 0) {
-                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                const val = fields.filter((f) => Object.keys(f)[0] == this.id)[0];
                 if (val !== null && val !== undefined) {
                     return val[this.id];
                 }
@@ -98,6 +113,11 @@ export default {
                 this.pickedModel = null;
             }
         },
+    },
+    mounted() {
+        if (this.picked) {
+            this.pickedModel = this.picked;
+        }
     },
 };
 </script>

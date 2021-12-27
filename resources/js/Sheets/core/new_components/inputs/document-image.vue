@@ -39,6 +39,7 @@ export default {
     },
     data: () => ({
         preview: null,
+        storage_url: process.env.MIX_SHEETS_STORAGE_URL,
     }),
     computed: {
         accept() {
@@ -48,20 +49,39 @@ export default {
             return `id-${this.id}`;
         },
         previewLink() {
-            return this.$store.getters[`${this.state}/fields`];
+            const fields = this.$store.getters[`${this.state}/fields`];
+
+            if (fields && fields.length > 0) {
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (val) {
+                    const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                    if (contentInfo) {
+                        const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
+                        const imgPre = entities.find((ent) => ent.id === val[this.id]);
+                        return `${this.storage_url}${imgPre.src}`;
+                    }
+                }
+            }
+            return null;
         },
     },
     watch: {
-        previewLink() {
-            const fields = this.$store.getters[`${this.state}/fields`];
-
-            if (fields.length > 0) {
-                const value = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
-                if (value) {
-                    // console.log(val, value)
-                }
+        previewLink(val) {
+            this.preview = val;
+            if (val) {
+                const container = document.getElementById('preview-image-container');
+                container.classList.remove('hide');
+                container.classList.add('show');
             }
         },
+    },
+    mounted() {
+        if (this.previewLink) {
+            this.preview = this.previewLink;
+            const container = document.getElementById('preview-image-container');
+            container.classList.remove('hide');
+            container.classList.add('show');
+        }
     },
     methods: {
         onChange(event) {
@@ -79,11 +99,10 @@ export default {
             };
             if (this.input.permission === 2) {
                 this.$store.commit(`${this.state}/FILES`, data);
+                const validation = {};
+                validation[this.id] = 'file-pending';
+                this.$emit('input', validation);
             }
-        },
-        // eslint-disable-next-line no-unused-vars
-        onInput(event) {
-            // console.log(event)
         },
     },
 };

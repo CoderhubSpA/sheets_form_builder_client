@@ -18,9 +18,7 @@
         />
         <div class="row" v-if="this.input.default_value !== null">
             <div class="col">
-                <p class="input-placeholder">
-                    {{ this.input.default_value || `Placeholder: ${this.input.format}` }}
-                </p>
+                <p class="input-placeholder">Por defecto: {{ defaultOption }}</p>
             </div>
         </div>
     </form-group>
@@ -42,10 +40,17 @@ export default {
 </script>
 <style>
 span.vs__selected {
-    max-width: 90%;
+    max-width: 80%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
+}
+input.vs__search {
+    width: 1px;
+    height: 24px;
+}
+div.vs__actions {
+    padding: 0;
 }
 </style>

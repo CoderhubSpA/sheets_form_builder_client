@@ -5,16 +5,17 @@
 </template>
 
 <script>
+/* eslint-disable eqeqeq */
 export default {
     props: {
         action: {
             type: Object,
-            default: () => {}
+            default: () => {},
         },
         disabledaction: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     computed: {
         name() {
@@ -22,12 +23,13 @@ export default {
         },
         styles() {
             const styles = [
+                'sheets-action-btn',
                 'btn',
                 'btn-block',
-                this.action.cancel_form == 1 ? 'btn-warning' : 'btn-success'
+                this.action.cancel_form == 1 ? 'btn-warning' : 'btn-success',
             ];
             return styles.join(' ');
-        }
+        },
     },
     methods: {
         trigger() {
@@ -38,8 +40,8 @@ export default {
                     this.$emit('trigger', false, this.action);
                 }
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

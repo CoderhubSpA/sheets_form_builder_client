@@ -54,7 +54,7 @@ export default {
             return this.row.sections || [];
         },
         row_height() {
-            if (this.row.row_height) {
+            if (this.row.height) {
                 return `${this.row.height}px`;
             }
             return 'unset';

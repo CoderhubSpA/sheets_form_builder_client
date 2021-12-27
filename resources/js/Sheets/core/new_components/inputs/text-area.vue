@@ -12,7 +12,7 @@
             class="form-control"
             :id="id"
             rows="3"
-            :placeholder="this.input.default_value"
+            :placeholder="defaultValue"
             :value="inputValue"
             :disabled="disabled"
             @input="onInput"

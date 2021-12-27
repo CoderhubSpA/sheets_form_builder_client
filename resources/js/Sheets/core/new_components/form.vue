@@ -89,6 +89,8 @@ export default {
         formAnswer: [],
         // archivos cargados en el form
         files: [],
+        // archivos cargados en el backend
+        filesUploaded: [],
         // snackbar para recepcion de mensajes desde el server
         snackbar: { message: '', success: false, show: false },
         //
@@ -369,7 +371,7 @@ export default {
                         });
                     }
                 }
-                const body = {};
+                let body = {};
 
                 this.result.forEach((r) => {
                     if (r) {
@@ -383,7 +385,7 @@ export default {
                 if (this.record_id) {
                     body.id = this.record_id;
                 }
-
+                body = { ...body, ...this.filesUploaded };
                 data[entityId].push(body);
 
                 const form = new FormData();
@@ -457,7 +459,6 @@ export default {
             const promises = [];
             const req = [];
             Object.entries(files).forEach((file) => {
-                // console.log(388, file[1]);
                 req.push(file[1].id);
                 const form = new FormData();
 
@@ -475,29 +476,38 @@ export default {
             });
             await Promise.all(promises).then((resp) => {
                 for (let index = 0; index < resp.length; index += 1) {
-                    const obj = {};
-                    obj[req[index]] = resp[index].id;
-                    //   obj.id = resp[index].id;
-                    this.formAnswer.push(obj);
-                    const finded = this.formAnswer.find((ans) => !!ans.id);
-                    // eslint-disable-next-line no-console
-                    console.log(
-                        finded,
-                        !finded,
-                        resp[index],
-                        resp[index].data.entity_type_fk === 'document'
-                    );
-                    if (
-                        !finded &&
-                        resp[index].data.col_name === 'id' &&
-                        resp[index].data.entity_type_fk === 'document'
-                    ) {
-                        // eslint-disable-next-line no-console
-                        console.log('agregando id');
-                        this.formAnswer.push({ id: resp[index].id });
+                    if (resp[index].data.col_name === 'id') {
+                        if (!this.record_id && resp[index].data.entity_type_fk === 'document') {
+                            this.filesUploaded[req[index]] = resp[index].id;
+                            this.filesUploaded.id = resp[index].id;
+                        }
+                    } else {
+                        this.filesUploaded[req[index]] = resp[index].id;
                     }
 
-                    // this.formAnswer[0].push(obj);
+                    // const obj = {};
+                    // obj[req[index]] = resp[index].id;
+                    // //   obj.id = resp[index].id;
+                    // this.formAnswer.push(obj);
+                    // const finded = this.formAnswer.find((ans) => !!ans.id);
+                    // // eslint-disable-next-line no-console
+                    // console.log(
+                    //     finded,
+                    //     !finded,
+                    //     resp[index],
+                    //     resp[index].data.entity_type_fk === 'document'
+                    // );
+                    // if (
+                    //     !finded &&
+                    //     resp[index].data.col_name === 'id' &&
+                    //     resp[index].data.entity_type_fk === 'document'
+                    // ) {
+                    //     // eslint-disable-next-line no-console
+                    //     console.log('agregando id');
+                    //     this.formAnswer.push({ id: resp[index].id });
+                    // }
+
+                    // // this.formAnswer[0].push(obj);
                 }
             });
         },

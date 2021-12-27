@@ -12,7 +12,7 @@
             type="email"
             :id="id"
             :value="inputValue"
-            :placeholder="this.input.default_value"
+            :placeholder="defaultValue"
             @input="onInput"
             class="form-control"
             maxlength="250"

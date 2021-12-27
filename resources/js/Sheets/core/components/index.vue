@@ -59,8 +59,6 @@ export default {
     }),
     mounted() {
         this.loading = true;
-        console.log('is test', this.form_test);
-        console.log('json', FormTestJson);
         if (this.form_test === 'false') {
             this.$store
                 .dispatch('form/get_form', {

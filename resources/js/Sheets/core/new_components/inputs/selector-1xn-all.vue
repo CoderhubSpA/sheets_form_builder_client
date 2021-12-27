@@ -26,9 +26,7 @@
         />
         <div class="row" v-if="this.input.default_value !== null">
             <div class="col">
-                <p class="input-placeholder">
-                    {{ this.input.default_value || `Placeholder: ${this.input.format}` }}
-                </p>
+                <p class="input-placeholder">Por defecto: {{ defaultOption }}</p>
             </div>
         </div>
     </form-group>
