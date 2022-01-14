@@ -45,6 +45,19 @@ export default {
         accept() {
             return '*';
         },
+        preFile() {
+            const fields = this.$store.getters[`${this.state}/fields`];
+
+            if (fields && fields.length > 0) {
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (val) {
+                    const prevVal = {};
+                    prevVal[this.id] = val;
+                    this.$emit('input', prevVal);
+                }
+            }
+            return null;
+        },
     },
     methods: {
         onChange(event) {

@@ -20,7 +20,7 @@
         <div class="row">
             <div class="col">
                 <div class="preview-container hide" id="preview-image-container">
-                    <img :src="preview" alt="preview-image" />
+                    <img :src="preview" :class="`preview-image-${id}`" />
                 </div>
             </div>
         </div>
@@ -54,6 +54,9 @@ export default {
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
+                    const prevVal = {};
+                    prevVal[this.id] = val;
+                    this.$emit('input', prevVal);
                     const contentInfo = this.$store.getters[`${this.state}/content_info`];
                     if (contentInfo) {
                         const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];

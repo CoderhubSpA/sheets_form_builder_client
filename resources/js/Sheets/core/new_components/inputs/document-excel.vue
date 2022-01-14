@@ -70,7 +70,11 @@ export default {
         selected(val) {
             if (val) {
                 const data = {};
-                data[this.id] = val.id;
+                if (Array.isArray(val)) {
+                    data[this.id] = val[0].id;
+                } else {
+                    data[this.id] = val.id;
+                }
                 this.$emit('input', data);
 
                 const store = { id: this.id, file: this.file, metadata: data[this.id] };

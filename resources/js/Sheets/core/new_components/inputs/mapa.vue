@@ -39,7 +39,7 @@
             <mia-map-loader />
         </l-map>
         <!--  -->
-        <p class="text-danger text-center" v-if="errorMsgAddress">
+        <p class="text-danger text-center error-map-search" v-if="errorMsgAddress">
             {{ errorMsgAddress }}
         </p>
     </div>
@@ -146,11 +146,14 @@ export default {
                     if (!!data) {
                         this.center = latLng(data.lat, data.lon);
                         this.zoom = 17;
+                    } else {
+                        this.errorMsgAddress = 'No se encontró resultados';
                     }
                 })
                 .catch((error) => {
                     // eslint-disable-next-line no-console
                     console.log(error);
+                    this.errorMsgAddress = 'No se encontró resultados';
                 });
         },
     },

@@ -13,7 +13,7 @@
             :state="state"
         >
         </component>
-        <div class="row">
+        <div class="row" v-if="error_messages">
             <div class="col">
                 <span class="float-right text-danger sheets-required-answer">
                     {{ error_messages }}

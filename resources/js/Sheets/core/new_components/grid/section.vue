@@ -1,5 +1,5 @@
 <template>
-    <div :class="`${sm} ${md} ${xl}`" v-if="show_section">
+    <div :class="`${sm} ${md} ${xl}`" v-if="show_section" :id="section.id">
         <h5 class="sheets-section-title">
             {{ name }}
         </h5>

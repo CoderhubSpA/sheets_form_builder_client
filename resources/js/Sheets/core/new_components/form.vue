@@ -255,7 +255,7 @@ export default {
             this.formRows.forEach((row) => {
                 row.sections.forEach((section) => {
                     section.fields.forEach(async (field) => {
-                        if (field.required === 1) {
+                        if (field.required === 1 && field.default_value === null) {
                             if (Object.keys(resultValidator).includes(field.id)) {
                                 if (
                                     resultValidator[field.id] === null ||
@@ -398,53 +398,65 @@ export default {
                 const action = !this.record_id
                     ? `${this.namespace}/save`
                     : `${this.namespace}/update`;
-                this.$store
-                    .dispatch(action, form)
-                    .then((response) => {
-                        this.snackbar = {
-                            success: response.success,
-                            show: true,
-                            message: response.content.message,
-                        };
+                if (this.is_test !== 'false') {
+                    this.snackbar = {
+                        success: true,
+                        show: true,
+                        message: 'Datos enviados',
+                    };
+                    if (this.action.refresh_form === 1) {
+                        this.resetForm();
+                    }
+                    this.disabledAction = false;
+                } else {
+                    this.$store
+                        .dispatch(action, form)
+                        .then((response) => {
+                            this.snackbar = {
+                                success: response.success,
+                                show: true,
+                                message: response.content.message,
+                            };
 
-                        if (response.success) {
-                            if (this.action.refresh_form === 1) {
-                                this.resetForm();
+                            if (response.success) {
+                                if (this.action.refresh_form === 1) {
+                                    this.resetForm();
+                                }
+                                this.$emit('input', response.content);
+                                this.postMessage(response);
+                                this.action = {};
                             }
-                            this.$emit('input', response.content);
-                            this.postMessage(response);
-                            this.action = {};
-                        }
-                        this.disabledAction = false;
-                    })
-                    .catch((error) => {
-                        this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
-                        if (error.data) {
-                            this.snackbar = {
-                                message:
-                                    error.data.content !== null
-                                        ? error.data.content.message
-                                        : 'Ocurrió un error inesperado',
-                                success: false,
-                                show: true,
-                            };
-                            this.postMessage(error.data);
-                            this.action = {};
-                        } else {
-                            this.snackbar = {
-                                message:
-                                    error.response.data.content !== null
-                                        ? error.response.data.content.message
-                                        : 'Ocurrió un error inesperado',
-                                success: false,
-                                show: true,
-                            };
-                            this.postMessage(error.response.data);
-                            this.action = {};
-                        }
+                            this.disabledAction = false;
+                        })
+                        .catch((error) => {
+                            this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
+                            if (error.data) {
+                                this.snackbar = {
+                                    message:
+                                        error.data.content !== null
+                                            ? error.data.content.message
+                                            : 'Ocurrió un error inesperado',
+                                    success: false,
+                                    show: true,
+                                };
+                                this.postMessage(error.data);
+                                this.action = {};
+                            } else {
+                                this.snackbar = {
+                                    message:
+                                        error.response.data.content !== null
+                                            ? error.response.data.content.message
+                                            : 'Ocurrió un error inesperado',
+                                    success: false,
+                                    show: true,
+                                };
+                                this.postMessage(error.response.data);
+                                this.action = {};
+                            }
 
-                        this.disabledAction = false;
-                    });
+                            this.disabledAction = false;
+                        });
+                }
             } else {
                 this.snackbar = {
                     message: 'Existen errores de validación',
