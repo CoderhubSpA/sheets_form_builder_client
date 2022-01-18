@@ -11,6 +11,7 @@
             @tooglefield="handleToogleField"
             disabled
             :state="state"
+            :base_url="base_url"
         >
         </component>
         <div class="row" v-if="error_messages">
@@ -35,6 +36,10 @@ export default {
         state: {
             type: String,
             required: true,
+        },
+        base_url: {
+            type: String,
+            default: '',
         },
     },
     data: () => ({

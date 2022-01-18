@@ -16,6 +16,7 @@
                 :key="key"
                 v-model="sectionModel[key]"
                 :state="state"
+                :base_url="base_url"
             >
             </sheets-field>
         </div>
@@ -41,6 +42,10 @@ export default {
         state: {
             type: String,
             require: true,
+        },
+        base_url: {
+            type: String,
+            default: '',
         },
     },
     data: () => ({

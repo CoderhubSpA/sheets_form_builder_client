@@ -37,9 +37,14 @@ export default {
     components: {
         'file-template': FileTemplate,
     },
+    props: {
+        base_url: {
+            type: String,
+            default: '',
+        },
+    },
     data: () => ({
         preview: null,
-        storage_url: process.env.MIX_SHEETS_STORAGE_URL,
     }),
     computed: {
         accept() {
@@ -61,7 +66,7 @@ export default {
                     if (contentInfo) {
                         const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
                         const imgPre = entities.find((ent) => ent.id === val[this.id]);
-                        return `${this.storage_url}${imgPre.src}`;
+                        return `${this.base_url}${imgPre.src}`;
                     }
                 }
             }

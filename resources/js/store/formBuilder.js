@@ -557,7 +557,7 @@ export default {
                         resolve({ id, data: data.file });
                     })
                     .catch((error) => {
-                        reject(error);
+                        resolve({ id: 'error-on-upload', data: data.file, error });
                     })
                     .finally(() => {
                         commit('LOADING', false);

@@ -7,6 +7,7 @@
                 :key="key"
                 :section="sect"
                 :state="state"
+                :base_url="base_url"
                 v-model="rowModel[key]"
             >
             </sheets-section>
@@ -29,6 +30,10 @@ export default {
         state: {
             type: String,
             require: true,
+        },
+        base_url: {
+            type: String,
+            default: '',
         },
     },
     data: () => ({

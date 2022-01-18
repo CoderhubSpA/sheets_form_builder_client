@@ -8,6 +8,7 @@
             :key="key"
             :row="row"
             :state="namespace"
+            :base_url="base_url"
             v-model="formAnswer[key]"
         />
 
@@ -16,6 +17,7 @@
                 <sheets-action
                     :disabledaction="disabledAction"
                     :action="action"
+                    :uploading="uploadingForm"
                     @trigger="handlerAction"
                 ></sheets-action>
             </div>
@@ -98,6 +100,8 @@ export default {
         disabledAction: false,
         errorsOnSMA: false,
         errorRequiredFields: false,
+        errorOnLoadFiles: false,
+        uploadingForm: false,
     }),
     computed: {
         loading() {
@@ -466,6 +470,7 @@ export default {
             }
         },
         async sendFiles() {
+            this.errorOnLoadFiles = false;
             const files = this.$store.getters[`${this.namespace}/files`];
 
             const promises = [];
@@ -488,13 +493,17 @@ export default {
             });
             await Promise.all(promises).then((resp) => {
                 for (let index = 0; index < resp.length; index += 1) {
-                    if (resp[index].data.col_name === 'id') {
-                        if (!this.record_id && resp[index].data.entity_type_fk === 'document') {
+                    if (resp[index].id !== 'error-on-upload') {
+                        if (resp[index].data.col_name === 'id') {
+                            if (!this.record_id && resp[index].data.entity_type_fk === 'document') {
+                                this.filesUploaded[req[index]] = resp[index].id;
+                                this.filesUploaded.id = resp[index].id;
+                            }
+                        } else {
                             this.filesUploaded[req[index]] = resp[index].id;
-                            this.filesUploaded.id = resp[index].id;
                         }
                     } else {
-                        this.filesUploaded[req[index]] = resp[index].id;
+                        this.errorOnLoadFiles = true;
                     }
 
                     // const obj = {};
@@ -524,6 +533,7 @@ export default {
             });
         },
         async handlerAction(saveForm, action) {
+            this.uploadingForm = true;
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
             if (
                 action.id !== 'DEFAULT-ACTION' &&
@@ -534,9 +544,18 @@ export default {
             }
             if (saveForm) {
                 if (this.filesInForm) await this.sendFiles();
-                await this.save();
+                if (this.errorOnLoadFiles === false) {
+                    await this.save();
+                } else {
+                    this.snackbar = {
+                        success: false,
+                        show: true,
+                        message: 'Ocurrió un error al cargar los archivos',
+                    };
+                }
             }
             this.action = action;
+            this.uploadingForm = false;
         },
         resetForm() {
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, true);
