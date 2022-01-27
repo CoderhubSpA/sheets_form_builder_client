@@ -7,16 +7,27 @@
         :linkDescription="this.input.link_name"
         :tooltipInfo="this.input.description"
         v-if="show_field"
+        :showDeleteButton="showDeleteBtn"
     >
-        <input
-            type="file"
-            class="custom-file-input"
-            :id="id"
-            :accept="accept"
-            lang="es"
-            @input="onInput"
-            @change="onChange"
-        />
+        <div class="row">
+            <div class="col">
+                <input
+                    type="file"
+                    class="custom-file-input"
+                    :id="id"
+                    :accept="accept"
+                    lang="es"
+                    ref="inputFileRef"
+                    @input="onInput"
+                    @change="onChange"
+                />
+            </div>
+            <div class="col" v-if="showDeleteBtn">
+                <button class="btn btn-danger float-right" @click="onDeleteFile()">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </div>
+        </div>
         <div class="row">
             <div class="col">
                 <div class="preview-container hide" id="preview-image-container">
@@ -85,6 +96,7 @@ export default {
     },
     mounted() {
         if (this.previewLink) {
+            this.showDeleteBtn = true;
             this.preview = this.previewLink;
             const container = document.getElementById('preview-image-container');
             container.classList.remove('hide');
@@ -93,6 +105,7 @@ export default {
     },
     methods: {
         onChange(event) {
+            this.showDeleteBtn = true;
             const f = event.target.files[0];
             const container = document.getElementById('preview-image-container');
             this.preview = URL.createObjectURL(f);
@@ -111,6 +124,15 @@ export default {
                 validation[this.id] = 'file-pending';
                 this.$emit('input', validation);
             }
+        },
+        onDeleteFile() {
+            this.showDeleteBtn = false;
+            this.preview = '';
+            this.$refs.inputFileRef.value = null;
+            this.$store.commit(`${this.state}/DELETE_FILE`, this.id);
+            const validation = {};
+            validation[this.id] = null;
+            this.$emit('input', validation);
         },
     },
 };

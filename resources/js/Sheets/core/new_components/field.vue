@@ -1,7 +1,7 @@
 <template>
     <div
         class="sheets-field-wrapper"
-        :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl} ${hidden_class}`"
+        :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl} ${hidden_class} ${visible_class}`"
     >
         <component
             :is="fieldInput"
@@ -38,6 +38,10 @@ export default {
             required: true,
         },
         base_url: {
+            type: String,
+            default: '',
+        },
+        visible_class: {
             type: String,
             default: '',
         },
@@ -143,7 +147,8 @@ export default {
     visibility: visible;
 }
 
-.not-visible-field {
+.not-visible-field,
+.hidden-config-field {
     display: none;
     max-width: 0;
     overflow: hidden;

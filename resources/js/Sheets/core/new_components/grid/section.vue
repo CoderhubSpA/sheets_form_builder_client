@@ -17,6 +17,7 @@
                 v-model="sectionModel[key]"
                 :state="state"
                 :base_url="base_url"
+                :visible_class="field.visible == 0 ? 'hidden-config-field' : 'visible-config-field'"
             >
             </sheets-field>
         </div>

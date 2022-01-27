@@ -195,6 +195,16 @@ export default {
             state.hasFiles = true;
             state.files[val.id] = val;
         },
+        DELETE_FILE(state, val) {
+            state.files[val] = null;
+            let validation = false;
+            state.files.forEach((file) => {
+                if (file !== null) {
+                    validation = true;
+                }
+            });
+            state.hasFiles = validation;
+        },
         FIELDS(state, val) {
             Vue.set(state.fields, state.fields.length, val);
             // state.fields.push(val);

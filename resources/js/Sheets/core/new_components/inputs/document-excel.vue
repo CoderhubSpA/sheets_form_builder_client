@@ -1,14 +1,30 @@
 <template>
     <div>
-        <file-template :label="label" :id="id" :required="required" :placeholder="ph">
-            <input
-                type="file"
-                class="custom-file-input"
-                :id="id"
-                :accept="accept"
-                lang="es"
-                @change="onChange"
-            />
+        <file-template
+            :label="label"
+            :id="id"
+            :required="required"
+            :placeholder="ph"
+            :showDeleteButton="showDeleteBtn"
+        >
+            <div class="row">
+                <div class="col">
+                    <input
+                        type="file"
+                        class="custom-file-input"
+                        :id="id"
+                        :accept="accept"
+                        lang="es"
+                        ref="inputFileRef"
+                        @change="onChange"
+                    />
+                </div>
+                <div class="col" v-if="showDeleteBtn">
+                    <button class="btn btn-danger float-right" @click="onDeleteFile()">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </div>
+            </div>
         </file-template>
         <div class="form-group" v-if="can_select_sheets">
             <label :for="id"> Página del Excel </label>
@@ -47,6 +63,7 @@ export default {
         ph: '',
         can_select_sheets: true,
         extension: '',
+        showDeleteBtn: false,
     }),
     computed: {
         accept() {
@@ -100,6 +117,7 @@ export default {
             };
         },
         onChange(event) {
+            this.showDeleteBtn = true;
             const f = event.target.files[0];
             const splited = f.name.split('.');
             this.extension = splited[splited.length - 1].toLowerCase();
@@ -114,6 +132,17 @@ export default {
             } else {
                 this.ph = `${event.target.files[0].name}`;
             }
+        },
+        onDeleteFile() {
+            this.showDeleteBtn = false;
+            this.$refs.inputFileRef.value = null;
+            this.ph = '';
+            this.options = [];
+            this.selected = [];
+            this.$store.commit(`${this.state}/DELETE_FILE`, this.id);
+            const validation = {};
+            validation[this.id] = null;
+            this.$emit('input', validation);
         },
     },
 };

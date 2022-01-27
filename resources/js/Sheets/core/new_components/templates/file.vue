@@ -23,7 +23,11 @@
         </div>
         <div class="custom-file">
             <slot />
-            <label class="custom-file-label" :for="id">
+            <label
+                class="custom-file-label"
+                :class="showDeleteButton ? 'shrinklabel' : ''"
+                :for="id"
+            >
                 {{ placeholder }}
             </label>
         </div>
@@ -52,6 +56,10 @@ export default {
             type: String,
             default: '',
         },
+        showDeleteButton: {
+            type: Boolean,
+            default: false,
+        },
     },
     methods: {
         getClass() {
@@ -63,3 +71,8 @@ export default {
     },
 };
 </script>
+<style scoped>
+.shrinklabel {
+    width: calc(100% - 43px);
+}
+</style>

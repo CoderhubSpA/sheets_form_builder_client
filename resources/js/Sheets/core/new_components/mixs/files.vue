@@ -8,6 +8,9 @@ export default {
             required: true,
         },
     },
+    data: () => ({
+        showDeleteBtn: false,
+    }),
     computed: {},
     methods: {
         onChange(event) {

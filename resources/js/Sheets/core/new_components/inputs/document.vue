@@ -8,16 +8,27 @@
         :linkDescription="this.input.link_name"
         :tooltipInfo="this.input.description"
         v-if="show_field"
+        :showDeleteButton="showDeleteBtn"
     >
-        <input
-            type="file"
-            class="custom-file-input"
-            :id="id"
-            :accept="accept"
-            lang="es"
-            @input="onInput"
-            @change="onChange"
-        />
+        <div class="row">
+            <div class="col">
+                <input
+                    type="file"
+                    class="custom-file-input"
+                    :id="id"
+                    :accept="accept"
+                    lang="es"
+                    ref="inputFileRef"
+                    @input="onInput"
+                    @change="onChange"
+                />
+            </div>
+            <div class="col" v-if="showDeleteBtn">
+                <button class="btn btn-danger float-right" @click="onDeleteFile()">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </div>
+        </div>
         <div class="row" v-if="this.input.default_value !== null">
             <div class="col">
                 <p class="input-placeholder">Por defecto: {{ this.input.default_value }}</p>
@@ -61,6 +72,7 @@ export default {
     },
     methods: {
         onChange(event) {
+            this.showDeleteBtn = true;
             if (event.target.files.lenght > 1) {
                 this.ph = `${event.target.files.lenght} archivos seleccionados`;
             } else {
@@ -84,6 +96,15 @@ export default {
         // eslint-disable-next-line no-unused-vars
         onInput(event) {
             // console.log(event)
+        },
+        onDeleteFile() {
+            this.showDeleteBtn = false;
+            this.$refs.inputFileRef.value = null;
+            this.ph = '';
+            this.$store.commit(`${this.state}/DELETE_FILE`, this.id);
+            const validation = {};
+            validation[this.id] = null;
+            this.$emit('input', validation);
         },
     },
 };

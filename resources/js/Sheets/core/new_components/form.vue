@@ -32,6 +32,7 @@
 </template>
 
 <script>
+/* eslint-disable no-console */
 import Row from './grid/row.vue';
 import Action from './actions/button.vue';
 // import Loading from "./utils/loading.vue";
@@ -377,7 +378,7 @@ export default {
                 }
                 let body = {};
 
-                this.result.forEach((r) => {
+                await this.result.forEach((r) => {
                     if (r) {
                         // eslint-disable-next-line prefer-object-spread
                         const obj = Object.assign({}, r);
@@ -472,7 +473,6 @@ export default {
         async sendFiles() {
             this.errorOnLoadFiles = false;
             const files = this.$store.getters[`${this.namespace}/files`];
-
             const promises = [];
             const req = [];
             Object.entries(files).forEach((file) => {
@@ -505,7 +505,7 @@ export default {
                     } else {
                         this.errorOnLoadFiles = true;
                     }
-
+                    // DEPRECATED
                     // const obj = {};
                     // obj[req[index]] = resp[index].id;
                     // //   obj.id = resp[index].id;
@@ -543,6 +543,7 @@ export default {
                 this.formAnswer.push({ action_id: action.id });
             }
             if (saveForm) {
+                this.filesUploaded = [];
                 if (this.filesInForm) await this.sendFiles();
                 if (this.errorOnLoadFiles === false) {
                     await this.save();
