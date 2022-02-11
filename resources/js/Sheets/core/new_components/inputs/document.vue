@@ -25,7 +25,7 @@
             </div>
             <div class="col" v-if="showDeleteBtn">
                 <button class="btn btn-danger float-right" @click="onDeleteFile()">
-                    <i class="bi bi-trash-fill"></i>
+                    <i class="fa fa-trash"></i>
                 </button>
             </div>
         </div>

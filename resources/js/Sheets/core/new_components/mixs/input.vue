@@ -15,6 +15,10 @@ export default {
             type: String,
             required: true,
         },
+        base_url: {
+            type: String,
+            required: true,
+        },
     },
     data: () => ({
         // VERIFICACIÓN DEL MODEL PARA LOS TEST

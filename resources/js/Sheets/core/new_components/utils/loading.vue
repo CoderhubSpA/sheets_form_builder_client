@@ -19,27 +19,26 @@ export default {
          * True => Muestra el component
          * False => Oculta el component
          */
-        status: Boolean
-    }
-
-}
+        status: Boolean,
+    },
+};
 </script>
 
 <style lang="scss">
 .loader-modal {
     background-color: rgb(230, 230, 230);
-    position:fixed;
-    top:0;
-    right:0;
-    bottom:0;
-    left:0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
 
     .loader-modal-spinner {
-        background-color:rgb(56, 75, 124);
+        background-color: rgb(56, 75, 124);
         width: 6rem;
         height: 6rem;
         padding: 10px 20px;

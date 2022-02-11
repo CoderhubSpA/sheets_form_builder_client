@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
@@ -111,6 +112,8 @@ export default {
          */
         field_show_hide: {},
         base_url: '',
+        active_filter: [],
+        url_selector_remote: {},
     }),
     getters: {
         loading: (state) => state.loading,
@@ -162,6 +165,8 @@ export default {
         field_show_hide: (state) => state.field_show_hide,
         // url base
         base_url: (state) => state.base_url,
+        active_filter: (state) => state.active_filter,
+        url_selector_remote: (state) => state.url_selector_remote,
     },
     mutations: {
         LOADING(state, val) {
@@ -294,6 +299,50 @@ export default {
         },
         BASE_URL(state, val) {
             state.base_url = val;
+        },
+        ACTIVE_FILTERS(state, val) {
+            if (val.remote) {
+                const item = {
+                    column: val.column,
+                    id: `external-filter-${val.column.id}`,
+                    order: 0,
+                    search: val.search,
+                };
+                const preitem = state.active_filter.find((it) => it.id === item.id);
+                if (val.search !== '' && val.search !== null && val.search !== undefined) {
+                    if (preitem) {
+                        const preindex = state.active_filter.indexOf(preitem);
+                        state.active_filter[preindex] = item;
+                    } else {
+                        state.active_filter.push(item);
+                    }
+                } else {
+                    if (preitem) {
+                        const preindex = state.active_filter.indexOf(preitem);
+                        if (preindex > -1) {
+                            state.active_filter.splice(preindex, 1);
+                        }
+                    }
+                }
+                state.active_filter.forEach((it, key) => {
+                    it.order = key + 1;
+                });
+                const mainfilter = {
+                    active_filters: state.active_filter.filter((f) => f.value !== ''),
+                    searched_col: val.column,
+                };
+                const url = `${encodeURIComponent(JSON.stringify(mainfilter))}`;
+                Vue.set(state.url_selector_remote, val.column.id, url);
+                Object.keys(state.url_selector_remote).forEach((key) => {
+                    const column = state.contentInfo.content.columns.find((col) => col.id === key);
+                    const newfilter = {
+                        active_filters: state.active_filter.filter((f) => f.value !== ''),
+                        searched_col: column,
+                    };
+                    const newurl = `${encodeURIComponent(JSON.stringify(newfilter))}`;
+                    Vue.set(state.url_selector_remote, key, newurl);
+                });
+            }
         },
     },
     actions: {
@@ -499,6 +548,28 @@ export default {
                         // eslint-disable-next-line no-console
                         // console.log(error);
                         reject(error);
+                    })
+                    .finally(() => {
+                        commit('LOADING', false);
+                    });
+            });
+        },
+        get_filters({ commit }, data) {
+            commit('LOADING', true);
+            return new Promise((resolve, reject) => {
+                axios
+                    .get(`/api/sheets/getfilters/${data}`)
+                    .then((response) => {
+                        resolve({
+                            response: response.data.content.content,
+                            success: true,
+                        });
+                    })
+                    .catch((error) => {
+                        resolve({
+                            response: null,
+                            success: false,
+                        });
                     })
                     .finally(() => {
                         commit('LOADING', false);
