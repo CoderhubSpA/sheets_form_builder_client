@@ -80,36 +80,11 @@ export default {
         smarequiredfields: [],
         errorssma: null,
         selectorfilters: {},
-        /**
-         * Si “default:1”, el Form Builder no debe enviar al backend:
-         * form_id
-         * form_fields
-         * action_id
-         */
         default_form: false,
-        /**
-         * respuesta del server sin tratar
-         */
         raw: {},
-        /**
-         * Conjunto de opciones disponibles
-         * para multiples selectore 1xn Availables
-         * con la misma col_fk_1_n
-         */
         col_fk_1_n: {},
-        /**
-         * Titulo del form
-         */
         form_name: '',
-        /**
-         * Manipula el mostrar/ocultar
-         * secciones segun su valor
-         */
         field_section_show_hide: {},
-        /**
-         * Muestra/Oculta campos
-         * segun el valor de otro campo
-         */
         field_show_hide: {},
         base_url: '',
         active_filter: [],

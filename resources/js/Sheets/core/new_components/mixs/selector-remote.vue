@@ -35,6 +35,7 @@ export default {
          */
         optionsRemote: [],
         loading: false,
+        remotecolumn: null,
     }),
     computed: {
         /**
@@ -44,15 +45,11 @@ export default {
         selectedValue() {
             let result = null;
             const fields = this.$store.getters[`${this.state}/fields`];
-
             if (fields && fields.length > 0) {
                 const field = fields.filter((f) => Object.keys(f)[0] == this.id)[0];
-
                 if (field) {
                     const key = Object.keys(field)[0];
-
                     const search = this.multiple ? JSON.parse(field[key]) : field[key];
-
                     if (this.multiple && !!search) {
                         result = Object.entries(search).map((s) =>
                             this.options.find((o) => o.id == s[1])
@@ -70,6 +67,8 @@ export default {
             const key = this.input.col_name_fk || 'name';
             if (contentInfo) {
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+                this.remotecolumn = column;
                 const filter = {
                     column,
                     id: `external-filter-${column.id}`,
@@ -79,13 +78,11 @@ export default {
                 };
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
                 const fk = this.input.entity_type_fk;
-
                 const entities = contentInfo.content.entities_fk[fk];
                 if (entities) {
                     options = entities.map((e) => ({ id: e.id, name: e[key] }));
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
-
                     Object.keys(opt).forEach((objKey) => {
                         options.push({ id: objKey, name: opt[objKey] });
                     });
@@ -102,11 +99,9 @@ export default {
                 if (a.name > b.name) {
                     return 1;
                 }
-
                 if (b.name > a.name) {
                     return -1;
                 }
-
                 return 0;
             });
             return options;
@@ -182,6 +177,9 @@ export default {
             this.$emit('tooglefield', show_field);
             return show_field;
         },
+        active_filter() {
+            return this.$store.getters[`${this.state}/active_filter`];
+        },
     },
     watch: {
         /**
@@ -193,13 +191,11 @@ export default {
         selected(val) {
             if (val) {
                 const data = {};
-
                 if (this.multiple) {
                     data[this.id] = val.map((v) => v.id);
                 } else {
                     data[this.id] = val.id;
                 }
-
                 // eslint-disable-next-line prefer-object-spread
                 this.selectorvmodelsample = Object.assign({}, data);
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
@@ -312,8 +308,34 @@ export default {
             }
             this.cleanReadOnly();
         },
-        filterByFunc(option, label, search) {
+        async filterByFunc(option, label, search) {
             this.cleanReadOnly();
+            if (this.input.options === null && this.input.entity_type_fk === null) {
+                const item = {
+                    column: this.remotecolumn,
+                    id: `external-filter-${this.remotecolumn.id}`,
+                    order: 1,
+                    search,
+                };
+                const filters = [...this.active_filter];
+                const preitem = filters.find((it) => it.id === this.remotecolumn.id);
+                if (preitem) {
+                    const preindex = filters.indexOf(preitem);
+                    filters[preindex] = item;
+                } else {
+                    filters.push(item);
+                }
+                filters.forEach((it, key) => {
+                    // eslint-disable-next-line no-param-reassign
+                    it.order = key + 1;
+                });
+                const mainfilter = {
+                    active_filters: filters,
+                    searched_col: this.remotecolumn,
+                };
+                console.log('url params', mainfilter);
+                await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
+            }
             return (label || '').toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1;
         },
     },

@@ -1,7 +1,7 @@
 <template>
     <button :class="styles" @click="trigger" :disabled="disabledaction || uploading">
         <span
-            v-if="uploading"
+            :class="!uploading ? 'transparentcolor' : ''"
             class="spinner-border spinner-border-sm"
             role="status"
             aria-hidden="true"
@@ -54,3 +54,8 @@ export default {
     },
 };
 </script>
+<style scoped>
+.transparentcolor {
+    color: transparent;
+}
+</style>

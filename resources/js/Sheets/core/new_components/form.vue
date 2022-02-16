@@ -346,10 +346,12 @@ export default {
             return true;
         },
         async save() {
+            this.uploadingForm = true;
             await this.validateAllFields();
             await this.getSMAValidation();
             if (this.errorRequiredFields === false && this.errorsOnSMA === false) {
                 this.disabledAction = true;
+                this.uploadingForm = true;
                 const entityId = this.$store.getters[`${this.namespace}/entity_id`];
 
                 const data = {};
@@ -417,6 +419,7 @@ export default {
                     this.$store
                         .dispatch(action, form)
                         .then((response) => {
+                            this.uploadingForm = false;
                             this.snackbar = {
                                 success: response.success,
                                 show: true,
@@ -458,11 +461,13 @@ export default {
                                 this.postMessage(error.response.data);
                                 this.action = {};
                             }
-
+                            this.uploadingForm = false;
                             this.disabledAction = false;
                         });
                 }
             } else {
+                this.disabledAction = false;
+                this.uploadingForm = false;
                 this.snackbar = {
                     message: 'Existen errores de validación',
                     success: false,
@@ -472,6 +477,7 @@ export default {
         },
         async sendFiles() {
             this.errorOnLoadFiles = false;
+            this.uploadingForm = true;
             const files = this.$store.getters[`${this.namespace}/files`];
             const promises = [];
             const req = [];
@@ -483,7 +489,6 @@ export default {
                 form.append('fileid', file[1].id);
                 if (file[1].metadata) {
                     form.append('metadata', JSON.stringify({ sheets: [file[1].metadata] }));
-                    //   form.append('metadata', JSON.stringify({ sheets: file[1].metadata }));
                 }
                 const data = {
                     form,
@@ -505,35 +510,10 @@ export default {
                     } else {
                         this.errorOnLoadFiles = true;
                     }
-                    // DEPRECATED
-                    // const obj = {};
-                    // obj[req[index]] = resp[index].id;
-                    // //   obj.id = resp[index].id;
-                    // this.formAnswer.push(obj);
-                    // const finded = this.formAnswer.find((ans) => !!ans.id);
-                    // // eslint-disable-next-line no-console
-                    // console.log(
-                    //     finded,
-                    //     !finded,
-                    //     resp[index],
-                    //     resp[index].data.entity_type_fk === 'document'
-                    // );
-                    // if (
-                    //     !finded &&
-                    //     resp[index].data.col_name === 'id' &&
-                    //     resp[index].data.entity_type_fk === 'document'
-                    // ) {
-                    //     // eslint-disable-next-line no-console
-                    //     console.log('agregando id');
-                    //     this.formAnswer.push({ id: resp[index].id });
-                    // }
-
-                    // // this.formAnswer[0].push(obj);
                 }
             });
         },
         async handlerAction(saveForm, action) {
-            this.uploadingForm = true;
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
             if (
                 action.id !== 'DEFAULT-ACTION' &&
@@ -556,7 +536,6 @@ export default {
                 }
             }
             this.action = action;
-            this.uploadingForm = false;
         },
         resetForm() {
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, true);
