@@ -76,6 +76,10 @@ export default {
             type: String,
             default: 'false',
         },
+        params_actions: {
+            type: String,
+            default: '',
+        },
     },
     components: {
         // "sheets-loading": Loading,
@@ -84,19 +88,12 @@ export default {
         'sheets-snackbar': Snackbar,
     },
     data: () => ({
-        // filas de form
         formRows: [],
-        // botones del formulario
         formActions: [],
-        // informacion resultante del llenado del formulario
         formAnswer: [],
-        // archivos cargados en el form
         files: [],
-        // archivos cargados en el backend
         filesUploaded: [],
-        // snackbar para recepcion de mensajes desde el server
         snackbar: { message: '', success: false, show: false },
-        //
         action: {},
         disabledAction: false,
         errorsOnSMA: false,
@@ -118,6 +115,9 @@ export default {
         filesInForm() {
             return this.$store.getters[`${this.namespace}/hasFiles`];
         },
+        form_type() {
+            return this.$store.getters[`${this.namespace}/form_type`];
+        },
         form_id() {
             return this.$store.getters[`${this.namespace}/form_id`];
         },
@@ -133,6 +133,12 @@ export default {
         form_title() {
             return this.$store.getters[`${this.namespace}/form_name`];
         },
+        selector_remote_filter() {
+            return this.$store.getters[`${this.namespace}/selector_remote_filter`];
+        },
+        form_loaded() {
+            return this.$store.getters[`${this.namespace}/form_loaded`];
+        },
     },
     watch: {
         name(val) {
@@ -140,6 +146,14 @@ export default {
         },
         formAnswer() {
             //   console.log(this.formAnswer);
+        },
+        form_loaded(val) {
+            console.log('form_loaded', val);
+            if (val) {
+                setTimeout(() => {
+                    this.handleParamsActions();
+                }, 1500);
+            }
         },
     },
     beforeCreate() {
@@ -235,6 +249,32 @@ export default {
                         };
                     });
             }
+        },
+        async handleParamsActions() {
+            const paramsActions = JSON.parse(this.params_actions);
+            const defaultAction = {
+                id: 'DEFAULT-ACTION',
+                name: 'Guardar por defecto',
+                save_form: 1,
+                refresh_form: null,
+                close_form: null,
+                cancel_form: 0,
+                cancel_process: 0,
+                process_id: null,
+                color: null,
+                text_color: null,
+                valid: 1,
+            };
+            paramsActions.forEach(async (action) => {
+                switch (action.type) {
+                    case 'auto_submit':
+                        await this.handlerAction(true, defaultAction);
+                        break;
+
+                    default:
+                        break;
+                }
+            });
         },
         async get_record() {
             if (this.record_id) {
@@ -513,7 +553,12 @@ export default {
                 }
             });
         },
+        // eslint-disable-next-line no-unused-vars
         async handlerAction(saveForm, action) {
+            if (this.form_type === 'filter') {
+                this.handlerFilterData();
+                return;
+            }
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
             if (
                 action.id !== 'DEFAULT-ACTION' &&
@@ -536,6 +581,23 @@ export default {
                 }
             }
             this.action = action;
+        },
+        handlerFilterData() {
+            const data = {
+                type: 'filter_data',
+                params: [
+                    {
+                        active_filters: this.selector_remote_filter,
+                    },
+                ],
+            };
+            console.log('data to postmessage', data);
+            try {
+                this.window.parent.postMessage(data, '*');
+            } catch (error) {
+                // eslint-disable-next-line no-console
+                console.warn(error);
+            }
         },
         resetForm() {
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, true);

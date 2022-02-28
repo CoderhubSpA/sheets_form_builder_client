@@ -77,6 +77,7 @@ export default {
                     remote: this.input.options === null && this.input.entity_type_fk === null,
                 };
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
                 const fk = this.input.entity_type_fk;
                 const entities = contentInfo.content.entities_fk[fk];
                 if (entities) {
@@ -208,6 +209,7 @@ export default {
                     remote: this.input.options === null && this.input.entity_type_fk === null,
                 };
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
                 this.$emit('input', data);
                 /**
                  * mostrar/ocultar section

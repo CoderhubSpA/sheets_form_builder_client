@@ -8,6 +8,7 @@
                 :params="params"
                 :base_url="base_url"
                 :is_test="form_test"
+                :params_actions="actions"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true">
@@ -51,6 +52,10 @@ export default {
             type: String,
             default: 'false',
         },
+        actions: {
+            type: String,
+            default: '',
+        },
     },
 
     data: () => ({
@@ -68,21 +73,37 @@ export default {
                 })
                 .then((response) => {
                     this.loading = false;
+                    switch (response.type) {
+                        case 'poll':
+                            this.isPoll = true;
+                            this.$store
+                                .dispatch('poll/load_poll', response.fullResponse.data)
+                                .then(() => {
+                                    this.loading = false;
+                                })
+                                .catch((err) => {
+                                    // eslint-disable-next-line no-console
+                                    console.error('error cargando formulario', err);
+                                });
+                            break;
+
+                        default:
+                            this.isPoll = false;
+                            this.$store
+                                .dispatch('form/load_form', response.fullResponse.data)
+                                .then(() => {
+                                    this.loading = false;
+                                })
+                                .catch((err) => {
+                                    // eslint-disable-next-line no-console
+                                    console.error('error cargando formulario', err);
+                                });
+                            break;
+                    }
                     if (response.poll === 1) {
                         this.isPoll = true;
                         this.$store
                             .dispatch('poll/load_poll', response.fullResponse.data)
-                            .then(() => {
-                                this.loading = false;
-                            })
-                            .catch((err) => {
-                                // eslint-disable-next-line no-console
-                                console.error('error cargando formulario', err);
-                            });
-                    } else {
-                        this.isPoll = false;
-                        this.$store
-                            .dispatch('form/load_form', response.fullResponse.data)
                             .then(() => {
                                 this.loading = false;
                             })

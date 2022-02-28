@@ -59,6 +59,8 @@ const DOCUMENT_EXCEL = {
 export default {
     namespaced: true,
     state: () => ({
+        form_loaded: false,
+        form_type: 'form',
         loading: false,
         entityId: '',
         entityName: '',
@@ -88,9 +90,12 @@ export default {
         field_show_hide: {},
         base_url: '',
         active_filter: [],
+        selector_remote_filter: [],
         url_selector_remote: {},
     }),
     getters: {
+        form_loaded: (state) => state.form_loaded,
+        form_type: (state) => state.form_type,
         loading: (state) => state.loading,
         entity_id: (state) => state.entityId,
         entity_name: (state) => state.entityName,
@@ -141,9 +146,13 @@ export default {
         // url base
         base_url: (state) => state.base_url,
         active_filter: (state) => state.active_filter,
+        selector_remote_filter: (state) => state.selector_remote_filter,
         url_selector_remote: (state) => state.url_selector_remote,
     },
     mutations: {
+        FORM_LOADED(state, val) {
+            state.form_loaded = val;
+        },
         LOADING(state, val) {
             state.loading = val;
         },
@@ -227,6 +236,9 @@ export default {
         },
         FORM_ID(state, val) {
             state.form_id = val;
+        },
+        FORM_TYPE(state, val) {
+            state.form_type = val;
         },
         ERRORS_FIELD(state, val) {
             Vue.set(state.errors_fields, val.key, val.value);
@@ -319,6 +331,33 @@ export default {
                 });
             }
         },
+        SELECTOR_REMOTE_FILTER(state, val) {
+            const item = {
+                column: val.column,
+                id: `external-filter-${val.column.id}`,
+                order: 0,
+                search: val.search,
+            };
+            const preitem = state.selector_remote_filter.find((it) => it.id === item.id);
+            if (val.search !== '' && val.search !== null && val.search !== undefined) {
+                if (preitem) {
+                    const preindex = state.selector_remote_filter.indexOf(preitem);
+                    state.selector_remote_filter[preindex] = item;
+                } else {
+                    state.selector_remote_filter.push(item);
+                }
+            } else {
+                if (preitem) {
+                    const preindex = state.selector_remote_filter.indexOf(preitem);
+                    if (preindex > -1) {
+                        state.selector_remote_filter.splice(preindex, 1);
+                    }
+                }
+            }
+            state.selector_remote_filter.forEach((it, key) => {
+                it.order = key + 1;
+            });
+        },
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -342,6 +381,9 @@ export default {
                         // asignacion del titulo de formulario
                         commit('FORM_NAME', data.name);
                         commit('RAW', data);
+                        if (data.type) {
+                            commit('FORM_TYPE', data.type);
+                        }
                         // const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
                         let actions = [];
                         if (data.actions.length > 0)
@@ -564,6 +606,7 @@ export default {
                         console.log(error);
                     })
                     .finally(() => {
+                        commit('FORM_LOADED', true);
                         commit('LOADING', false);
                     });
             }
