@@ -148,7 +148,6 @@ export default {
             //   console.log(this.formAnswer);
         },
         form_loaded(val) {
-            console.log('form_loaded', val);
             if (val) {
                 setTimeout(() => {
                     this.handleParamsActions();

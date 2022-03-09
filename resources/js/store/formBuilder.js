@@ -294,6 +294,7 @@ export default {
                     id: `external-filter-${val.column.id}`,
                     order: 0,
                     search: val.search,
+                    type: val.type,
                 };
                 const preitem = state.active_filter.find((it) => it.id === item.id);
                 if (val.search !== '' && val.search !== null && val.search !== undefined) {
@@ -337,6 +338,7 @@ export default {
                 id: `external-filter-${val.column.id}`,
                 order: 0,
                 search: val.search,
+                type: val.type,
             };
             const preitem = state.selector_remote_filter.find((it) => it.id === item.id);
             if (val.search !== '' && val.search !== null && val.search !== undefined) {

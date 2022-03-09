@@ -3,6 +3,8 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable eqeqeq */
 /* eslint-disable camelcase */
+import _ from 'lodash';
+
 export default {
     /**
      * las props: input, state y value
@@ -38,6 +40,11 @@ export default {
         remotecolumn: null,
     }),
     computed: {
+        multiple() {
+            const isMultiple = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]';
+
+            return isMultiple;
+        },
         /**
          * Se encarga de mostrar el/los valor(es)
          * selecciondos
@@ -69,11 +76,22 @@ export default {
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
                 // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 this.remotecolumn = column;
+                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' ? 'IN' : 'EQUAL';
+                let selectedValue = '';
+                if (this.selected !== null) {
+                    if (!this.multiple) {
+                        selectedValue = this.selected.id;
+                    } else {
+                        selectedValue =
+                            this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                    }
+                }
                 const filter = {
                     column,
                     id: `external-filter-${column.id}`,
                     order: 1,
-                    search: this.selected === null ? '' : this.selected.id,
+                    search: selectedValue,
+                    type,
                     remote: this.input.options === null && this.input.entity_type_fk === null,
                 };
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
@@ -201,11 +219,21 @@ export default {
                 this.selectorvmodelsample = Object.assign({}, data);
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                let selectedValue = '';
+                if (val !== null) {
+                    if (!this.multiple) {
+                        selectedValue = val.id;
+                    } else {
+                        selectedValue = val.length > 0 ? val.map((v) => v.id) : '';
+                    }
+                }
+                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' ? 'IN' : 'EQUAL';
                 const filter = {
                     column,
                     id: `external-filter-${column.id}`,
                     order: 1,
-                    search: data[this.id],
+                    search: selectedValue,
+                    type,
                     remote: this.input.options === null && this.input.entity_type_fk === null,
                 };
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
@@ -305,12 +333,47 @@ export default {
                         }
                     });
                     this.optionsRemote = optionsToSet;
-                    this.loading = false;
                 }
             }
+            this.loading = false;
             this.cleanReadOnly();
         },
-        async filterByFunc(option, label, search) {
+        // filterByFunc: _.debounce(async function handleFilterBy(option, label, search) {
+        //     console.log(`filtering ${search}`);
+        //     this.cleanReadOnly();
+        //     if (this.input.options === null && this.input.entity_type_fk === null) {
+        //         const item = {
+        //             column: this.remotecolumn,
+        //             id: `external-filter-${this.remotecolumn.id}`,
+        //             order: 1,
+        //             search,
+        //             type: 'EQUAL',
+        //         };
+        //         const filters = this.active_filter.slice();
+        //         const preitem = filters.find(
+        //             (it) => it.id === `external-filter-${this.remotecolumn.id}`
+        //         );
+        //         if (preitem) {
+        //             const preindex = filters.indexOf(preitem);
+        //             filters[preindex] = item;
+        //         } else {
+        //             filters.push(item);
+        //         }
+        //         filters.forEach((it, key) => {
+        //             // eslint-disable-next-line no-param-reassign
+        //             it.order = key + 1;
+        //         });
+        //         const mainfilter = {
+        //             active_filters: filters,
+        //             searched_col: this.remotecolumn,
+        //         };
+        //         await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
+        //     }
+        //     return (label || '').toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1;
+        // }, 400),
+        // eslint-disable-next-line prefer-arrow-callback
+        filterByFuncDebounce: _.debounce(async function handleFilterBy(search) {
+            console.log(`filtering debounce ${search}`);
             this.cleanReadOnly();
             if (this.input.options === null && this.input.entity_type_fk === null) {
                 const item = {
@@ -318,9 +381,12 @@ export default {
                     id: `external-filter-${this.remotecolumn.id}`,
                     order: 1,
                     search,
+                    type: 'EQUAL',
                 };
-                const filters = [...this.active_filter];
-                const preitem = filters.find((it) => it.id === this.remotecolumn.id);
+                const filters = this.active_filter.slice();
+                const preitem = filters.find(
+                    (it) => it.id === `external-filter-${this.remotecolumn.id}`
+                );
                 if (preitem) {
                     const preindex = filters.indexOf(preitem);
                     filters[preindex] = item;
@@ -335,11 +401,9 @@ export default {
                     active_filters: filters,
                     searched_col: this.remotecolumn,
                 };
-                console.log('url params', mainfilter);
                 await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
             }
-            return (label || '').toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1;
-        },
+        }, 400),
     },
 };
 </script>
