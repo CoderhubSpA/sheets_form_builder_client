@@ -338,44 +338,14 @@ export default {
             this.loading = false;
             this.cleanReadOnly();
         },
-        // filterByFunc: _.debounce(async function handleFilterBy(option, label, search) {
-        //     console.log(`filtering ${search}`);
-        //     this.cleanReadOnly();
-        //     if (this.input.options === null && this.input.entity_type_fk === null) {
-        //         const item = {
-        //             column: this.remotecolumn,
-        //             id: `external-filter-${this.remotecolumn.id}`,
-        //             order: 1,
-        //             search,
-        //             type: 'EQUAL',
-        //         };
-        //         const filters = this.active_filter.slice();
-        //         const preitem = filters.find(
-        //             (it) => it.id === `external-filter-${this.remotecolumn.id}`
-        //         );
-        //         if (preitem) {
-        //             const preindex = filters.indexOf(preitem);
-        //             filters[preindex] = item;
-        //         } else {
-        //             filters.push(item);
-        //         }
-        //         filters.forEach((it, key) => {
-        //             // eslint-disable-next-line no-param-reassign
-        //             it.order = key + 1;
-        //         });
-        //         const mainfilter = {
-        //             active_filters: filters,
-        //             searched_col: this.remotecolumn,
-        //         };
-        //         await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
-        //     }
-        //     return (label || '').toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) > -1;
-        // }, 400),
         // eslint-disable-next-line prefer-arrow-callback
         filterByFuncDebounce: _.debounce(async function handleFilterBy(search) {
-            console.log(`filtering debounce ${search}`);
             this.cleanReadOnly();
-            if (this.input.options === null && this.input.entity_type_fk === null) {
+            if (
+                this.input.options === null &&
+                this.input.entity_type_fk === null &&
+                search !== ''
+            ) {
                 const item = {
                     column: this.remotecolumn,
                     id: `external-filter-${this.remotecolumn.id}`,
