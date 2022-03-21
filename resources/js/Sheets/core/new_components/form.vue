@@ -1,5 +1,6 @@
 <template>
     <div class="">
+        <loading-message :status="loadingForm"></loading-message>
         <h3 class="sheets-form-title">
             {{ form_title }}
         </h3>
@@ -35,7 +36,7 @@
 /* eslint-disable no-console */
 import Row from './grid/row.vue';
 import Action from './actions/button.vue';
-// import Loading from "./utils/loading.vue";
+import LoadingMessage from '../components/loading-message.vue';
 import Snackbar from './utils/snackbar.vue';
 import FormBuilderStore from '../../../store/formBuilder';
 import registerStore from './utils/reusabale-store';
@@ -86,6 +87,7 @@ export default {
         'sheets-row': Row,
         'sheets-action': Action,
         'sheets-snackbar': Snackbar,
+        LoadingMessage,
     },
     data: () => ({
         formRows: [],
@@ -100,6 +102,7 @@ export default {
         errorRequiredFields: false,
         errorOnLoadFiles: false,
         uploadingForm: false,
+        loadingForm: false,
     }),
     computed: {
         loading() {
@@ -185,6 +188,7 @@ export default {
             }
         },
         initForm() {
+            this.loadingForm = true;
             if (this.is_test === 'false') {
                 this.$store
                     .dispatch(`${this.namespace}/get`, {
@@ -193,6 +197,7 @@ export default {
                         params: this.params,
                     })
                     .then((form) => {
+                        this.loadingForm = false;
                         if (form.success) {
                             this.formRows = form.rows;
                             this.formActions = form.actions;
@@ -208,6 +213,7 @@ export default {
                         // this.get_record();
                     })
                     .catch((error) => {
+                        this.loadingForm = false;
                         this.snackbar = {
                             message: error.message,
                             success: false,
@@ -226,6 +232,7 @@ export default {
                         contentinfo: entityinfoTest,
                     })
                     .then((form) => {
+                        this.loadingForm = false;
                         if (form.success) {
                             this.formRows = form.rows;
                             this.formActions = form.actions;
@@ -241,6 +248,7 @@ export default {
                         // this.get_record();
                     })
                     .catch((error) => {
+                        this.loadingForm = false;
                         this.snackbar = {
                             message: error.message,
                             success: false,
@@ -276,12 +284,14 @@ export default {
             });
         },
         async get_record() {
+            this.loadingForm = true;
             if (this.record_id) {
                 const data = {
                     entity_name: this.$store.getters[`${this.namespace}/entity_name`],
                     id: this.record_id,
                 };
                 await this.$store.dispatch(`${this.namespace}/get_record`, data);
+                this.loadingForm = false;
             }
         },
         async validateAllFields() {
@@ -295,6 +305,8 @@ export default {
                     resultValidator[key] = obj[key];
                 }
             });
+
+            console.log('resultValidator', resultValidator);
 
             this.formRows.forEach((row) => {
                 row.sections.forEach((section) => {

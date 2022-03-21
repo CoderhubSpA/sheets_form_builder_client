@@ -79,42 +79,63 @@ export default {
     watch: {
         file(val) {
             if (val) {
-                if (this.extension === 'xlsx') {
-                    this.handleImport();
-                }
+                this.handleImport();
             }
         },
         selected(val) {
-            if (val) {
+            if (val && val !== undefined) {
                 const data = {};
-                if (Array.isArray(val)) {
+                if (Array.isArray(val) && val[0] !== undefined) {
                     data[this.id] = val[0].id;
                 } else {
                     data[this.id] = val.id;
                 }
                 this.$emit('input', data);
+                let store = {};
+                switch (this.extension) {
+                    case 'xlsx':
+                        store = { id: this.id, file: this.file, metadata: data[this.id] };
+                        break;
+                    case 'xls':
+                    case 'csv':
+                        store = { id: this.id, file: this.file };
+                        break;
+                    default:
+                        break;
+                }
 
-                const store = { id: this.id, file: this.file, metadata: data[this.id] };
                 this.$store.commit(`${this.state}/FILES`, store);
             }
         },
     },
     methods: {
-        handleImport() {
+        async handleImport() {
             const wb = new ExcelJs.Workbook();
             const reader = new FileReader();
             reader.readAsArrayBuffer(this.file);
+            switch (this.extension) {
+                case 'xlsx':
+                    reader.onload = () => {
+                        const buffer = reader.result;
+                        wb.xlsx.load(buffer).then((workbook) => {
+                            this.options = workbook.worksheets.map((sheet) => {
+                                return { id: sheet.name, name: sheet.name };
+                            });
 
-            reader.onload = () => {
-                const buffer = reader.result;
-                wb.xlsx.load(buffer).then((workbook) => {
-                    this.options = workbook.worksheets.map((sheet) => {
-                        return { id: sheet.name, name: sheet.name };
-                    });
+                            this.selected.push(this.options[0]);
+                        });
+                    };
+                    break;
+                case 'xls':
+                case 'csv':
+                    reader.onload = async () => {
+                        this.selected.push({ id: 'file-pending', name: 'file-pending' });
+                    };
+                    break;
 
-                    this.selected.push(this.options[0]);
-                });
-            };
+                default:
+                    break;
+            }
         },
         onChange(event) {
             this.showDeleteBtn = true;
