@@ -306,8 +306,6 @@ export default {
                 }
             });
 
-            console.log('resultValidator', resultValidator);
-
             this.formRows.forEach((row) => {
                 row.sections.forEach((section) => {
                     section.fields.forEach(async (field) => {

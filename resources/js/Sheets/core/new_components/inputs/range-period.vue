@@ -23,7 +23,7 @@
             <div class="col-6">
                 <vue-monthly-picker
                     :selectedBackgroundColor="errorInput ? 'red' : ''"
-                    :id="`${id}-start`"
+                    :id="`${id}-end`"
                     placeHolder="Valor final"
                     v-model="dateEnd"
                     @selected="selectedEnd"

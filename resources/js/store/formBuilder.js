@@ -557,7 +557,6 @@ export default {
                         Object.keys(fields).forEach((key) => {
                             const f = {};
                             f[key] = fields[key];
-
                             commit('FIELDS', f);
                         });
                         commit('PIVOTS', response.data.content.pivots);

@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable camelcase */
 import Handsontable from 'handsontable';
 import { KeyValueSelect } from 'handsontable-key-value-select';
 import CustomMultiSelectEditor from '../handsontableCustom/customMultiSelectEditor';
@@ -66,6 +67,45 @@ export default {
         },
         col_name() {
             return this.input.col_name;
+        },
+
+        show_by_field_id() {
+            return this.input.show_by_field_id;
+        },
+        show_by_field_value() {
+            return this.input.show_by_field_value;
+        },
+        show_field() {
+            const fields = this.$store.getters[`${this.state}/field_show_hide`];
+            // eslint-disable-next-line camelcase
+            let show_field = false;
+            if (this.show_by_field_id) {
+                // eslint-disable-next-line eqeqeq
+                if ((fields[this.show_by_field_id] || false) == this.show_by_field_value) {
+                    // eslint-disable-next-line camelcase
+                    show_field = true;
+                }
+                try {
+                    // Permite validar si entre un selector multiple existe el
+                    // valor que condiciona que el elemento se vea o no
+                    if (
+                        Array.isArray(fields[this.show_by_field_id]) &&
+                        fields[this.show_by_field_id]
+                            .map((d) => d.id)
+                            .includes(this.show_by_field_value)
+                    ) {
+                        // eslint-disable-next-line camelcase, no-undef
+                        show_section = true;
+                    }
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.warn(e);
+                }
+                // eslint-disable-next-line camelcase
+            } else show_field = true;
+            // eslint-disable-next-line camelcase
+            this.$emit('tooglefield', show_field);
+            return show_field;
         },
     },
     watch: {

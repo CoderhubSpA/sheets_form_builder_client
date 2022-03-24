@@ -75,6 +75,20 @@ export default {
         multiple() {
             return false;
         },
+        preFile() {
+            const fields = this.$store.getters[`${this.state}/fields`];
+
+            if (fields && fields.length > 0) {
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (val) {
+                    const prevVal = {};
+                    prevVal[this.id] = val[this.id];
+                    this.$emit('input', prevVal);
+                    return prevVal[this.id];
+                }
+            }
+            return null;
+        },
     },
     watch: {
         file(val) {
@@ -108,7 +122,23 @@ export default {
             }
         },
     },
+    mounted() {
+        this.readPreFile();
+    },
     methods: {
+        readPreFile() {
+            if (this.preFile) {
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                if (contentInfo) {
+                    const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
+                    const fileEntity = entities.find((ent) => ent.id === this.preFile);
+                    if (fileEntity) {
+                        this.ph = fileEntity.name;
+                        this.can_select_sheets = false;
+                    }
+                }
+            }
+        },
         async handleImport() {
             const wb = new ExcelJs.Workbook();
             const reader = new FileReader();

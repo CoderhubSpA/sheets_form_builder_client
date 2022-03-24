@@ -3,6 +3,8 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
+import _ from 'lodash';
+
 export default {
     props: {
         input: {
@@ -123,7 +125,6 @@ export default {
         },
     },
     mounted() {
-        console.log('rangeValue', this.rangeValue);
         this.readInputValue();
     },
     methods: {
@@ -134,30 +135,36 @@ export default {
             };
             this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
         },
-        onInputStart(e) {
+        onInputStart: _.debounce(async function handlerInputStart(e) {
             this.rangeValue.start = Number(e.target.value);
             this.handleInputData();
-        },
-        onInputEnd(e) {
+        }, 400),
+        onInputEnd: _.debounce(async function handlerInputEnd(e) {
             this.rangeValue.end = Number(e.target.value);
             this.handleInputData();
-        },
+        }, 400),
         selectedStart(val) {
-            console.log('start', val);
-            const start = val._i.split('/');
-            if (Number(start[1]) <= 9) {
-                start[1] = `0${start[1]}`;
+            if (val !== null) {
+                const start = val._i.split('/');
+                if (Number(start[1]) <= 9) {
+                    start[1] = `0${start[1]}`;
+                }
+                this.rangeValue.start = Number(`${start[0]}${start[1]}`);
+            } else {
+                this.rangeValue.start = null;
             }
-            this.rangeValue.start = Number(`${start[0]}${start[1]}`);
             this.handleInputData();
         },
         selectedEnd(val) {
-            console.log('end', val);
-            const end = val._i.split('/');
-            if (Number(end[1]) <= 9) {
-                end[1] = `0${end[1]}`;
+            if (val !== null) {
+                const end = val._i.split('/');
+                if (Number(end[1]) <= 9) {
+                    end[1] = `0${end[1]}`;
+                }
+                this.rangeValue.end = Number(`${end[0]}${end[1]}`);
+            } else {
+                this.rangeValue.end = null;
             }
-            this.rangeValue.end = Number(`${end[0]}${end[1]}`);
             this.handleInputData();
         },
         handleInputData() {
@@ -175,7 +182,6 @@ export default {
             this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
             const data = {};
             data[this.id] = this.rangeValue;
-            console.log('data', data);
             this.vmodelcurrentvalue = data;
             this.$emit('input', data);
             /**
@@ -192,6 +198,36 @@ export default {
             const field_show_hide = {};
             field_show_hide[this.form_field_id] = this.rangeValue;
             this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
+            /**
+             * Almacenar data para filtros
+             */
+            if (this.rangeValue.start === null && this.rangeValue.end === null) {
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                const filter = {
+                    column,
+                    id: `external-filter-${column.id}`,
+                    order: 1,
+                    search: null,
+                    type: 'BETWEEN',
+                    remote: true,
+                };
+                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+            } else {
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                const filter = {
+                    column,
+                    id: `external-filter-${column.id}`,
+                    order: 1,
+                    search: this.rangeValue,
+                    type: 'BETWEEN',
+                    remote: true,
+                };
+                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+            }
         },
     },
 };

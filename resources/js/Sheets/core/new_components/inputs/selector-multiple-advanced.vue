@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid">
+    <div v-if="show_field" class="container-fluid">
         <div class="row p-1 mb-2">
             <div class="col-12">
                 <div class="row">

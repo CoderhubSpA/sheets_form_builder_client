@@ -40,7 +40,6 @@ export default {
 
             if (fields && fields.length > 0) {
                 const field = fields.filter((f) => Object.keys(f)[0] == this.id)[0];
-
                 if (field) {
                     const key = Object.keys(field)[0];
 
@@ -50,12 +49,16 @@ export default {
                         result = Object.entries(search).map((s) =>
                             this.options.find((o) => o.id == s[1])
                         );
-                    } else if (!this.multiple && !!search) {
+                    } else if ((!this.multiple && !!search) || (!this.multiple && search === 0)) {
                         result = this.options.find((o) => o.id == search);
                     }
                 }
             }
             return result;
+        },
+        selectorFilters() {
+            const selectorfilters = this.$store.getters[`${this.state}/selectorfilters`];
+            return selectorfilters;
         },
         /**
          * armado de las opciones para los selectores
@@ -69,7 +72,24 @@ export default {
 
                 const entities = contentInfo.content.entities_fk[fk];
                 if (entities) {
-                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
+                    if (this.input.col_filter_by === null && this.input.col_fk_filter === null) {
+                        options = entities.map((e) => ({ id: e.id, name: e[key] }));
+                    } else {
+                        options = [];
+                        if (
+                            Object.keys(this.selectorFilters).indexOf(this.input.col_filter_by) >= 0
+                        ) {
+                            if (this.selectorFilters[this.input.col_filter_by]) {
+                                // eslint-disable-next-line array-callback-return,  consistent-return
+                                const optionsfiltered = entities.filter(
+                                    (e) =>
+                                        e[this.input.col_fk_filter] ===
+                                        this.selectorFilters[this.input.col_filter_by].toString()
+                                );
+                                options = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));
+                            }
+                        }
+                    }
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
 
@@ -177,33 +197,38 @@ export default {
          * para ser enviado al server
          */
         selected(val) {
+            const data = {};
+            if (this.multiple) {
+                data[this.id] = [];
+            } else {
+                data[this.id] = null;
+            }
             if (val) {
-                const data = {};
-
                 if (this.multiple) {
                     data[this.id] = val.map((v) => v.id);
                 } else {
                     data[this.id] = val.id;
                 }
-
-                // eslint-disable-next-line prefer-object-spread
-                this.selectorvmodelsample = Object.assign({}, data);
-                this.$emit('input', data);
-                /**
-                 * mostrar/ocultar section
-                 */
-                // eslint-disable-next-line camelcase
-                const field_section_show_hide = {};
-                field_section_show_hide[this.form_field_id] = data[this.id];
-                this.$store.commit(
-                    `${this.state}/FIELD_SECTION_SHOW_HIDE`,
-                    field_section_show_hide
-                );
-                // eslint-disable-next-line camelcase
-                const field_show_hide = {};
-                field_show_hide[this.form_field_id] = data[this.id];
-                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
             }
+            // eslint-disable-next-line prefer-object-spread
+            this.selectorvmodelsample = Object.assign({}, data);
+            this.$emit('input', data);
+            const dataToSelectorFilters = {
+                key: this.input.col_name,
+                value: data[this.id],
+            };
+            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
+            /**
+             * mostrar/ocultar section
+             */
+            // eslint-disable-next-line camelcase
+            const field_section_show_hide = {};
+            field_section_show_hide[this.form_field_id] = data[this.id];
+            this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
+            // eslint-disable-next-line camelcase
+            const field_show_hide = {};
+            field_show_hide[this.form_field_id] = data[this.id];
+            this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
         },
         /**
          * Observador para selectedValue
