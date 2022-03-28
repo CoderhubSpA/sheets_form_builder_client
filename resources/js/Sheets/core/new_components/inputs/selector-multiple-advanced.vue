@@ -1,5 +1,5 @@
 <template>
-    <div v-if="show_field" class="container-fluid" :id="`sma-${id}`">
+    <div class="container-fluid" :id="`sma-${id}`" :class="!show_field ? 'sma-not-visible' : ''">
         <div class="row p-1 mb-2">
             <div class="col-12">
                 <div class="row">
@@ -42,6 +42,11 @@
                 <p class="text-danger">Por favor complete los campos requeridos</p>
             </div>
         </div>
+        <div v-if="loadingSelector" class="clearfix" style="margin: 15px">
+            <div class="spinner-border float-right" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -66,6 +71,9 @@ export default {
 };
 </script>
 <style scoped>
+.sma-not-visible {
+    display: none;
+}
 .min-height-handsontable {
     min-height: 150px;
 }

@@ -54,6 +54,9 @@ export default {
         fieldInput() {
             const chars = { '[': '-', ']': '' };
             const format = this.field.format.toLowerCase().replace(/\[|\]/g, (m) => chars[m]);
+            if (format === 'selector-multiple-advanced') {
+                return () => import(`./inputs/text`);
+            }
             return () => import(`./inputs/${format}`);
         },
         xl() {
@@ -94,8 +97,8 @@ export default {
         handlePollEntry(val, id, colName) {
             this.$emit('sheets-input-change', val, id, colName);
         },
-        handleToogleField(hide) {
-            if (hide) {
+        handleToogleField(show) {
+            if (show) {
                 this.hidden_class = 'visible-field';
             } else {
                 this.hidden_class = 'not-visible-field';

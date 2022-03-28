@@ -258,30 +258,32 @@ export default {
             }
         },
         async handleParamsActions() {
-            const paramsActions = JSON.parse(this.params_actions);
-            const defaultAction = {
-                id: 'DEFAULT-ACTION',
-                name: 'Guardar por defecto',
-                save_form: 1,
-                refresh_form: null,
-                close_form: null,
-                cancel_form: 0,
-                cancel_process: 0,
-                process_id: null,
-                color: null,
-                text_color: null,
-                valid: 1,
-            };
-            paramsActions.forEach(async (action) => {
-                switch (action.type) {
-                    case 'auto_submit':
-                        await this.handlerAction(true, defaultAction);
-                        break;
+            if (this.params_actions) {
+                const paramsActions = JSON.parse(this.params_actions);
+                const defaultAction = {
+                    id: 'DEFAULT-ACTION',
+                    name: 'Guardar por defecto',
+                    save_form: 1,
+                    refresh_form: null,
+                    close_form: null,
+                    cancel_form: 0,
+                    cancel_process: 0,
+                    process_id: null,
+                    color: null,
+                    text_color: null,
+                    valid: 1,
+                };
+                paramsActions.forEach(async (action) => {
+                    switch (action.type) {
+                        case 'auto_submit':
+                            await this.handlerAction(true, defaultAction);
+                            break;
 
-                    default:
-                        break;
-                }
-            });
+                        default:
+                            break;
+                    }
+                });
+            }
         },
         async get_record() {
             this.loadingForm = true;

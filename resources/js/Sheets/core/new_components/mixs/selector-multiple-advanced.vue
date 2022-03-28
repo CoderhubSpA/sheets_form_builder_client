@@ -126,8 +126,17 @@ export default {
                 });
             }
         },
+        show_field() {
+            this.loadingSelector = true;
+            setTimeout(() => {
+                this.loadingSelector = false;
+                this.addRow();
+                this.handsontableData.pop();
+            }, 500);
+        },
     },
     data: () => ({
+        loadingSelector: false,
         multipleSelectorsFormats: [
             'SELECTOR[MULTIPLE]',
             'SELECTOR[1XN][ALL]',
@@ -201,6 +210,7 @@ export default {
     methods: {
         getEntityInfo() {
             this.$store.commit(`${this.state}/LOADING`, true);
+            this.loadingSelector = true;
             // eslint-disable-next-line no-undef
             axios
                 .get(`/api/sheets/entity/info/${this.input.entity_type_pivot_fk}`)
@@ -213,13 +223,16 @@ export default {
                     this.buildHotTableColumns();
                     // ARMO EL CONTENIDO DE CADA ROW
                     this.buildHotTableData();
+                    this.loadingSelector = false;
                 })
                 .catch((error) => {
                     // eslint-disable-next-line no-console
                     console.log(error);
+                    this.loadingSelector = false;
                 })
                 .finally(() => {
                     this.hotTableLoaded = true;
+                    this.loadingSelector = false;
                     // AGREGO LOS HOOKS
                     this.addHooks();
                 });
