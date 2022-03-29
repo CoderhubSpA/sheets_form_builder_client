@@ -28,6 +28,7 @@ export default {
          * Valor por defecto
          */
         defaultOption: null,
+        optionsFiltered: [],
     }),
     computed: {
         /**
@@ -46,11 +47,15 @@ export default {
                     const search = this.multiple ? JSON.parse(field[key]) : field[key];
 
                     if (this.multiple && !!search) {
-                        result = Object.entries(search).map((s) =>
-                            this.options.find((o) => o.id == s[1])
-                        );
+                        if (this.options.length !== 0) {
+                            result = Object.entries(search).map((s) =>
+                                this.options.find((o) => o.id == s[1])
+                            );
+                        }
                     } else if ((!this.multiple && !!search) || (!this.multiple && search === 0)) {
-                        result = this.options.find((o) => o.id == search);
+                        if (this.options.length !== 0) {
+                            result = this.options.find((o) => o.id == search);
+                        }
                     }
                 }
             }
@@ -72,24 +77,7 @@ export default {
 
                 const entities = contentInfo.content.entities_fk[fk];
                 if (entities) {
-                    if (this.input.col_filter_by === null && this.input.col_fk_filter === null) {
-                        options = entities.map((e) => ({ id: e.id, name: e[key] }));
-                    } else {
-                        options = [];
-                        if (
-                            Object.keys(this.selectorFilters).indexOf(this.input.col_filter_by) >= 0
-                        ) {
-                            if (this.selectorFilters[this.input.col_filter_by]) {
-                                // eslint-disable-next-line array-callback-return,  consistent-return
-                                const optionsfiltered = entities.filter(
-                                    (e) =>
-                                        e[this.input.col_fk_filter] ===
-                                        this.selectorFilters[this.input.col_filter_by].toString()
-                                );
-                                options = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));
-                            }
-                        }
-                    }
+                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
 
@@ -203,9 +191,11 @@ export default {
             } else {
                 data[this.id] = null;
             }
-            if (val) {
+            if (val !== undefined && val !== null) {
                 if (this.multiple) {
-                    data[this.id] = val.map((v) => v.id);
+                    if (val[0] !== undefined) {
+                        data[this.id] = val.map((v) => v.id);
+                    }
                 } else {
                     data[this.id] = val.id;
                 }
@@ -266,6 +256,31 @@ export default {
                 }
             }
         },
+        selectorFilters(val) {
+            if (val && this.input.col_filter_by !== null && this.input.col_fk_filter !== null) {
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                let optionsFil = [];
+                const key = this.input.col_name_fk || 'name';
+                if (contentInfo) {
+                    const fk = this.input.entity_type_fk;
+
+                    const entities = contentInfo.content.entities_fk[fk];
+                    if (
+                        Object.keys(this.selectorFilters).indexOf(this.input.col_filter_by) >= 0 &&
+                        this.selectorFilters[this.input.col_filter_by] !== undefined &&
+                        this.selectorFilters[this.input.col_filter_by] !== null
+                    ) {
+                        const optionsfiltered = entities.filter(
+                            (e) =>
+                                e[this.input.col_fk_filter] ===
+                                this.selectorFilters[this.input.col_filter_by].toString()
+                        );
+                        optionsFil = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));
+                    }
+                }
+                this.optionsFiltered = optionsFil;
+            }
+        },
     },
     mounted() {
         // console.log('selector', this.input);
@@ -273,8 +288,6 @@ export default {
     methods: {
         createdOption(id) {
             const optionToSelect = this.options.find((option) => option.id === id);
-            // eslint-disable-next-line no-console
-            console.log(this.selected, optionToSelect);
             if (this.multiple) {
                 if (this.selected) this.selected.push(optionToSelect);
                 else this.selected = [optionToSelect];

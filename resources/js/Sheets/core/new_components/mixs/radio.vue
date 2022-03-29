@@ -35,6 +35,7 @@ export default {
                     return entities.map((e) => {
                         if (this.input.default_value == e.id) {
                             this.defaultOption = e.name;
+                            this.pickedModel = this.input.default_value;
                         }
                         return { id: e.id, name: e.name };
                     });
@@ -50,6 +51,7 @@ export default {
                     optionsReturn.forEach((optV) => {
                         if (this.input.default_value == optV.id) {
                             this.defaultOption = optV.name;
+                            this.pickedModel = this.input.default_value;
                         }
                     });
                 }
@@ -115,7 +117,7 @@ export default {
         },
     },
     mounted() {
-        if (this.picked) {
+        if (this.picked !== null && this.picked !== undefined) {
             this.pickedModel = this.picked;
         }
     },

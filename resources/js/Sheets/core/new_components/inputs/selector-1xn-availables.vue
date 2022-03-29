@@ -11,7 +11,13 @@
         <v-select
             label="name"
             :id="id"
-            :options="options"
+            :options="
+                optionsFiltered.length === 0 &&
+                this.input.col_filter_by === null &&
+                this.input.col_fk_filter === null
+                    ? options
+                    : optionsFiltered
+            "
             :disabled="disabled"
             v-model="selected"
             :multiple="multiple"

@@ -8,7 +8,19 @@
         :tooltipInfo="this.input.description"
         v-if="show_field"
     >
-        <v-select label="name" :id="id" :options="options" :disabled="disabled" v-model="selected">
+        <v-select
+            label="name"
+            :id="id"
+            :options="
+                optionsFiltered.length === 0 &&
+                this.input.col_filter_by === null &&
+                this.input.col_fk_filter === null
+                    ? options
+                    : optionsFiltered
+            "
+            :disabled="disabled"
+            v-model="selected"
+        >
         </v-select>
         <nested-form
             v-if="has_entity_type_permission_fk"

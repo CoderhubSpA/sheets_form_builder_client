@@ -8,20 +8,22 @@
         :tooltipInfo="this.input.description"
         v-if="show_field"
     >
-        <div class="custom-control custom-radio" v-for="(option, key) in options" :key="key">
-            <input
-                type="radio"
-                :id="`${input.col_name}-${option.id}`"
-                :name="input.col_name"
-                :value="option.id"
-                v-model="pickedModel"
-                :disabled="disabled"
-                :checked="pickedModel === option.id"
-                class="custom-control-input"
-            />
-            <label class="custom-control-label" :for="`${input.col_name}-${option.id}`">{{
-                option.name
-            }}</label>
+        <div class="radio-list">
+            <div class="custom-control custom-radio" v-for="(option, key) in options" :key="key">
+                <input
+                    type="radio"
+                    :id="`${input.col_name}-${option.id}`"
+                    :name="input.col_name"
+                    :value="option.id"
+                    v-model="pickedModel"
+                    :disabled="disabled"
+                    :checked="pickedModel == option.id"
+                    class="custom-control-input"
+                />
+                <label class="custom-control-label" :for="`${input.col_name}-${option.id}`">{{
+                    option.name
+                }}</label>
+            </div>
         </div>
         <div class="row" v-if="this.input.default_value !== null">
             <div class="col">

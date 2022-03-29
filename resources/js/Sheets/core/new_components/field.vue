@@ -54,8 +54,8 @@ export default {
         fieldInput() {
             const chars = { '[': '-', ']': '' };
             const format = this.field.format.toLowerCase().replace(/\[|\]/g, (m) => chars[m]);
-            // if (format === 'selector-multiple-advanced') {
-            //     return () => import(`./inputs/text`);
+            // if (format === 'selector') {
+            //     return () => import(`./inputs/radio`);
             // }
             return () => import(`./inputs/${format}`);
         },
