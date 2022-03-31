@@ -113,6 +113,7 @@ export default {
             this.formAnswer.forEach((row) => {
                 arr = arr.concat(row);
             });
+            console.log('result', arr);
             return arr;
         },
         filesInForm() {
@@ -436,6 +437,9 @@ export default {
                         // eslint-disable-next-line prefer-object-spread
                         const obj = Object.assign({}, r);
                         const key = Object.keys(obj)[0];
+                        if (key === '01d70032-ac2c-4880-9c89-22d466b5944b') {
+                            console.log('r', r);
+                        }
                         body[key] = obj[key];
                     }
                 });
@@ -444,6 +448,7 @@ export default {
                     body.id = this.record_id;
                 }
                 body = { ...body, ...this.filesUploaded };
+                console.log('body', body);
                 data[entityId].push(body);
 
                 const form = new FormData();

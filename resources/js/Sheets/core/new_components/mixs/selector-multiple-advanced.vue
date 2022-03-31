@@ -557,6 +557,11 @@ export default {
         logData() {
             // eslint-disable-next-line no-console
             console.log('this.handsontableData', this.handsontableData);
+            // eslint-disable-next-line no-console
+            console.log('this.mainPivot', this.mainPivot);
+            const record_id = this.$store.getters[`${this.state}/record_id`];
+            // eslint-disable-next-line no-console
+            console.log('record_id', record_id);
         },
         changeData() {
             const dataToSend = {};
@@ -587,6 +592,10 @@ export default {
                         }
                     }
                 });
+                const record_id = this.$store.getters[`${this.state}/record_id`];
+                if (record_id !== null && record_id !== undefined) {
+                    dataToPush[this.mainPivot.id] = record_id;
+                }
                 if (Object.keys(dataToPush).length > 0) {
                     dataToSend[this.input.id][this.input.entity_type_pivot_fk].push(dataToPush);
                 }
