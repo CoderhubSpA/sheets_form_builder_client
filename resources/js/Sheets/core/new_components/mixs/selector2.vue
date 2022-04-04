@@ -36,7 +36,7 @@ export default {
          * selecciondos
          */
         selectedValue() {
-            let result = null;
+            let result = this.multiple ? [] : null;
             const fields = this.$store.getters[`${this.state}/fields`];
 
             if (fields && fields.length > 0) {

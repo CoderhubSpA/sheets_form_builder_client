@@ -23,7 +23,9 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
     const span = document.createElement('SPAN');
     if (value !== null && value !== undefined && value !== '') {
         const selected = cellProperties.selectOptions.find((opt) => opt.value === value);
-        span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${selected.label}`;
+        span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${
+            selected ? selected.label : value.toString()
+        }`;
     } else {
         span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>`;
     }
