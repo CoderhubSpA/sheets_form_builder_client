@@ -28,6 +28,7 @@ export default {
         recordid: null,
         entities_fk: null,
         contentinfo: null,
+        timestamp : (new Date()).getTime()
     },
     getters: {
         form: (state) => state.form,
@@ -43,6 +44,7 @@ export default {
         recordid: (state) => state.recordid,
         entities_fk: (state) => state.entities_fk,
         contentinfo: (state) => state.contentinfo,
+        timestamp: (state) => state.timestamp,
     },
     mutations: {
         FORM(state, form) {

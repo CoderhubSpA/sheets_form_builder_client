@@ -595,6 +595,7 @@ export default {
         },
         handlerFilterData() {
             const data = {
+                timestamp: this.$store.getters["form/timestamp"],
                 type: 'filter_data',
                 params: [
                     {
