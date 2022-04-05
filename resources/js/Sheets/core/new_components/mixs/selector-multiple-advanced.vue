@@ -481,7 +481,14 @@ export default {
             // Si no es null pero es falsy, esta vacio. Salir.
             if (!this.pivots) return;
 
-            const data = Object.values(this.pivots);
+            let pivots_raw = Object.values(this.pivots);
+
+            let pivots = _.first(pivots_raw)
+            
+            if (!pivots) return;
+            
+            const data = Object.values(pivots);
+
             data.forEach((element) => {
                 // eslint-disable-next-line array-callback-return
                 Object.keys(element).map((key) => {
