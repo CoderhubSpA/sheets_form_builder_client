@@ -483,7 +483,11 @@ export default {
 
             let pivots_raw = Object.values(this.pivots);
 
-            let pivots = _.first(pivots_raw)
+            let pivots = pivots_raw.reduce( (acc,p) => {
+                let f = Object.values(p);
+                acc = acc.concat(f);
+                return acc;
+            },[]);
             
             if (!pivots) return;
             
