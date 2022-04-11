@@ -5,7 +5,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import Vue from 'vue';
 
