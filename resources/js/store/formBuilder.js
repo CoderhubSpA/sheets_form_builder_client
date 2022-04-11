@@ -92,6 +92,7 @@ export default {
         active_filter: [],
         selector_remote_filter: [],
         url_selector_remote: {},
+        uuid: null,
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -148,6 +149,7 @@ export default {
         active_filter: (state) => state.active_filter,
         selector_remote_filter: (state) => state.selector_remote_filter,
         url_selector_remote: (state) => state.url_selector_remote,
+        uuid: (state) => state.uuid,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -359,6 +361,9 @@ export default {
             state.selector_remote_filter.forEach((it, key) => {
                 it.order = key + 1;
             });
+        },
+        UUID(state, uuid) {
+            state.uuid = uuid;
         },
     },
     actions: {

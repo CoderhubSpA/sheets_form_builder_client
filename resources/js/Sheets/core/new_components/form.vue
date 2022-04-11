@@ -166,6 +166,7 @@ export default {
         if (this.base_url) {
             this.$store.commit(`${this.namespace}/BASE_URL`, this.base_url);
         }
+        this.$store.commit(`${this.namespace}/UUID`, uuidv4());
     },
     mounted() {
         window.name = this.windowName;
@@ -595,7 +596,7 @@ export default {
         },
         handlerFilterData() {
             const data = {
-                uuid: this.$store.getters["form/uuid"],
+                uuid: this.$store.getters[`${this.namespace}/uuid`],
                 type: 'filter_data',
                 params: [
                     {

@@ -5,8 +5,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
-import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import Vue from 'vue';
 
 export default {
@@ -29,7 +29,6 @@ export default {
         recordid: null,
         entities_fk: null,
         contentinfo: null,
-        uuid: uuidv4()
     },
     getters: {
         form: (state) => state.form,
@@ -45,7 +44,6 @@ export default {
         recordid: (state) => state.recordid,
         entities_fk: (state) => state.entities_fk,
         contentinfo: (state) => state.contentinfo,
-        uuid: (state) => state.uuid,
     },
     mutations: {
         FORM(state, form) {
