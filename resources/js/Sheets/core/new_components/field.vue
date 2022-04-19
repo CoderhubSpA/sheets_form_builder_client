@@ -88,6 +88,7 @@ export default {
             this.$emit('input', this.data);
         },
         clear(val) {
+            console.log('field 91',val)
             if (val) {
                 this.data = {};
             }

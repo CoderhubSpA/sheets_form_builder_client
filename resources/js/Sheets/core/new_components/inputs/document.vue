@@ -97,15 +97,6 @@ export default {
         onInput(event) {
             // console.log(event)
         },
-        onDeleteFile() {
-            this.showDeleteBtn = false;
-            this.$refs.inputFileRef.value = null;
-            this.ph = '';
-            this.$store.commit(`${this.state}/DELETE_FILE`, this.id);
-            const validation = {};
-            validation[this.id] = null;
-            this.$emit('input', validation);
-        },
     },
 };
 </script>

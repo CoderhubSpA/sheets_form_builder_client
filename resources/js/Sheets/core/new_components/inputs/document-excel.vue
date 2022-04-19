@@ -184,17 +184,6 @@ export default {
                 this.ph = `${event.target.files[0].name}`;
             }
         },
-        onDeleteFile() {
-            this.showDeleteBtn = false;
-            this.$refs.inputFileRef.value = null;
-            this.ph = '';
-            this.options = [];
-            this.selected = [];
-            this.$store.commit(`${this.state}/DELETE_FILE`, this.id);
-            const validation = {};
-            validation[this.id] = null;
-            this.$emit('input', validation);
-        },
     },
 };
 </script>

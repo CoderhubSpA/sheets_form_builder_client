@@ -488,9 +488,9 @@ export default {
                 acc = acc.concat(f);
                 return acc;
             },[]);
-            
+
             if (!pivots) return;
-            
+
             const data = Object.values(pivots);
 
             data.forEach((element) => {

@@ -16,6 +16,7 @@
             @input="onInput"
             class="form-control"
             maxlength="250"
+            autocomplete="off"
         />
     </form-group>
 </template>

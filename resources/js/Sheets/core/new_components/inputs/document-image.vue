@@ -93,6 +93,10 @@ export default {
                 container.classList.add('show');
             }
         },
+        value(val) {
+            if (Object.keys(val).length === 0)
+                this.onDeleteFile()
+        }
     },
     mounted() {
         if (this.previewLink) {
@@ -124,15 +128,6 @@ export default {
                 validation[this.id] = 'file-pending';
                 this.$emit('input', validation);
             }
-        },
-        onDeleteFile() {
-            this.showDeleteBtn = false;
-            this.preview = '';
-            this.$refs.inputFileRef.value = null;
-            this.$store.commit(`${this.state}/DELETE_FILE`, this.id);
-            const validation = {};
-            validation[this.id] = null;
-            this.$emit('input', validation);
         },
     },
 };

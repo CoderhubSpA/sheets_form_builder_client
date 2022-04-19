@@ -164,6 +164,7 @@ export default {
         this.namespace = namespace;
     },
     created() {
+        console.log(this)
         if (this.base_url) {
             this.$store.commit(`${this.namespace}/BASE_URL`, this.base_url);
         }
