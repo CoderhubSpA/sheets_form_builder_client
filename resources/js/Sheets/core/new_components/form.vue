@@ -33,6 +33,7 @@
 </template>
 
 <script>
+
 /* eslint-disable no-console */
 import Row from './grid/row.vue';
 import Action from './actions/button.vue';
@@ -164,7 +165,6 @@ export default {
         this.namespace = namespace;
     },
     created() {
-        console.log(this)
         if (this.base_url) {
             this.$store.commit(`${this.namespace}/BASE_URL`, this.base_url);
         }
@@ -353,6 +353,7 @@ export default {
             ];
             let valid = true;
             smarequiredfields.forEach((rf) => {
+
                 if (fieldId === rf.fieldId) {
                     content.forEach((item) => {
                         const keys = Object.keys(item);
@@ -465,6 +466,7 @@ export default {
                         show: true,
                         message: 'Datos enviados',
                     };
+                    console.log(this.action.refresh_form)
                     if (this.action.refresh_form === 1) {
                         this.resetForm();
                     }
@@ -481,6 +483,7 @@ export default {
                             };
 
                             if (response.success) {
+                                console.log(this.action.refresh_form)
                                 if (this.action.refresh_form === 1) {
                                     this.resetForm();
                                 }

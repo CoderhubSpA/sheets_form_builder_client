@@ -117,7 +117,7 @@ export default {
         },
     },
     mounted() {
-        this.readInputValue();
+        // this.readInputValue();
     },
     methods: {
         readInputValue() {

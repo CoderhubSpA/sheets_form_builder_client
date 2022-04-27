@@ -50,9 +50,9 @@
 import ExcelJs from 'exceljs';
 import FileTemplate from '../templates/file.vue';
 import mix from '../mixs/input.vue';
-// import mixFile from '../mixs/files.vue';
+import mixFile from '../mixs/files.vue';
 export default {
-    mixins: [mix],
+    mixins: [mix, mixFile],
     components: {
         FileTemplate,
     },
@@ -76,18 +76,22 @@ export default {
             return false;
         },
         preFile() {
-            const fields = this.$store.getters[`${this.state}/fields`];
+            const prevVal = {};
+            const contentInfo = this.$store.getters[`${this.state}/content_info`];
+            if (contentInfo) {
+                const fields = this.$store.getters[`${this.state}/fields`];
 
-            if (fields && fields.length > 0) {
-                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
-                if (val) {
-                    const prevVal = {};
-                    prevVal[this.id] = val[this.id];
-                    this.$emit('input', prevVal);
-                    return prevVal[this.id];
+                if (fields && fields.length > 0) {
+                    const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                    if (val) {
+                        prevVal[this.id] = val[this.id];
+                        this.$emit('input', prevVal);
+                        return prevVal[this.id];
+                    }
                 }
             }
-            return null;
+
+            return prevVal[this.id] ? prevVal[this.id] : '';
         },
     },
     watch: {
@@ -121,9 +125,23 @@ export default {
                 this.$store.commit(`${this.state}/FILES`, store);
             }
         },
+        preFile(val) {
+            if (val) {
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                if (contentInfo) {
+                    const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
+                    const fileEntity = entities.find((ent) => ent.id === val);
+
+                    if (fileEntity) {
+                        this.ph = fileEntity.name;
+                        this.can_select_sheets = false;
+                    }
+                }
+            }
+        }
     },
     mounted() {
-        this.readPreFile();
+        // this.readPreFile();
     },
     methods: {
         readPreFile() {

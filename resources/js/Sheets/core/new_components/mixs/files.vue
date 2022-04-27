@@ -11,6 +11,13 @@ export default {
     data: () => ({
         showDeleteBtn: false,
     }),
+    watch: {
+        value(val) {
+            if (Object.keys(val).length === 0) {
+                this.onDeleteFile()
+            }
+        }
+    },
     methods: {
         onChange(event) {
             const f = event.target.files[0];

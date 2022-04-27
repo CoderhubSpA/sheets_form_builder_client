@@ -255,6 +255,11 @@ export default {
             this.sendingIds.push(this.mainPivot.id);
             // eslint-disable-next-line array-callback-return
             this.entityInfo.columns.map((column) => {
+
+                const readonly = column.show_in_edit_form === 1;
+                const sendtobackend = column.show_in_edit_form === 2;
+                const isRequired = column.col_name === this.input.col_fk_n_1;
+
                 if (
                     column.visible === 1 &&
                     column.show_in_edit_form > 0 &&
@@ -268,34 +273,24 @@ export default {
                                 longestOption = option.name;
                             }
                         });
-                        this.handsontableSettings.colHeaders.push(
-                            column.col_name !== this.input.col_fk_n_1
-                                ? `<div style="width: ${
-                                      longestOption.length * 10
-                                  }px; text-align: center;">${column.name}</div>`
-                                : `<div style="width: ${
-                                      longestOption.length * 10
-                                  }px; text-align: center;">${
-                                      column.name
-                                  } <b style="color: red;">*</b></div>`
-                        );
+
+                        const notRequiredHeader = `<div style="width: ${longestOption.length * 10}px; text-align: center;">${column.name}</div>`;
+                        const requiredHeader = `<div style="width: ${longestOption.length * 10}px; text-align: center;">${column.name} <b style="color: red;">*</b></div>`;
+                        const colHeader = isRequired && !readonly ? requiredHeader : notRequiredHeader;
+
+                        this.handsontableSettings.colHeaders.push(colHeader);
                     } else {
-                        this.handsontableSettings.colHeaders.push(
-                            column.col_name !== this.input.col_fk_n_1
-                                ? column.name
-                                : `${column.name} <b style="color: red;">*</b>`
-                        );
+                        const colHeader = isRequired && !readonly ? `${column.name} <b style="color: red;">*</b>`: column.name;
+                        this.handsontableSettings.colHeaders.push(colHeader);
                     }
-                    if (column.col_name === this.input.col_fk_n_1) {
-                        this.$store.commit(`${this.state}/SMAREQUIREDFIELDS`, {
+                    if (isRequired && !readonly) {
+                        const requireField = {
                             fieldId: this.input.id,
                             name: column.col_name,
                             id: column.id,
-                        });
+                        }
+                        this.$store.commit(`${this.state}/SMAREQUIREDFIELDS`, requireField);
                     }
-                    const readonly = column.show_in_edit_form === 1;
-                    const sendtobackend = column.show_in_edit_form === 2;
-                    const isRequired = column.col_name === this.input.col_fk_n_1;
                     if (sendtobackend) {
                         this.sendingIds.push(column.id);
                     }
@@ -304,7 +299,7 @@ export default {
                         column,
                         readonly,
                         sendtobackend,
-                        isRequired,
+                        isRequired: (isRequired && !readonly),
                     });
                 }
             });
