@@ -258,7 +258,7 @@ export default {
 
                 const readonly = column.show_in_edit_form === 1;
                 const sendtobackend = column.show_in_edit_form === 2;
-                const isRequired = column.col_name === this.input.col_fk_n_1;
+                const isRequired = column.col_name === this.input.col_fk_n_1 || column.required_in_create_form;
 
                 if (
                     column.visible === 1 &&
