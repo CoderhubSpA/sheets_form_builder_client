@@ -32,6 +32,9 @@ export default {
         'form-group': FormGroup,
         'date-picker': DatePicker,
     },
+    created() {
+        console.log(this)
+    }
 };
 </script>
 

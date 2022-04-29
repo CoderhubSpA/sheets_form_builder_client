@@ -18,6 +18,9 @@ export default {
             }
         }
     },
+    mounted() {
+        //
+    },
     methods: {
         onChange(event) {
             const f = event.target.files[0];

@@ -324,9 +324,34 @@ export default {
                 const url = `${encodeURIComponent(JSON.stringify(mainfilter))}`;
                 Vue.set(state.url_selector_remote, val.column.id, url);
                 Object.keys(state.url_selector_remote).forEach((key) => {
+                    // Obtenemos la columna del filtro desde el entity_info
                     const column = state.contentInfo.content.columns.find((col) => col.id === key);
+
+                    // Obtenmos el filtro actual (si es que se ha filtrado)
+                    const filter = _.first(
+                        (_.cloneDeep(state.active_filter) || []).filter(
+                            (af) => af.column.id == column.id
+                        )
+                    );
+                    // Duplicamos los filtros activos actuales (esto debido a un error de infinity loop)
+                    let current_active_filters = _.cloneDeep(state.active_filter);
+                    // Ordenamos los filtros segun el orden en que se seleccionaron
+                    current_active_filters = current_active_filters.sort((a, b) => (a.order > b.order ? 1 : 0));
+                    // Debido a que los filtros filtran filtros, hay que dejar solo los filtros con un order menor
+                    // pues estos se seleccionaron antes y filtraran al filtro actual
+                    if (filter){
+                        current_active_filters = current_active_filters.filter(
+                            (f) => f.order < filter.order
+                        );
+                    }
+                    // Eliminamos el filtro actual (pues este no se debe filtrar a si mismo)
+                    // Y solo filtramos si es que posee valor para filtrar
+                    current_active_filters = current_active_filters
+                        .filter((f) => f.column.id !== column.id)
+                        .filter((f) => f.value !== '');
+
                     const newfilter = {
-                        active_filters: state.active_filter.filter((f) => f.value !== ''),
+                        active_filters: current_active_filters,
                         searched_col: column,
                     };
                     const newurl = `${encodeURIComponent(JSON.stringify(newfilter))}`;

@@ -1,6 +1,4 @@
 <script>
-/* eslint-disable eqeqeq */
-/* eslint-disable camelcase */
 import Moment from 'moment';
 
 export default {
@@ -64,16 +62,10 @@ export default {
     watch: {
         fieldValue(val) {
             if (val) {
-                this.picker = new Date(val);
+                this.picker = moment(this.fieldValue).toDate()
                 this.onInput(val);
             }
         },
-    },
-    mounted() {
-        if (this.fieldValue) {
-            this.picker = new Date(this.fieldValue);
-            this.onInput(this.fieldValue);
-        }
     },
     methods: {
         onInput(val) {

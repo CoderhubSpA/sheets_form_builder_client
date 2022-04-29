@@ -58,7 +58,6 @@ export default {
         },
         preFile() {
             const fields = this.$store.getters[`${this.state}/fields`];
-
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
@@ -92,10 +91,6 @@ export default {
                 validation[this.id] = 'file-pending';
                 this.$emit('input', validation);
             }
-        },
-        // eslint-disable-next-line no-unused-vars
-        onInput(event) {
-            // console.log(event)
         },
     },
 };

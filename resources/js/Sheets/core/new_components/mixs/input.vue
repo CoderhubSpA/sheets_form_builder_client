@@ -30,6 +30,7 @@ export default {
             RUT: 250,
             TEXT: 250,
         },
+        updatedInput: null,
     }),
     computed: {
         label() {
@@ -54,16 +55,22 @@ export default {
             return this.input.placeholder;
         },
         inputValue() {
-            const fields = this.$store.getters[`${this.state}/fields`];
+            if(!this.updatedInput) {
+                const fields = this.$store.getters[`${this.state}/fields`];
 
-            if (fields && fields.length > 0) {
-                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
-                if (val) {
-                    this.$emit('input', val);
-                    return val[this.id];
+                if (fields && fields.length > 0) {
+                    const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                    if (val) {
+                        this.$emit('input', val);
+                        return val[this.id];
+                    }
                 }
+
+                return this.value ? this.value[this.id] : '';
+            } else {
+                this.$emit('input', this.updatedInput);
+                return this.updatedInput[this.id];
             }
-            return this.value ? this.value[this.id] : '';
         },
         col_name() {
             return this.input.col_name;
@@ -153,7 +160,7 @@ export default {
             data[this.id] = valueParsed;
 
             this.vmodelcurrentvalue = data;
-
+            this.updatedInput = data;
             this.$emit('input', data);
             /**
              * mostrar/ocultar section

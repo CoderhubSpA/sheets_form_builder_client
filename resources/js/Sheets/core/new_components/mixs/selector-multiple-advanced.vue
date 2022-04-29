@@ -269,7 +269,7 @@ export default {
                         const options = this.entityInfo.entities_fk[column.entity_type_fk];
                         let longestOption = column.name;
                         options.forEach((option) => {
-                            if (option.name.length > longestOption.length) {
+                            if (!!option.name && (option.name.length > longestOption.length)) {
                                 longestOption = option.name;
                             }
                         });
@@ -520,7 +520,7 @@ export default {
             // Esto puede pasar si los pivotes llegan tarde
             if (this.$refs.hotTableComponent) {
                 // eslint-disable-next-line no-console
-                console.log('SMA 406', this.$refs.hotTableComponent.hotInstance.loadData(data));
+                // console.log('SMA 406', this.$refs.hotTableComponent.hotInstance.loadData(data));
             }
         },
         addHooks() {
