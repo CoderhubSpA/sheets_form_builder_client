@@ -4,12 +4,13 @@
         :id="id"
         :required="required"
         :placeholder="ph"
-        :linkTarget="this.input.link_url"
-        :linkDescription="this.input.link_name"
-        :tooltipInfo="this.input.description"
+        :linkTarget="input.link_url"
+        :linkDescription="input.link_name"
+        :tooltipInfo="input.description"
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
     >
+
         <div class="row">
             <div class="col">
                 <input
@@ -21,6 +22,7 @@
                     ref="inputFileRef"
                     @input="onInput"
                     @change="onChange"
+
                 />
             </div>
             <div class="col" v-if="showDeleteBtn">
@@ -34,6 +36,7 @@
                 <p class="input-placeholder">Por defecto: {{ this.input.default_value }}</p>
             </div>
         </div>
+
     </file-template>
 </template>
 
@@ -50,24 +53,45 @@ export default {
     },
     data: () => ({
         // placeholder
-        ph: '',
     }),
     computed: {
         accept() {
             return '*';
         },
         preFile() {
+            let prevVal = {};
             const fields = this.$store.getters[`${this.state}/fields`];
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+
                 if (val) {
-                    const prevVal = {};
-                    prevVal[this.id] = val;
+                    prevVal = {};
+                    prevVal[this.id] = val[this.id];
                     this.$emit('input', prevVal);
                 }
             }
-            return null;
+            return prevVal[this.id];
         },
+        ph() {
+            let name = ''
+            if (this.preFile) {
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                if (contentInfo) {
+                    const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
+                    const fileEntity = entities.find((ent) => ent.id === this.preFile);
+
+                    if (fileEntity) {
+                        name = fileEntity.name;
+                        this.can_select_sheets = false;
+                    }
+                }
+            }
+            return name;
+        }
+
+    },
+    watch: {
+
     },
     methods: {
         onChange(event) {

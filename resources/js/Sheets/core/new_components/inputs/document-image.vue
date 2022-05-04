@@ -77,7 +77,9 @@ export default {
                     if (contentInfo) {
                         const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
                         const imgPre = entities.find((ent) => ent.id === val[this.id]);
-                        return `${this.base_url}${imgPre.src}`;
+                    
+                        (imgPre && imgPre.src) ? this.showDeleteBtn = true : '';
+                        return (imgPre && imgPre.src) ? `${this.base_url}${imgPre.src}` : '';
                     }
                 }
             }
@@ -98,15 +100,17 @@ export default {
                 this.onDeleteFile()
         }
     },
-    mounted() {
+
+   /*  mounted() {
         if (this.previewLink) {
-            this.showDeleteBtn = true;
             this.preview = this.previewLink;
+            this.showDeleteBtn = true;
             const container = document.getElementById('preview-image-container');
             container.classList.remove('hide');
             container.classList.add('show');
         }
-    },
+    }, */
+
     methods: {
         onChange(event) {
             this.showDeleteBtn = true;

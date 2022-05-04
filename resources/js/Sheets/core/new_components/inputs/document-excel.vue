@@ -126,6 +126,7 @@ export default {
             }
         },
         preFile(val) {
+            console.log(val)
             if (val) {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
                 if (contentInfo) {

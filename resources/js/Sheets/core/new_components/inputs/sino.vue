@@ -50,34 +50,45 @@ export default {
         inputValue(val) {
             this.indeterminate = false;
             this.checked = val;
+
         },
-    },
-    mounted() {
-        if (this.inputValue === null) {
-            if (this.input.default_value != null || this.input.default_value != undefined) {
-                switch (this.input.default_value) {
-                    case 1:
-                    case '1':
-                        this.indeterminate = false;
-                        this.checked = true;
-                        break;
-                    case 0:
-                    case '0':
-                        this.indeterminate = false;
-                        this.checked = false;
-                        break;
-                    default:
-                        break;
+        checked(val, old) {
+            // !Emulando el objeto event del input
+            console.log('watch checked', this.label, val, old)
+            const e = {
+                target: {
+                    checked: val
                 }
-            }
-        } else if (this.inputValue === 0) {
-            this.indeterminate = false;
-            this.checked = false;
-        } else if (this.inputValue === 1) {
-            this.indeterminate = false;
-            this.checked = true;
+            };
+            this.onInput(e)
         }
     },
+    // mounted() {
+    //     if (this.inputValue === null) {
+    //         if (this.input.default_value != null || this.input.default_value != undefined) {
+    //             switch (this.input.default_value) {
+    //                 case 1:
+    //                 case '1':
+    //                     this.indeterminate = false;
+    //                     this.checked = true;
+    //                     break;
+    //                 case 0:
+    //                 case '0':
+    //                     this.indeterminate = false;
+    //                     this.checked = false;
+    //                     break;
+    //                 default:
+    //                     break;
+    //             }
+    //         }
+    //     } else if (this.inputValue === 0) {
+    //         this.indeterminate = false;
+    //         this.checked = false;
+    //     } else if (this.inputValue === 1) {
+    //         this.indeterminate = false;
+    //         this.checked = true;
+    //     }
+    // },
     methods: {
         getInputClasses() {
             if (this.input.link_url !== null && this.input.link_url !== undefined) {
@@ -102,26 +113,19 @@ export default {
             const data = {};
             data[this.id] = e.target.checked;
             this.vmodelcurrentvalue = data;
-            const dataToSelectorFilters = {
+            const filters = {
                 key: this.input.col_name,
                 value: data[this.id].toString(),
             };
-            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
+            this.$store.commit(`${this.state}/SELECTORFILTERS`, filters);
             this.$emit('input', data);
             /**
              * mostrar/ocultar section
              */
             // eslint-disable-next-line camelcase
-            const field_section_show_hide = {};
-            field_section_show_hide[this.form_field_id] = data[this.id];
-            this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
-            /**
-             * mostrar/ocultar field
-             */
-            // eslint-disable-next-line camelcase
-            const field_show_hide = {};
-            field_show_hide[this.form_field_id] = data[this.id];
-            this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
+            const show_hide = {};
+            show_hide[this.form_field_id] = data[this.id];
+            this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, show_hide);
         },
     },
 };
