@@ -1,23 +1,23 @@
 <template>
     <div class="container" v-if="show_field">
         <div class="row">
-            <div class="col-12" v-if="this.input.link_url">
+            <div class="col-12" v-if="link_target">
                 <a
                     class="float-right sheet-field-info-link"
-                    :href="this.input.link_url"
+                    :href="link_target"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    {{ this.input.link_name }}
+                    {{ link_target }}
                 </a>
             </div>
         </div>
         <h3 class="text-center">
             {{ label }} <span v-if="required" class="text-danger">*</span
-            ><span class="tooltip-custom" v-if="this.input.description">
+            ><span class="tooltip-custom" v-if="tooltip">
                 <span class="icon">&#9432;</span>
                 <span class="tooltiptext">
-                    {{ this.input.description }}
+                    {{ tooltip }}
                 </span>
             </span>
         </h3>

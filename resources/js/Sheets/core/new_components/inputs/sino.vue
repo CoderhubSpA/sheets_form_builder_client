@@ -3,9 +3,9 @@
         :label="label"
         :id="id"
         :required="required"
-        :linkTarget="this.input.link_url"
-        :linkDescription="this.input.link_name"
-        :tooltipInfo="this.input.description"
+        :linkTarget="link_target"
+        :linkDescription="link_description"
+        :tooltipInfo="tooltip"
     >
         <input
             :class="getInputClasses()"
@@ -54,7 +54,6 @@ export default {
         },
         checked(val, old) {
             // !Emulando el objeto event del input
-            console.log('watch checked', this.label, val, old)
             const e = {
                 target: {
                     checked: val
@@ -126,6 +125,10 @@ export default {
             const show_hide = {};
             show_hide[this.form_field_id] = data[this.id];
             this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, show_hide);
+            // * Mostrar/Ocultar campo
+            const field_show_hide = {};
+            field_show_hide[this.form_field_id] = data[this.id];
+            this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
         },
     },
 };

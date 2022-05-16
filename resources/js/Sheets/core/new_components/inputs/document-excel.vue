@@ -4,7 +4,7 @@
             :label="label"
             :id="id"
             :required="required"
-            :placeholder="ph"
+            :placeholder="document_name"
             :showDeleteButton="showDeleteBtn"
         >
             <div class="row">
@@ -37,9 +37,9 @@
                 :multiple="multiple"
             />
         </div>
-        <div class="row" v-if="this.input.default_value !== null">
+        <div class="row" v-if="input.default_value !== null">
             <div class="col">
-                <p class="input-placeholder">Por defecto: {{ this.input.default_value }}</p>
+                <p class="input-placeholder">Por defecto: {{ input.default_value }}</p>
             </div>
         </div>
     </div>
@@ -66,6 +66,7 @@ export default {
         showDeleteBtn: false,
     }),
     computed: {
+        // @override
         accept() {
             return '.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,vnd.ms-excel';
         },
@@ -189,18 +190,20 @@ export default {
         onChange(event) {
             this.showDeleteBtn = true;
             const f = event.target.files[0];
+
             const splited = f.name.split('.');
             this.extension = splited[splited.length - 1].toLowerCase();
             this.options = [];
+            this.selected = [];
             if (this.extension !== 'xlsx') {
                 this.can_select_sheets = false;
-                this.selected = [];
+
             } else this.can_select_sheets = true;
             this.file = f;
             if (event.target.files.lenght > 1) {
-                this.ph = `${event.target.files.lenght} archivos seleccionados`;
+                this.document_name = `${event.target.files.lenght} archivos seleccionados`;
             } else {
-                this.ph = `${event.target.files[0].name}`;
+                this.document_name = f.name;
             }
         },
     },

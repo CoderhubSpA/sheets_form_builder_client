@@ -3,11 +3,12 @@
         :label="label"
         :id="id"
         :required="required"
-        :linkTarget="this.input.link_url"
-        :linkDescription="this.input.link_name"
-        :tooltipInfo="this.input.description"
+        :linkTarget="link_target"
+        :linkDescription="link_description"
+        :tooltipInfo="tooltip"
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
+        :placeholder="document_name"
     >
         <div class="row">
             <div class="col">
@@ -58,6 +59,7 @@ export default {
         preview: null,
     }),
     computed: {
+        // @override
         accept() {
             return 'image/*';
         },
@@ -70,14 +72,17 @@ export default {
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                 if (val) {
-                    const prevVal = {};
+                    /* const prevVal = {};
                     prevVal[this.id] = val;
-                    this.$emit('input', prevVal);
+                    this.$emit('input', prevVal); */
+
+                    this.$emit('input', val);
                     const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
                     if (contentInfo) {
                         const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
                         const imgPre = entities.find((ent) => ent.id === val[this.id]);
-                    
+
                         (imgPre && imgPre.src) ? this.showDeleteBtn = true : '';
                         return (imgPre && imgPre.src) ? `${this.base_url}${imgPre.src}` : '';
                     }
@@ -101,20 +106,11 @@ export default {
         }
     },
 
-   /*  mounted() {
-        if (this.previewLink) {
-            this.preview = this.previewLink;
-            this.showDeleteBtn = true;
-            const container = document.getElementById('preview-image-container');
-            container.classList.remove('hide');
-            container.classList.add('show');
-        }
-    }, */
-
     methods: {
         onChange(event) {
             this.showDeleteBtn = true;
             const f = event.target.files[0];
+            this.document_name = f.name
             const container = document.getElementById('preview-image-container');
             this.preview = URL.createObjectURL(f);
             container.classList.remove('hide');

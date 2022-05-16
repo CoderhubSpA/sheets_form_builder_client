@@ -201,7 +201,10 @@ export default {
             /**
              * Almacenar data para filtros
              */
-            if (this.rangeValue.start === null && this.rangeValue.end === null) {
+            if (
+                (this.rangeValue.start === 0 && this.rangeValue.end === 0) ||
+                (this.rangeValue.start === '' && this.rangeValue.end === '')
+            ) {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
                 const filter = {
@@ -214,6 +217,7 @@ export default {
                 };
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
                 this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                this.$emit('deletedFilter');
             } else {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);

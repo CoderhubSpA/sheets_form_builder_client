@@ -3,9 +3,9 @@
         :id="id"
         :label="label"
         :required="required"
-        :linkTarget="input.link_url"
-        :linkDescription="input.link_name"
-        :tooltipInfo="input.description"
+        :linkTarget="link_target"
+        :linkDescription="link_description"
+        :tooltipInfo="tooltip"
         v-if="show_field">
         <div class="radio-list">
             <div class="custom-control custom-radio" v-for="(option, key) in options" :key="key">
@@ -84,8 +84,9 @@ export default {
 
             const value = fields.filter((field) => Object.keys(field)[0] == this.id)[0];
 
-            if (value)
-                picked = value[this.id].toString();
+            if (value) {
+                picked = value[this.id] ? value[this.id].toString() : '';
+            }
             else if (this.defaultOption)
                 this.pickedModel = this.defaultOption;
 
@@ -150,16 +151,25 @@ export default {
                 this.$emit('input', picked)
                 // TODO: Refactorizar el manejo de encuestas
                 this.$emit('poll-entry', value, this.id, this.input.col_name);
-                // * Mostrado/ocultado de campos
-                const show_hide = {};
-                show_hide[this.form_field_id] = value;
-                this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, show_hide);
                 // * Envio de informacion al filtrado de selectores
                 const selector_filters = {
                     key: this.input.col_name,
                     value: value.toString()
                 };
                 this.$store.commit(`${this.state}/SELECTORFILTERS`, selector_filters);
+                // * Mostrado/ocultado de sections
+                const show_hide = {};
+                show_hide[this.form_field_id] = value;
+
+                this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, show_hide);
+                /**
+                 * mostrar/ocultar field
+                 */
+                // eslint-disable-next-line camelcase
+                const field_show_hide = {};
+                field_show_hide[this.form_field_id] = value;
+                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
+
             } else {
                 const picked = {};
                 picked[this.id] = this.defaultOption;

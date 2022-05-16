@@ -4,9 +4,9 @@
             :id="id"
             :label="label"
             :required="required"
-            :linkTarget="this.input.link_url"
-            :linkDescription="this.input.link_name"
-            :tooltipInfo="this.input.description"
+            :linkTarget="link_target"
+            :linkDescription="link_description"
+            :tooltipInfo="tooltip"
             v-if="show_field"
         >
             <v-select

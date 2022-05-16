@@ -466,7 +466,6 @@ export default {
                         show: true,
                         message: 'Datos enviados',
                     };
-                    console.log(this.action.refresh_form)
                     if (this.action.refresh_form === 1) {
                         this.resetForm();
                     }

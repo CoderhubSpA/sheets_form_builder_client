@@ -3,10 +3,10 @@
         :label="label"
         :id="id"
         :required="required"
-        :placeholder="ph"
-        :linkTarget="input.link_url"
-        :linkDescription="input.link_name"
-        :tooltipInfo="input.description"
+        :placeholder="document_name"
+        :linkTarget="link_target"
+        :linkDescription="link_description"
+        :tooltipInfo="tooltip"
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
     >
@@ -31,12 +31,11 @@
                 </button>
             </div>
         </div>
-        <div class="row" v-if="this.input.default_value !== null">
+        <div class="row" v-if="input.default_value !== null">
             <div class="col">
-                <p class="input-placeholder">Por defecto: {{ this.input.default_value }}</p>
+                <p class="input-placeholder">Por defecto: {{ input.default_value }}</p>
             </div>
         </div>
-
     </file-template>
 </template>
 
@@ -51,55 +50,13 @@ export default {
     components: {
         'file-template': FileTemplate,
     },
-    data: () => ({
-        // placeholder
-    }),
-    computed: {
-        accept() {
-            return '*';
-        },
-        preFile() {
-            let prevVal = {};
-            const fields = this.$store.getters[`${this.state}/fields`];
-            if (fields && fields.length > 0) {
-                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
-
-                if (val) {
-                    prevVal = {};
-                    prevVal[this.id] = val[this.id];
-                    this.$emit('input', prevVal);
-                }
-            }
-            return prevVal[this.id];
-        },
-        ph() {
-            let name = ''
-            if (this.preFile) {
-                const contentInfo = this.$store.getters[`${this.state}/content_info`];
-                if (contentInfo) {
-                    const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
-                    const fileEntity = entities.find((ent) => ent.id === this.preFile);
-
-                    if (fileEntity) {
-                        name = fileEntity.name;
-                        this.can_select_sheets = false;
-                    }
-                }
-            }
-            return name;
-        }
-
-    },
-    watch: {
-
-    },
     methods: {
         onChange(event) {
             this.showDeleteBtn = true;
             if (event.target.files.lenght > 1) {
-                this.ph = `${event.target.files.lenght} archivos seleccionados`;
+                this.document_name = `${event.target.files.lenght} archivos seleccionados`;
             } else {
-                this.ph = `${event.target.files[0].name}`;
+                this.document_name = `${event.target.files[0].name}`;
             }
             const file = event.target.files[0];
 

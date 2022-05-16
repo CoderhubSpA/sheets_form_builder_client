@@ -3,9 +3,9 @@
         :id="id"
         :label="label"
         :required="required"
-        :linkTarget="this.input.link_url"
-        :linkDescription="this.input.link_name"
-        :tooltipInfo="this.input.description"
+        :linkTarget="link_target"
+        :linkDescription="link_description"
+        :tooltipInfo="tooltip"
         v-if="show_field"
         :classes="errorInput ? ['field-error'] : []"
     >
@@ -43,9 +43,9 @@
 import VueMonthlyPicker from 'vue-monthly-picker';
 import FormGroup from '../templates/form-group.vue';
 import mix from '../mixs/range.vue';
-
+import mixInput from '../mixs/input.vue';
 export default {
-    mixins: [mix],
+    mixins: [mixInput,mix],
     components: {
         'form-group': FormGroup,
         VueMonthlyPicker,

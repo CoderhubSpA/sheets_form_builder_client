@@ -56,19 +56,18 @@ export default {
         },
         inputValue() {
             if(!this.updatedInput) {
+                let result = {};
                 const fields = this.$store.getters[`${this.state}/fields`];
 
                 if (fields && fields.length > 0) {
                     const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                     if (val) {
-                        this.$emit('input', val);
-                        return val[this.id];
+                        result[this.id] = val[this.id]
                     }
                 }
 
-                return this.value ? this.value[this.id] : '';
+                return result[this.id] ? result[this.id] : '';
             } else {
-                this.$emit('input', this.updatedInput);
                 return this.updatedInput[this.id];
             }
         },
@@ -122,6 +121,15 @@ export default {
             }
             return null;
         },
+        link_target() {
+            return this.input.link_url || '';
+        },
+        link_description() {
+            return this.input.link_name || '';
+        },
+        tooltip() {
+            return this.input.description || '';
+        }
     },
     mounted() {
         // this.readInputValue();
