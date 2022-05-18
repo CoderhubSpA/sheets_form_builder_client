@@ -33,7 +33,7 @@ export default {
         'date-picker': DatePicker,
     },
     created() {
-        console.log(this)
+        //console.log(this)
     }
 };
 </script>
