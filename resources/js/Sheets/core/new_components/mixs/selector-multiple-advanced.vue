@@ -255,10 +255,10 @@ export default {
             this.sendingIds.push(this.mainPivot.id);
             // eslint-disable-next-line array-callback-return
             this.entityInfo.columns.map((column) => {
-
                 const readonly = column.show_in_edit_form === 1;
                 const sendtobackend = column.show_in_edit_form === 2;
-                const isRequired = column.col_name === this.input.col_fk_n_1 || column.required_in_create_form;
+                const isRequired =
+                    column.col_name === this.input.col_fk_n_1 || column.required_in_create_form;
 
                 if (
                     column.visible === 1 &&
@@ -269,18 +269,28 @@ export default {
                         const options = this.entityInfo.entities_fk[column.entity_type_fk];
                         let longestOption = column.name;
                         options.forEach((option) => {
-                            if (!!option.name && (option.name.length > longestOption.length)) {
+                            if (!!option.name && option.name.length > longestOption.length) {
                                 longestOption = option.name;
                             }
                         });
 
-                        const notRequiredHeader = `<div style="width: ${longestOption.length * 10}px; text-align: center;">${column.name}</div>`;
-                        const requiredHeader = `<div style="width: ${longestOption.length * 10}px; text-align: center;">${column.name} <b style="color: red;">*</b></div>`;
-                        const colHeader = isRequired && !readonly ? requiredHeader : notRequiredHeader;
+                        const notRequiredHeader = `<div style="width: ${
+                            longestOption.length * 10
+                        }px; text-align: center;">${column.name}</div>`;
+                        const requiredHeader = `<div style="width: ${
+                            longestOption.length * 10
+                        }px; text-align: center;">${
+                            column.name
+                        } <b style="color: red;">*</b></div>`;
+                        const colHeader =
+                            isRequired && !readonly ? requiredHeader : notRequiredHeader;
 
                         this.handsontableSettings.colHeaders.push(colHeader);
                     } else {
-                        const colHeader = isRequired && !readonly ? `${column.name} <b style="color: red;">*</b>`: column.name;
+                        const colHeader =
+                            isRequired && !readonly
+                                ? `${column.name} <b style="color: red;">*</b>`
+                                : column.name;
                         this.handsontableSettings.colHeaders.push(colHeader);
                     }
                     if (isRequired && !readonly) {
@@ -288,7 +298,7 @@ export default {
                             fieldId: this.input.id,
                             name: column.col_name,
                             id: column.id,
-                        }
+                        };
                         this.$store.commit(`${this.state}/SMAREQUIREDFIELDS`, requireField);
                     }
                     if (sendtobackend) {
@@ -299,7 +309,7 @@ export default {
                         column,
                         readonly,
                         sendtobackend,
-                        isRequired: (isRequired && !readonly),
+                        isRequired: isRequired && !readonly,
                     });
                 }
             });
@@ -476,13 +486,12 @@ export default {
             // Si no es null pero es falsy, esta vacio. Salir.
             if (!this.pivots) return;
 
-            let pivots_raw = Object.values(this.pivots);
+            const pivots_raw = Object.values(this.pivots);
 
-            let pivots = pivots_raw.reduce( (acc,p) => {
-                let f = Object.values(p);
-                acc = acc.concat(f);
-                return acc;
-            },[]);
+            const pivots = pivots_raw.reduce((acc, p) => {
+                const f = Object.values(p);
+                return acc.concat(f);
+            }, []);
 
             if (!pivots) return;
 
@@ -533,6 +542,7 @@ export default {
                     this.changeData();
                 });
                 this.$store.commit(`${this.state}/LOADING`, false);
+                this.reRenderTable();
             });
         },
         addRow() {
@@ -611,6 +621,13 @@ export default {
         },
         sleep(ms) {
             return new Promise((resolve) => setTimeout(resolve, ms));
+        },
+        reRenderTable() {
+            if (this.handsontableData.length === 0) {
+                setTimeout(() => {
+                    this.$refs.hotTableComponent.hotInstance.render();
+                }, 1);
+            }
         },
     },
 };
