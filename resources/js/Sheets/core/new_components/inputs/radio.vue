@@ -6,7 +6,8 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
-        v-if="show_field">
+        v-if="show_field"
+    >
         <div class="radio-list">
             <div class="custom-control custom-radio" v-for="(option, key) in options" :key="key">
                 <input
@@ -42,7 +43,7 @@ export default {
         'form-group': FormGroup,
     },
     data: () => ({
-        pickedModel: null
+        pickedModel: null,
     }),
     computed: {
         /**
@@ -86,9 +87,7 @@ export default {
 
             if (value) {
                 picked = value[this.id] ? value[this.id].toString() : '';
-            }
-            else if (this.defaultOption)
-                this.pickedModel = this.defaultOption;
+            } else if (this.defaultOption) this.pickedModel = this.defaultOption;
 
             return picked;
         },
@@ -98,18 +97,19 @@ export default {
          */
         defaultOption() {
             let default_option = null;
+
             if (this.input.options) {
                 const options = JSON.parse(this.input.options);
 
                 Object.keys(options).forEach((key) => {
-                    if (this.input.default_value == key) {
-                        default_option = key.toString();
+                    if (this.input.default_value === parseInt(key, 10)) {
+                        default_option = parseInt(key, 10);
                     }
                 });
             } else {
                 this.options.map(option => {
                     if (option.id == this.input.default_value) {
-                        default_option = option.id.toString()
+                        default_option = option.id.toString();
                     }
                 })
             }
