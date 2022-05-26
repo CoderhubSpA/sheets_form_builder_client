@@ -136,11 +136,11 @@ export default {
             this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
         },
         onInputStart: _.debounce(async function handlerInputStart(e) {
-            this.rangeValue.start = Number(e.target.value);
+            e.target.value === "" ? this.rangeValue.start = e.target.value : this.rangeValue.start = Number(e.target.value);
             this.handleInputData();
         }, 400),
         onInputEnd: _.debounce(async function handlerInputEnd(e) {
-            this.rangeValue.end = Number(e.target.value);
+            e.target.value === "" ? this.rangeValue.end = e.target.value : this.rangeValue.end = Number(e.target.value);
             this.handleInputData();
         }, 400),
         selectedStart(val) {
@@ -203,7 +203,7 @@ export default {
              */
             if (
                 (this.rangeValue.start === 0 && this.rangeValue.end === 0) ||
-                (this.rangeValue.start === '' && this.rangeValue.end === '')
+                (this.rangeValue.start === "" && this.rangeValue.end === "")
             ) {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
@@ -215,6 +215,7 @@ export default {
                     type: 'BETWEEN',
                     remote: true,
                 };
+
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
                 this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
                 this.$emit('deletedFilter');
