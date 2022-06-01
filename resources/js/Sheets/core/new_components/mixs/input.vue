@@ -66,7 +66,11 @@ export default {
                     }
                 }
 
-                return result[this.id] ? result[this.id] : '';
+                return result[this.id] ? result[this.id] : "";
+            } else if(this.updatedInput[this.id] === "" && this.input.default_value) {
+                this.updatedInput[this.id] = this.input.default_value;
+
+                return "";
             } else {
                 return this.updatedInput[this.id];
             }
@@ -130,9 +134,6 @@ export default {
         tooltip() {
             return this.input.description || '';
         }
-    },
-    mounted() {
-        // this.readInputValue();
     },
     methods: {
         readInputValue() {
