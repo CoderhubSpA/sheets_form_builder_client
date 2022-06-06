@@ -1,3 +1,4 @@
+use GuzzleHttp\Promise\Promise;
 <script>
 /* eslint-disable camelcase */
 import Handsontable from 'handsontable';
@@ -227,7 +228,6 @@ export default {
                 })
                 .catch((error) => {
                     // eslint-disable-next-line no-console
-                    console.log(error);
                     this.loadingSelector = false;
                 })
                 .finally(() => {
@@ -266,9 +266,16 @@ export default {
                     column.col_name !== this.input.col_fk_1_n
                 ) {
                     if (selectorsFormats.indexOf(column.format) > -1) {
-                        const options = this.entityInfo.entities_fk[column.entity_type_fk];
+                        let options_name = [];
+
+                        if (!column.entity_type_fk) {
+                            options_name.push({ id: column.id, name: column.name });
+                        } else {
+                            options_name = this.entityInfo.entities_fk[column.entity_type_fk]
+                        }
+
                         let longestOption = column.name;
-                        options.forEach((option) => {
+                        options_name.forEach((option) => {
                             if (!!option.name && option.name.length > longestOption.length) {
                                 longestOption = option.name;
                             }
@@ -340,20 +347,37 @@ export default {
                             columnToPush.readOnly = column.readonly;
                             break;
                         case 'SELECTOR':
-                            // eslint-disable-next-line no-case-declarations
-                            options = this.entityInfo.entities_fk[column.column.entity_type_fk];
-                            // eslint-disable-next-line no-case-declarations
                             selectOptions = [];
-                            // eslint-disable-next-line array-callback-return
-                            options.map((option) => {
-                                selectOptions.push({
-                                    value: option.id,
-                                    label:
-                                        column.column.col_name_fk === null
-                                            ? option.name
-                                            : option[column.column.col_name_fk],
+
+                            if (column.column.options) {
+                                options = this.entityInfo.columns.filter((col) => {
+                                    if (col.id === column.id) {
+                                        return col;
+                                    }
+                                })
+
+                                const optionsParse = JSON.parse(options[0].options);
+
+                                for (var [key, value] of Object.entries(optionsParse)) {
+                                    selectOptions.push({
+                                        value: key,
+                                        label: value ? value : optionsParse[key]
+                                    });
+                                }
+                            } else {
+                                options = this.entityInfo.entities_fk[column.column.entity_type_fk];
+
+                                options.map((option) => {
+                                    selectOptions.push({
+                                        value: option.id,
+                                        label:
+                                            column.column.col_name_fk === null
+                                                ? option.name
+                                                : option[column.column.col_name_fk],
+                                    });
                                 });
-                            });
+                            }
+
                             columnToPush.data = column.id;
                             columnToPush.editor = KeyValueSelect;
                             columnToPush.renderer = customSelectRenderer;
@@ -572,12 +596,7 @@ export default {
         },
         logData() {
             // eslint-disable-next-line no-console
-            console.log('this.handsontableData', this.handsontableData);
-            // eslint-disable-next-line no-console
-            console.log('this.mainPivot', this.mainPivot);
             const record_id = this.$store.getters[`${this.state}/record_id`];
-            // eslint-disable-next-line no-console
-            console.log('record_id', record_id);
         },
         changeData() {
             const dataToSend = {};
