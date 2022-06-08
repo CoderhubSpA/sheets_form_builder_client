@@ -130,19 +130,19 @@ export default {
          */
         urlrequest() {
             let url = '';
+
             const urlRequestFromStore = this.$store.getters[`${this.state}/url_selector_remote`];
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
             if (contentInfo) {
                 if (this.input.options === null && this.input.entity_type_fk === null) {
                     const column = contentInfo.content.columns.find(
                         (col) => col.id === this.input.id
                     );
                     url = urlRequestFromStore[column.id];
-                    // if (url) {
-                    //     console.log(JSON.parse(decodeURIComponent(url)));
-                    // }
                 }
             }
+
             return url;
         },
         /**
@@ -298,7 +298,6 @@ export default {
         },
     },
     mounted() {
-        this.getNewOptions(this.urlrequest);
         this.cleanReadOnly();
     },
     methods: {
@@ -319,6 +318,7 @@ export default {
             if (this.input.options === null && this.input.entity_type_fk === null) {
                 this.loading = true;
                 const preoptions = await this.$store.dispatch(`${this.state}/get_filters`, url);
+
                 if (preoptions.success) {
                     const optionsToSet = [];
                     preoptions.response.forEach((pre) => {
