@@ -57,16 +57,31 @@ export default {
         inputValue() {
             if(!this.updatedInput) {
                 let result = {};
+
+                const e = {
+                    target: {
+                        value: null
+                    }
+                }
+
                 const fields = this.$store.getters[`${this.state}/fields`];
 
                 if (fields && fields.length > 0) {
                     const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
                     if (val) {
-                        result[this.id] = val[this.id]
+                        result[this.id] = val[this.id];
+                        e.target.value = val[this.id];
                     }
                 }
 
-                return result[this.id] ? result[this.id] : "";
+                if(result[this.id]) {
+                    this.onInput(e);
+
+                    return result[this.id];
+                } else {
+                    return "";
+                }
+
             } else if(this.updatedInput[this.id] === "" && this.input.default_value) {
                 this.updatedInput[this.id] = this.input.default_value;
 
