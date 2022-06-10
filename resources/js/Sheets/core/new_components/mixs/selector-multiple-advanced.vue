@@ -358,10 +358,10 @@ export default {
 
                                 const optionsParse = JSON.parse(options[0].options);
 
-                                for (var [key, value] of Object.entries(optionsParse)) {
+                                for (const [key, value] of Object.entries(optionsParse)) {
                                     selectOptions.push({
                                         value: key,
-                                        label: value ? value : optionsParse[key]
+                                        label: value
                                     });
                                 }
                             } else {
@@ -384,6 +384,7 @@ export default {
                             columnToPush.selectOptions = selectOptions;
                             columnToPush.readOnly = column.readonly;
                             columnToPush.isRequired = column.isRequired;
+
                             break;
                         case 'SELECTOR[MULTIPLE]':
                         case 'SELECTOR[1XN][ALL]':
@@ -527,10 +528,23 @@ export default {
                     // eslint-disable-next-line array-callback-return
                     this.columnsIds.map((column) => {
                         const val = element[key];
+
                         if (column.id === key && column.column.format === 'SiNo') {
                             // eslint-disable-next-line no-param-reassign
                             element[key] = val === 1;
                         }
+
+                        if (column.id === key && column.column.format === 'SELECTOR') {
+                            if (column.column.options) {
+                                for (const [k, v] of Object.entries(element)) {
+                                    if (column.id === k) {
+                                        element[key] = this.getTextValueFromOptions(column.id, v);
+                                        console.log(element[key])
+                                    }
+                                }
+                            }
+                        }
+
                         if (
                             column.id === key &&
                             this.multipleSelectorsFormats.indexOf(column.column.format) > -1
@@ -581,7 +595,7 @@ export default {
                     if (column.column.format === 'SiNo') {
                         newRow[column.id] = column.column.default_value === 1;
                     } else if (column.column.format.indexOf('SELECTOR') > -1) {
-                        newRow[column.id] = column.column.default_value || [];
+                        newRow[column.id] = this.getTextValueFromOptions(column.id, column.column.default_value);
                     } else {
                         newRow[column.id] = column.column.default_value;
                     }
@@ -616,6 +630,7 @@ export default {
                         const formatFinder = this.columnsIds.find(
                             (column) => column.column.id === key
                         );
+
                         if (formatFinder) {
                             if (multipleFormats.indexOf(formatFinder.column.format) > -1) {
                                 dataToPush[key] = hotData[key].split(';');
@@ -648,6 +663,19 @@ export default {
                 }, 1);
             }
         },
+        getTextValueFromOptions(columnId, value) {
+            const options = this.entityInfo.columns.filter((col) => {
+                return (col.id === columnId) ? col : null
+            });
+
+            const optionsParse = JSON.parse(options[0].options);
+
+            for (const [k, v] of Object.entries(optionsParse)) {
+                if (value === parseInt(k)) {
+                        return v;
+                }
+            }
+        }
     },
 };
 </script>
