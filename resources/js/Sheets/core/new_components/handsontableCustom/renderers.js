@@ -22,7 +22,7 @@ export function clpRenderer(instance, td, row, col, prop, value, cellProperties)
 export function customSelectRenderer(instance, td, row, col, prop, value, cellProperties) {
     const span = document.createElement('SPAN');
     if (value !== null && value !== undefined && value !== '') {
-        const selected = cellProperties.selectOptions.find((opt) => opt.value === value);
+        const selected = cellProperties.selectOptions.find((opt) => opt.value == value);
         span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${
             selected ? selected.label : value.toString()
         }`;

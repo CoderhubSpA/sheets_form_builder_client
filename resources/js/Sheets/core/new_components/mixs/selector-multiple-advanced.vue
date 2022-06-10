@@ -534,17 +534,6 @@ export default {
                             element[key] = val === 1;
                         }
 
-                        if (column.id === key && column.column.format === 'SELECTOR') {
-                            if (column.column.options) {
-                                for (const [k, v] of Object.entries(element)) {
-                                    if (column.id === k) {
-                                        element[key] = this.getTextValueFromOptions(column.id, v);
-                                        console.log(element[key])
-                                    }
-                                }
-                            }
-                        }
-
                         if (
                             column.id === key &&
                             this.multipleSelectorsFormats.indexOf(column.column.format) > -1
@@ -595,7 +584,7 @@ export default {
                     if (column.column.format === 'SiNo') {
                         newRow[column.id] = column.column.default_value === 1;
                     } else if (column.column.format.indexOf('SELECTOR') > -1) {
-                        newRow[column.id] = this.getTextValueFromOptions(column.id, column.column.default_value);
+                        newRow[column.id] = column.column.default_value;
                     } else {
                         newRow[column.id] = column.column.default_value;
                     }
@@ -663,19 +652,6 @@ export default {
                 }, 1);
             }
         },
-        getTextValueFromOptions(columnId, value) {
-            const options = this.entityInfo.columns.filter((col) => {
-                return (col.id === columnId) ? col : null
-            });
-
-            const optionsParse = JSON.parse(options[0].options);
-
-            for (const [k, v] of Object.entries(optionsParse)) {
-                if (value === parseInt(k)) {
-                        return v;
-                }
-            }
-        }
     },
 };
 </script>
