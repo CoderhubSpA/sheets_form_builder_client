@@ -45,6 +45,9 @@ export default {
     data: () => ({
         pickedModel: null,
     }),
+    created() {
+        this.$root.$refs.radioComponent = this;
+    },
     computed: {
         /**
          * * Listado de opciones
@@ -130,11 +133,14 @@ export default {
          */
         defaultOptionLabel() {
             let label = '';
-            let default_option = this.options.find(option => option.id == this.defaultOption)
+
+            let default_option = this.options.find(option => option.id == this.defaultOption);
+
             if (default_option) {
-                label = default_option.name
+                label = default_option.name;
             }
-            return label
+
+            return label;
         }
     },
     watch: {

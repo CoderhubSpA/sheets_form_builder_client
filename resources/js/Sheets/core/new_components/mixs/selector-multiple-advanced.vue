@@ -108,9 +108,13 @@ export default {
             this.$emit('tooglefield', show_field);
             return show_field;
         },
+        defaultOptionLabel() {
+            return this.$root.$refs.radioComponent.defaultOptionLabel;
+        }
     },
     watch: {
         handsontableData() {
+            this.myLabelTest = this.label;
             this.changeData();
         },
         errors(val) {
@@ -204,6 +208,9 @@ export default {
             licenseKey: 'non-commercial-and-evaluation',
         },
         hotTableLoaded: false,
+        optionsFilteredByEntityTypeFk: '',
+        optionsFiltered: [],
+        myLabelTest: ""
     }),
     mounted() {
         this.getEntityInfo();
@@ -354,7 +361,7 @@ export default {
                                     if (col.id === column.id) {
                                         return col;
                                     }
-                                })
+                                });
 
                                 const optionsParse = JSON.parse(options[0].options);
 
@@ -363,6 +370,21 @@ export default {
                                         value: key,
                                         label: value
                                     });
+                                }
+                            } else  if (column.column.col_fk_filter) {
+                                this.optionsFilteredByEntityTypeFk = column.column.entity_type_fk;
+
+                                if (this.optionsFiltered.length > 0) {
+                                    options = this.optionsFiltered;
+
+                                    options.map((option) => {
+                                        selectOptions.push({
+                                            value: option.id,
+                                            label: option.name
+                                        });
+                                    });
+
+                                    this.optionsFiltered = [];
                                 }
                             } else {
                                 options = this.entityInfo.entities_fk[column.column.entity_type_fk];
@@ -605,6 +627,7 @@ export default {
             const dataToSend = {};
             this.$store.commit(`${this.state}/ERRORSSMA`, null);
             dataToSend[this.input.id] = {};
+            //console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 618 ~ changeData ~ this.input.id", this.input)
             dataToSend[this.input.id][this.input.entity_type_pivot_fk] = [];
             // eslint-disable-next-line array-callback-return
             this.handsontableData.map((hotData) => {
@@ -624,6 +647,16 @@ export default {
                             if (multipleFormats.indexOf(formatFinder.column.format) > -1) {
                                 dataToPush[key] = hotData[key].split(';');
                             } else {
+                                if (this.optionsFilteredByEntityTypeFk) {
+                                    const entities = this.entityInfo.entities_fk[this.optionsFilteredByEntityTypeFk];
+
+                                    entities.filter((entity) => {
+                                        if (entity.area_id === hotData[key]) {
+                                           this.optionsFiltered.push(entity)
+                                        }
+                                    });
+                                }
+
                                 dataToPush[key] = hotData[key];
                             }
                         } else {
