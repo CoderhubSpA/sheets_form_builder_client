@@ -603,10 +603,16 @@ export default {
             });
         },
         get_filters({ commit }, data) {
+            let params = Object.fromEntries(new URLSearchParams(data));
+            params = Object.entries(params).map(([ key, val ]) => [ key, val ]);
+            params = params[0].toString().replace(/\\/g, '');
+            params = params.toString().replace(/,\s*$/, '');
+            params = JSON.parse(params);
+
             commit('LOADING', true);
             return new Promise((resolve, reject) => {
                 axios
-                    .get(`/api/sheets/getfilters/${data}`)
+                    .post(`/api/sheets/getfilters`, params)
                     .then((response) => {
                         resolve({
                             response: response.data.content.content,
