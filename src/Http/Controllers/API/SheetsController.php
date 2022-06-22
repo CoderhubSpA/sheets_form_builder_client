@@ -195,4 +195,24 @@ class SheetsController extends Controller
             return response()->json(['success' => false, 'content' => $th->getMessage()]);
         }
     }
+	 public function getfilters(Request $request)
+    {
+        try {
+            $this->init($request);
+
+            $endpoint = 'entity/filters/data?content='. $request->getContent();
+
+            $client = new GuzzleClient($this->clientBuilder);
+            $res = $client->request('GET', $endpoint);
+
+            $response          = new \stdClass();
+            $response->success = $res->getStatusCode() === 200 || $res->getStatusCode() === 404;
+            $response->content = json_decode($res->getBody()->getContents());
+            $response->status  = $res->getStatusCode() !== 200 && $res->getStatusCode() !== 404 ? $res->getStatusCode() : 200;
+            return response()->json($response, $response->status);
+        } catch (\Throwable $th) {
+            return response()->json([], 400);
+        }
+    }
+}
 }
