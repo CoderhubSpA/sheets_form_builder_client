@@ -38,6 +38,7 @@ export default {
         optionsRemote: [],
         loading: false,
         remotecolumn: null,
+        selectedOptions: []
     }),
     computed: {
         multiple() {
@@ -82,8 +83,7 @@ export default {
                     if (!this.multiple) {
                         selectedValue = this.selected.id;
                     } else {
-                        selectedValue =
-                            this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                        selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
                     }
                 }
                 const filter = {
@@ -210,16 +210,22 @@ export default {
         selected(val) {
             if (val) {
                 const data = {};
+                
                 if (this.multiple) {
                     data[this.id] = val.map((v) => v.id);
                 } else {
                     data[this.id] = val.id;
                 }
+                
                 // eslint-disable-next-line prefer-object-spread
                 this.selectorvmodelsample = Object.assign({}, data);
+                
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                
                 let selectedValue = '';
+                
                 if (val !== null) {
                     if (!this.multiple) {
                         selectedValue = val.id;
@@ -227,7 +233,9 @@ export default {
                         selectedValue = val.length > 0 ? val.map((v) => v.id) : '';
                     }
                 }
+
                 const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' ? 'IN' : 'EQUAL';
+                
                 const filter = {
                     column,
                     id: `external-filter-${column.id}`,
@@ -236,22 +244,30 @@ export default {
                     type,
                     remote: this.input.options === null && this.input.entity_type_fk === null,
                 };
+                
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                
                 this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                
                 this.$emit('input', data);
                 /**
                  * mostrar/ocultar section
                  */
                 // eslint-disable-next-line camelcase
                 const field_section_show_hide = {};
+                
                 field_section_show_hide[this.form_field_id] = data[this.id];
+
                 this.$store.commit(
                     `${this.state}/FIELD_SECTION_SHOW_HIDE`,
                     field_section_show_hide
                 );
+
                 // eslint-disable-next-line camelcase
                 const field_show_hide = {};
+
                 field_show_hide[this.form_field_id] = data[this.id];
+
                 this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
             }
         },
@@ -374,6 +390,49 @@ export default {
                 await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
             }
         }, 400),
+        addAllOptions() {
+
+            if (this.optionsRemote.length > 0) {
+                const allOptions = [];
+
+                this.optionsRemote.forEach((option) => {
+                    allOptions.push(option);
+                })
+
+                this.selectedOptions = allOptions;
+            }
+        },
+        removeOption(option) {
+           this.selectedOptions = this.selectedOptions.filter((opt) => {
+                return opt.id !== option.id
+            });
+        },
+        removeAllOptions() {
+            if (this.optionsRemote.length > 0) {
+                this.selected = [];
+                this.selectedOptions = [];
+            }
+        },
+        selectedOptonsFilter() {
+              if (this.selectedOptions.length > 0) {
+                const options = [];
+
+                this.selectedOptions.forEach((option) => {
+                    options.push(option);
+                })
+
+                this.selected = options;
+
+                this.selectorClose();
+            }
+        },
+        selectorClose() {
+            const searchEl = this.$refs.SelectorRemoteMultipleAll.searchEl;
+
+            searchEl ? searchEl.blur() : null;
+
+            this.seleted ? this.selected : this.selectedOptions = [];
+        }
     },
 };
 </script>
