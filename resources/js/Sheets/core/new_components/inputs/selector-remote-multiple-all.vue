@@ -34,7 +34,7 @@
                         </div>
                         <div style="clear:both;"></div>
                     </div>
-                    <div v-if="selectedOptions.length > 0 && selectedOptions.length < 20">
+                    <div v-if="selectedOptions.length <= 20">
                         <p class="filter-title">Opciones seleccionadas</p>
                         <div class="vs__selected-options">
                             <span v-for="option in selectedOptions" :key="option.id" class="vs__selected">

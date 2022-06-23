@@ -42,7 +42,7 @@ export default {
     }),
     computed: {
         multiple() {
-            const isMultiple = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]';
+            const isMultiple = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]';
 
             return isMultiple;
         },
@@ -77,7 +77,7 @@ export default {
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
                 // eslint-disable-next-line vue/no-side-effects-in-computed-properties
                 this.remotecolumn = column;
-                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' ? 'IN' : 'EQUAL';
+                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' ? 'IN' : 'EQUAL';
                 let selectedValue = '';
                 if (this.selected !== null) {
                     if (!this.multiple) {
@@ -234,7 +234,7 @@ export default {
                     }
                 }
 
-                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' ? 'IN' : 'EQUAL';
+                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' ? 'IN' : 'EQUAL';
                 
                 const filter = {
                     column,
