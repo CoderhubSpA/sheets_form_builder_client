@@ -244,7 +244,9 @@ export default {
              */
             // eslint-disable-next-line func-names, object-shorthand
             handler: function (val) {
-                if (val) this.selected = val;
+                if (val && val.length > 0) {
+                    this.selected = val;
+                }
             },
             /**
              * Examina los cambios de manera profunda,

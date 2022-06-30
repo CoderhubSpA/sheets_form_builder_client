@@ -16,7 +16,7 @@
             @input="onInput"
             class="form-control"
             maxlength="250"
-            autocomplete="off"
+            autocomplete="no-cache-password"
         />
     </form-group>
 </template>

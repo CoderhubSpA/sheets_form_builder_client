@@ -26,36 +26,24 @@
             >
                 <template #list-header>
                     <div v-if="optionsRemote.length > 0">
-                        <div v-if="selectedOptions.length > 0" class="all-remove">
+                        <div v-if="selectedOptions.length > 0 || selected && selected.length >= 2" class="all-remove">
                             <a href="javascript:void(0);" class="all-remove-link" @click="removeAllOptions">Remover todos</a>
                         </div>
                         <div class="all-add">
-                            <a v-if="optionsRemote.length !== selectedOptions.length" href="javascript:void(0);" class="all-add-link" @click="addAllOptions">Seleccionar todos</a>
+                            <a v-if="!selected || selected && optionsRemote.length !== selected.length" href="javascript:void(0);" class="all-add-link" @click="addAllOptions">Seleccionar todos</a>
                         </div>
                         <div style="clear:both;"></div>
                     </div>
-                    <div v-if="selectedOptions.length <= 20">
-                        <p class="filter-title">Opciones seleccionadas</p>
+                    <div v-if="selectedOptions.length > 0">
+                        <p class="search-title">Opciones seleccionadas</p>
+                        <div class="search">
+                            <button class="search-button search-button-ok" @click="selectedOptonsFilter">OK</button>
+                            <button class="search-button search-button-cancel" @click="selectorClose">Cancelar</button>
+                        </div>
                         <div class="vs__selected-options">
                             <span v-for="option in selectedOptions" :key="option.id" class="vs__selected">
                                 {{ option.name }} <button type="button" :title="'Deselect ' + option.name" :aria-label="'Deselect ' + option.name" class="vs__deselect" @click="removeOption(option)"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"></path></svg></button>
                             </span>
-                        </div>
-                         <div class="filter">
-                            <button class="filter-button" @click="selectedOptonsFilter">Filtrar</button>
-                        </div>
-                    </div>
-                </template>
-                 <template #list-footer>
-                    <div v-if="selectedOptions.length > 20">
-                        <p class="filter-title">Opciones seleccionadas</p>
-                        <div class="vs__selected-options">
-                            <span v-for="option in selectedOptions" :key="option.id" class="vs__selected">
-                                {{ option.name }} <button type="button" :title="'Deselect ' + option.name" :aria-label="'Deselect ' + option.name" class="vs__deselect" @click="removeOption(option)"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"></path></svg></button>
-                            </span>
-                        </div>
-                         <div class="filter">
-                            <button class="filter-button" @click="selectedOptonsFilter">Filtrar</button>
                         </div>
                     </div>
                 </template>
@@ -134,27 +122,40 @@ export default {
 
 .all-add-link {
    font-size: 0.8em;
-   margin: 0 10px 0 10px;
+   margin: 0 10px;
 }
 
-.filter-title {
+.search-title {
     text-align: center;
 }
 
-.filter {
+.search {
     display: block;
-    float: right;
-    margin-bottom: 10px;
+    text-align: right;
+    margin: 10px 0;
 }
 
-.filter-button {
+.search-button {
+    min-width: 64px;
+    height: 22px;
     margin-right: 10px;
-    color: #fff;
-    background-color: #28a745;
-    border-color: #28a745;
-    border-radius: 4px;
-    border: none;
+    padding: 1px 6px;
+    border: 1px solid #d2d1d1;
+    border-radius: 2px;
+    font-family: inherit;
+    font-size: .75em;
+    font-weight: 700;
     text-align: center;
-    text-decoration: none;
 }
+
+.search-button-ok {
+    background-color: #0f9d58;
+    color: #fff;
+}
+
+.search-button-cancel {
+    background-color: #eee;
+    color: #000;
+}
+
 </style>
