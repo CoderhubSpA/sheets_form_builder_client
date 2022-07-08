@@ -13,7 +13,7 @@
                         >
                             {{ this.input.link_name }}
                         </a>
-                        <label :for="id" @click="logData()">{{ this.myLabelTest ? this.myLabelTest : this.defaultOptionLabel }}</label>
+                        <label :for="id" @click="logData()">{{ defaultOptionLabel ? defaultOptionLabel : label }}</label>
                         <span v-if="required" class="text-danger">*</span>
                         <span class="tooltip-custom" v-if="this.input.description">
                             <span class="icon">&#9432;</span>

@@ -23,10 +23,12 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
     const span = document.createElement('SPAN');
 
     if (value !== null && value !== undefined && value !== '') {
-        const selected = cellProperties.selectOptions.find((opt) => opt.value == value);
+        let options = (typeof cellProperties.selectOptions == "function") ? cellProperties.selectOptions() : cellProperties.selectOptions;
+
+        const selected = options.find((opt) => opt.value == value);
 
         span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${
-            selected ? selected.label : "" //value.toString()
+            selected ? selected.label : ""
         }`;
     } else {
         span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>`;
@@ -41,8 +43,7 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
     td.classList.add('custom-hot-select');
 
     if (cellProperties.readOnly) {
-        td.classLis
-        t.add('htDimmed');
+        td.classList.add('htDimmed');
     }
 
     if (cellProperties.isRequired && (value === '' || value === null || value === undefined)) {
@@ -54,6 +55,7 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
 
 export function customDateRenderer(instance, td, row, col, prop, value, cellProperties) {
     const span = document.createElement('SPAN');
+
     if (value !== null && value !== undefined && value !== '') {
         const date = value.split(' ');
         span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${date[0]}`;

@@ -109,12 +109,11 @@ export default {
             return show_field;
         },
         defaultOptionLabel() {
-            return this.$root.$refs.radioComponent.defaultOptionLabel;
+            return this.$root.$refs.radioComponent ? this.$root.$refs.radioComponent.defaultOptionLabel : null;
         }
     },
     watch: {
         handsontableData() {
-            this.myLabelTest = this.label;
             this.changeData();
         },
         errors(val) {
@@ -210,7 +209,9 @@ export default {
         hotTableLoaded: false,
         optionsFilteredByEntityTypeFk: '',
         optionsFiltered: [],
-        myLabelTest: ""
+        optionsFilteredEntitiesId: [],
+        optionsFilteredPreviousIndex: null,
+        mainLabel: ""
     }),
     mounted() {
         this.getEntityInfo();
@@ -374,17 +375,35 @@ export default {
                             } else  if (column.column.col_fk_filter) {
                                 this.optionsFilteredByEntityTypeFk = column.column.entity_type_fk;
 
-                                if (this.optionsFiltered.length > 0) {
-                                    options = this.optionsFiltered;
+                                selectOptions = () => {
+                                    let options = this.optionsFiltered || [];
+                                    console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 379 ~ this.columnsIds.map ~ options", options)
+                                        /* console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 382 ~ this.columnsIds.map ~ this.optionsFiltered", this.optionsFiltered)
 
-                                    options.map((option) => {
-                                        selectOptions.push({
-                                            value: option.id,
-                                            label: option.name
+                                        console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 383 ~ testing ~ this.optionsFilteredPreviousIndex", this.optionsFilteredPreviousIndex)
+
+                                        const testing = options.find((option) => {
+                                            return option.position === this.optionsFilteredPreviousIndex ?  option.options : null;
                                         });
-                                    });
 
-                                    this.optionsFiltered = [];
+                                        console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 388 ~ testing ~ testing", testing) */
+
+                                        
+                                        /* return testing.options.map((option) => {
+                                            return {
+                                                value: option.id,
+                                                label: option.name
+                                            }
+                                        }); */
+                                        if (options.length > 0) {
+                                            return options.map((option) => {
+                                                return {
+                                                    value: option.id,
+                                                    label: option.name
+                                                }
+                                            });
+                                        }
+                                    
                                 }
                             } else {
                                 options = this.entityInfo.entities_fk[column.column.entity_type_fk];
@@ -587,10 +606,19 @@ export default {
                 this.$refs.hotTableComponent.hotInstance.addHook('afterChange', () => {
                     this.changeData();
                 });
-                this.$refs.hotTableComponent.hotInstance.addHook('afterRemoveRow', () => {
-                    this.changeData();
+
+                this.$refs.hotTableComponent.hotInstance.addHook('afterRemoveRow', (index) => {
+                    this.deleteOptionsSeleted(index);
                 });
+
+                /* this.$refs.hotTableComponent.hotInstance.addHook('afterOnCellMouseOver', (event, coords, TD) => {
+                    if(coords.row !== -1) {
+                        console.log(coords)
+                    }
+                }); */
+
                 this.$store.commit(`${this.state}/LOADING`, false);
+
                 this.reRenderTable();
             });
         },
@@ -627,8 +655,8 @@ export default {
             const dataToSend = {};
             this.$store.commit(`${this.state}/ERRORSSMA`, null);
             dataToSend[this.input.id] = {};
-            //console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 618 ~ changeData ~ this.input.id", this.input)
             dataToSend[this.input.id][this.input.entity_type_pivot_fk] = [];
+
             // eslint-disable-next-line array-callback-return
             this.handsontableData.map((hotData) => {
                 const dataToPush = {};
@@ -650,12 +678,35 @@ export default {
                                 if (this.optionsFilteredByEntityTypeFk) {
                                     const entities = this.entityInfo.entities_fk[this.optionsFilteredByEntityTypeFk];
 
-                                    entities.filter((entity) => {
-                                        if (entity.area_id === hotData[key]) {
-                                           this.optionsFiltered.push(entity)
+                                   /*  const verifyEntityAdd = this.optionsFilteredEntitiesId.filter((entity) => {
+                                        return (entity && entity.area_id === dataToPush[key]) ? entity : null;
+                                    })
+
+                                    console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 687 ~ verifyEntityAdd ~ verifyEntityAdd", verifyEntityAdd)
+
+                                    if (verifyEntityAdd.length === 0) {
+                                        this.optionsFilteredEntitiesId.push(dataToPush[key]);
+                                        console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 689 ~ Object.keys ~  this.optionsFilteredEntitiesId",  this.optionsFilteredEntitiesId)
+                                    } */
+
+                                   /*  if (options.length > 0) {
+                                        const row = {
+                                            position: this.optionsFilteredPreviousIndex,
+                                            options: options
                                         }
-                                    });
+
+                                        if (typeof this.optionsFiltered[this.optionsFilteredPreviousIndex] === 'undefined') {
+                                            this.optionsFiltered.push(row);
+                                        }
+                                        this.optionsFiltered.push(options)
+                                    } */
+
+                                    entities.filter((entity) => {
+                                        return entity.area_id === hotData[key] ? this.optionsFiltered.push(entity) : null
+                                    })
                                 }
+
+                                //console.log(" dataToPush[key], hotData[key]",  dataToPush[key], hotData[key])
 
                                 dataToPush[key] = hotData[key];
                             }
@@ -685,6 +736,11 @@ export default {
                 }, 1);
             }
         },
+        deleteOptionsSeleted(index) {
+            this.optionsFiltered = this.optionsFiltered.splice(index, 1);
+
+            this.changeData();
+        }
     },
 };
 </script>
