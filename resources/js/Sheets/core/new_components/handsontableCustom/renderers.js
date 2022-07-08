@@ -111,3 +111,25 @@ export function customMultiSelectRenderer(instance, td, row, col, prop, value, c
     }
     return td;
 }
+
+export function customTextRenderer(instance, td, row, col, prop, value, cellProperties) {
+    const span = document.createElement('SPAN');
+
+    (value !== null && value !== undefined && value !== '') ? span.innerHTML = `${value}` : span.innerHTML = ``;
+
+    Handsontable.dom.empty(td);
+
+    td.appendChild(span);
+    td.classList.add('htCenter');
+    td.classList.add('htMiddle');
+
+    if (cellProperties.readOnly) {
+        td.classList.add('htDimmed');
+    }
+
+    if (cellProperties.isRequired && (value === "" || value === null || value === undefined)) {
+        td.classList.add('htErrorWaiting');
+    }
+
+    return td;
+}

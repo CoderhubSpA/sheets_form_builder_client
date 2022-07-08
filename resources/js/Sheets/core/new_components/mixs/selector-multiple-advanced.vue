@@ -9,6 +9,7 @@ import {
     customDateRenderer,
     customSelectRenderer,
     customMultiSelectRenderer,
+    customTextRenderer,
 } from '../handsontableCustom/renderers';
 import 'handsontable-multi-select/dist/css/handsontable-multi-select.css';
 import 'handsontable/dist/handsontable.full.css';
@@ -353,6 +354,8 @@ export default {
                             columnToPush.data = column.id;
                             columnToPush.type = 'text';
                             columnToPush.readOnly = column.readonly;
+                            columnToPush.isRequired = column.isRequired;
+                            columnToPush.renderer = customTextRenderer;
                             break;
                         case 'SELECTOR':
                             selectOptions = [];
@@ -377,33 +380,15 @@ export default {
 
                                 selectOptions = () => {
                                     let options = this.optionsFiltered || [];
-                                    console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 379 ~ this.columnsIds.map ~ options", options)
-                                        /* console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 382 ~ this.columnsIds.map ~ this.optionsFiltered", this.optionsFiltered)
 
-                                        console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 383 ~ testing ~ this.optionsFilteredPreviousIndex", this.optionsFilteredPreviousIndex)
-
-                                        const testing = options.find((option) => {
-                                            return option.position === this.optionsFilteredPreviousIndex ?  option.options : null;
-                                        });
-
-                                        console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 388 ~ testing ~ testing", testing) */
-
-                                        
-                                        /* return testing.options.map((option) => {
+                                    if (options.length > 0) {
+                                        return options.map((option) => {
                                             return {
                                                 value: option.id,
                                                 label: option.name
                                             }
-                                        }); */
-                                        if (options.length > 0) {
-                                            return options.map((option) => {
-                                                return {
-                                                    value: option.id,
-                                                    label: option.name
-                                                }
-                                            });
-                                        }
-                                    
+                                        });
+                                    }
                                 }
                             } else {
                                 options = this.entityInfo.entities_fk[column.column.entity_type_fk];
@@ -678,35 +663,10 @@ export default {
                                 if (this.optionsFilteredByEntityTypeFk) {
                                     const entities = this.entityInfo.entities_fk[this.optionsFilteredByEntityTypeFk];
 
-                                   /*  const verifyEntityAdd = this.optionsFilteredEntitiesId.filter((entity) => {
-                                        return (entity && entity.area_id === dataToPush[key]) ? entity : null;
-                                    })
-
-                                    console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 687 ~ verifyEntityAdd ~ verifyEntityAdd", verifyEntityAdd)
-
-                                    if (verifyEntityAdd.length === 0) {
-                                        this.optionsFilteredEntitiesId.push(dataToPush[key]);
-                                        console.log("🚀 ~ file: selector-multiple-advanced.vue ~ line 689 ~ Object.keys ~  this.optionsFilteredEntitiesId",  this.optionsFilteredEntitiesId)
-                                    } */
-
-                                   /*  if (options.length > 0) {
-                                        const row = {
-                                            position: this.optionsFilteredPreviousIndex,
-                                            options: options
-                                        }
-
-                                        if (typeof this.optionsFiltered[this.optionsFilteredPreviousIndex] === 'undefined') {
-                                            this.optionsFiltered.push(row);
-                                        }
-                                        this.optionsFiltered.push(options)
-                                    } */
-
                                     entities.filter((entity) => {
                                         return entity.area_id === hotData[key] ? this.optionsFiltered.push(entity) : null
                                     })
                                 }
-
-                                //console.log(" dataToPush[key], hotData[key]",  dataToPush[key], hotData[key])
 
                                 dataToPush[key] = hotData[key];
                             }
