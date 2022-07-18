@@ -1,17 +1,19 @@
 <template>
-    <div class="">
+    <div>
         <loading-message :status="loadingForm"></loading-message>
         <h3 class="sheets-form-title">
             {{ form_title }}
         </h3>
-        <sheets-row
-            v-for="(row, key) in formRows"
-            :key="key"
-            :row="row"
-            :state="namespace"
-            :base_url="base_url"
-            v-model="formAnswer[key]"
-        />
+        <div :class="{scrolling: theme === 'sait'}">
+            <sheets-row
+                v-for="(row, key) in formRows"
+                :key="key"
+                :row="row"
+                :state="namespace"
+                :base_url="base_url"
+                v-model="formAnswer[key]"
+            />
+        </div>
 
         <div class="row text-center sheets-actions-container">
             <div class="col" v-for="(action, key) in formActions" :key="key">
@@ -83,6 +85,14 @@ export default {
             type: String,
             default: '',
         },
+        theme: {
+            type: String,
+            default: ''
+        },
+        customStyles: {
+            type: Object,
+            default: () => ({})
+        }
     },
     components: {
         // "sheets-loading": Loading,
@@ -632,4 +642,49 @@ export default {
     border: 1px solid gray;
     margin-bottom: 5px;
 }
+
+.scrolling {
+    height: 426px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.scrolling::-webkit-scrollbar {
+    display: none;
+}
+
+.scrolling > .scrolling-758 {
+    height: 426px;
+}
+
+@media (min-height: 576px) {
+  .scrolling {
+    min-height: 426px;
+  }
+}
+
+@media (min-height: 665px) {
+  .scrolling {
+    min-height: 508px;
+  }
+}
+
+@media (min-height: 768px) {
+  .scrolling {
+    min-height: 684px;
+  }
+}
+
+@media (min-height: 992px) {
+  .scrolling {
+    min-height: 764px;
+  }
+}
+
+@media (min-height: 1200px) {
+  .scrolling {
+    min-height: 761px;
+  }
+}
+
 </style>

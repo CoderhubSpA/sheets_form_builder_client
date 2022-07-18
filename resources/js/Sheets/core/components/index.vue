@@ -9,6 +9,8 @@
                 :base_url="base_url"
                 :is_test="form_test"
                 :params_actions="actions"
+                :theme="theme"
+                :customStyles="customStyles"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true">
@@ -56,6 +58,14 @@ export default {
             type: String,
             default: '',
         },
+        theme: {
+            type: String,
+            default: ''
+        },
+        customStyles: {
+            type: Object,
+            default: () => ({})
+        }
     },
 
     data: () => ({
