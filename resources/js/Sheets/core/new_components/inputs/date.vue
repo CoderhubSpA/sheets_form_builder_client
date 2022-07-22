@@ -10,10 +10,11 @@
     >
         <date-picker
             type="date"
+            v-model="picker"
             :format="dateFormat"
             :placeholder="defaultValue"
+            :disabled="disabled"
             @input="onInput"
-            v-model="picker"
         ></date-picker>
     </form-group>
 </template>

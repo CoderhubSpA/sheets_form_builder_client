@@ -9,14 +9,14 @@
         v-if="show_field"
     >
         <textarea
+            rows="3"
+            maxlength="1000"
             class="form-control"
             :id="id"
-            rows="3"
             :placeholder="defaultValue"
             :value="inputValue"
             :disabled="disabled"
             @input="onInput"
-            maxlength="1000"
         >
         </textarea>
     </form-group>

@@ -10,12 +10,13 @@
     >
         <input
             type="text"
+            maxlength="250"
+            class="form-control"
             :id="id"
             :value="inputValue"
             :placeholder="defaultValue"
+            :disabled="disabled"
             @input="onInput"
-            class="form-control"
-            maxlength="250"
         />
     </form-group>
 </template>
