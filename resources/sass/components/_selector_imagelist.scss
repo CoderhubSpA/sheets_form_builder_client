@@ -1,0 +1,138 @@
+.sheets-select-image {
+    background-color: rgba(0, 29, 9, 1);
+
+    .container-options {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .container-option {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .wrapper-option {
+        position: relative;
+    }
+
+    .wrapper-option-btn {
+        position: absolute;
+        z-index: 80;
+    }
+
+    .selected-indicator {
+        display: relative;
+        font-size: 1em;
+        text-align: right;
+        padding: 0 4px;
+    }
+
+    .options {
+        width: 100px;
+        height: 100px;
+        margin: 4px;
+        text-align: center;
+        color: #d2d2d2;
+        border: solid 2px;
+        border-radius: 8px;
+        border-color: #d2d2d2;
+    }
+
+    .container-option-image {
+        padding: 4px 0;
+    }
+
+    .container-option-icon {
+        font-size: 1.8em;
+    }
+
+    .option-image {
+        max-width: 50px;
+        max-height: 35px;
+        border-radius: 2px;
+    }
+
+    .option-only-name {
+        font-size: 0.6em;
+        line-height: normal;
+        margin-bottom: 0;
+    }
+
+    .options:hover {
+        color: #67f2a4;
+        border-color: #67f2a4;
+    }
+
+    .options:hover .option-image {
+        color: #67f2a4;
+        outline: #67f2a4 solid 2px;
+    }
+
+    .readonly,
+    .readonly:hover,
+    .readonly .option-image,
+    .readonly:hover .option-image {
+        color: #d2d2d28e;
+        border-color: #d2d2d28e;
+        opacity: 0.5;
+    }
+
+    .option-select {
+        width: 96px;
+        height: 96px;
+        border-radius: 6px;
+        border: none;
+        background-color: transparent;
+    }
+
+    .noimage,
+    .noicon {
+        padding-top: 16px;
+    }
+
+    .indicator {
+        color: rgba(0, 29, 9, 1);
+    }
+
+    .selected {
+        color: #67f2a4;
+        border-color: #67f2a4;
+    }
+
+    .container-option-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .actions {
+        width: 46px;
+        height: 46px;
+        margin: 4px;
+        padding: 3px 9px;
+        font-size: 1.5em;
+        color: #d2d2d2;
+        border: solid 2px #d2d2d2;
+        border-radius: 6px;
+        background-color: transparent;
+    }
+
+    .actions:hover {
+        color: #67f2a4;
+        border: solid 2px #67f2a4;
+    }
+
+    .selectedAll {
+        width: 46px;
+        height: 46px;
+        margin: 4px;
+        padding: 3px 9px;
+        font-size: 1.5em;
+        color: #67f2a4;
+        border: solid 2px #67f2a4;
+        border-radius: 6px;
+        background-color: transparent;
+    }
+}

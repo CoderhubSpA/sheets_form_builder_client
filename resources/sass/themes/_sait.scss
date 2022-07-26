@@ -1,0 +1,157 @@
+.theme-sait {
+    font-family: $theme-sait-csi__font-family;
+    font-style: $theme-sait-csi__font-style;
+    font-weight: $theme-sait-csi__font-weight;
+    font-size: $theme-sait-csi__font-size;
+    letter-spacing: $theme-sait-csi__character-spacing;
+    line-height: $theme-sait-csi__line-spacing;
+
+    h3.sheets-form-title {
+        color: $theme-sait-csi__selected-option-main-actions;
+        border: none;
+    }
+
+    div.sheets-rows {
+        padding: 24px;
+        background: $theme-sait-csi__container-bg;
+        border-radius: 4px;
+    }
+
+    div.sheets-row {
+        border: none;
+
+        label {
+            color: $theme-sait-csi__text-label-icon;
+            text-transform: lowercase;
+        }
+
+        label:first-letter {
+            text-transform: capitalize;
+        }
+    }
+
+    h3.sheets-row-title {
+        color: $theme-sait-csi__text-label-icon;
+    }
+
+    h5.sheets-section-title {
+        color: $theme-sait-csi__text-label-icon;
+    }
+
+    div.sheets-field {
+        border: none;
+    }
+
+    button.sheets-action-btn {
+        color: #000;
+        background-color: $theme-sait-csi__selected-option-main-actions;
+        border: none;
+    }
+
+    /* vue-select */
+    .sheets-select .vs__search::placeholder,
+    .sheets-select .vs__dropdown-menu,
+    .sheets-select .vs__dropdown-toggle {
+        background: $theme-sait-csi__bg-select-options;
+        border: solid 1px $theme-sait-csi__border-select-options;
+        color: $theme-sait-csi__text-label-icon;
+    }
+
+    .sheets-select .vs__search {
+        color: $theme-sait-csi__text-label-icon;
+    }
+
+    .sheets-select .vs__clear,
+    .sheets-select .vs__open-indicator,
+    .sheets-select .vs__deselect {
+        font-size: 1em;
+        fill: $theme-sait-csi__text-label-icon;
+    }
+
+    .sheets-select .vs__dropdown-option {
+        color: $theme-sait-csi__text-label-icon;
+    }
+
+    .sheets-select .vs__dropdown-option--highlight,
+    .sheets-select .vs__selected {
+        background: $theme-sait-csi__border-main-actions;
+        color: $theme-sait-csi__text-label-icon;
+    }
+
+    a.all-remove-link,
+    a.all-add-link {
+        color: $theme-sait-csi__text-label-icon;
+    }
+
+    /* vue-select */
+
+    /* vue2-datepicker */
+    div.mx-datepicker {
+        div.mx-input-wrapper {
+            input.mx-input {
+                background-color: $theme-sait-csi__bg-select-options !important;
+                border-color: $theme-sait-csi__border-select-options;
+                color: $theme-sait-csi__text-label-icon;
+            }
+
+            i.mx-icon-clear,
+            i.mx-icon-calendar {
+                color: $theme-sait-csi__text-label-icon;
+            }
+        }
+    }
+
+    /* vue2-datepicker */
+
+    div.sheets-form-scrolling {
+        height: 426px;
+        overflow-y: auto;
+        overflow-x: auto;
+        scrollbar-color: $theme-sait-csi__selected-option-main-actions $theme-sait-csi__border-select-options;
+    }
+
+    div.sheets-form-scrolling::-webkit-scrollbar {
+        width: 0.5em;
+    }
+
+    div.sheets-form-scrolling::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px $theme-sait-csi__bg-select-options;
+        border-radius: 10px;
+    }
+
+    div.sheets-form-scrolling::-webkit-scrollbar-thumb {
+        background-color: $theme-sait-csi__selected-option-main-actions;
+        border-radius: 10px;
+        /* outline: 1px solid $theme-sait-csi__bg-select-options; */
+    }
+
+    @media (min-height: 576px) {
+        div.sheets-form-scrolling {
+            min-height: 426px;
+        }
+    }
+
+    @media (min-height: 665px) {
+        div.sheets-form-scrolling {
+            min-height: 508px;
+        }
+    }
+
+    @media (min-height: 768px) {
+        div.sheets-form-scrolling {
+            min-height: 684px;
+        }
+    }
+
+    @media (min-height: 992px) {
+        div.sheets-form-scrolling {
+            min-height: 764px;
+        }
+    }
+
+    @media (min-height: 1200px) {
+        div.sheets-form-scrolling {
+            min-height: 761px;
+        }
+    }
+}

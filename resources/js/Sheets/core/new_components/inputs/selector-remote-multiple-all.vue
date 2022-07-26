@@ -97,11 +97,6 @@ export default {
             ];
             return styles.join(' ');
         },
-    },
-    methods: {
-        testing(value) {
-            console.log("🚀 ~ file: selector-remote-multiple.vue ~ line 147 ~ testing ~ value", value)
-        }
     }
 };
 </script>

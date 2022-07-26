@@ -77,12 +77,18 @@ export default {
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
             let options = [];
             const key = this.input.col_name_fk || 'name';
+
             if (contentInfo) {
                 const fk = this.input.entity_type_fk;
 
                 const entities = contentInfo.content.entities_fk[fk];
+
                 if (entities) {
-                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
+                    if(entities.length > 0 && entities[0].image_src) {
+                        options = entities.map((e) => ({ id: e.id, name: e.name, image: this.base_url + e.image_src, selected: true }));
+                    } else {
+                        options = entities.map((e) => ({ id: e.id, name: e[key] }));
+                    }
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
 
@@ -109,6 +115,7 @@ export default {
 
                 return 0;
             });
+
             return options;
         },
         /**
@@ -117,11 +124,13 @@ export default {
         multiple() {
             const isMultiple = this.input.format === 'SELECTOR[MULTIPLE]';
 
+            const isMultipleImageList = this.input.format === 'SELECTOR[IMAGELIST]';
+
             const is1xnAll = this.input.format === 'SELECTOR[1XN][ALL]';
 
             const isMultipleAdvanced = this.input.format === 'SELECTOR[MULTIPLE][ADVANCED]';
 
-            return isMultiple || is1xnAll || isMultipleAdvanced;
+            return isMultiple || isMultipleImageList || is1xnAll || isMultipleAdvanced;
         },
         /**
          * receptor de se;al para el limpiado del campo
@@ -212,12 +221,37 @@ export default {
 
             this.$emit('input', data);
 
-            const dataToSelectorFilters = {
+            if (this.input.format === 'SELECTOR[IMAGELIST]' && this.selected.length > 0) {
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                const type = 'IN';
+                let selectedValue = '';
+
+                if (this.selected !== null) {
+                    selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                }
+
+                const filter = {
+                    column,
+                    id: `external-filter-${column.id}`,
+                    order: 1,
+                    search: selectedValue,
+                    type,
+                    remote: this.input.options === null && this.input.entity_type_fk === null,
+                };
+
+                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+            }
+
+
+           /*  const dataToSelectorFilters = {
                 key: this.input.col_name,
                 value: data[this.id],
             };
 
-            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
+            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters); */
+
             /**
              * mostrar/ocultar section
              */
@@ -299,9 +333,6 @@ export default {
                 this.optionsFiltered = optionsFil;
             }
         },
-    },
-    mounted() {
-        // console.log('selector', this.input);
     },
     methods: {
         createdOption(id) {

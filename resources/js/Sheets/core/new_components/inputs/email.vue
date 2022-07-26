@@ -10,13 +10,13 @@
     >
         <input
             type="email"
+            maxlength="250"
+            class="form-control"
+            autocomplete="new-password"
             :id="id"
             :value="inputValue"
             :placeholder="defaultValue"
             @input="onInput"
-            class="form-control"
-            maxlength="250"
-            autocomplete="no-cache-email"
         />
     </form-group>
 </template>
