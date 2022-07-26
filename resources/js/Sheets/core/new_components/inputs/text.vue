@@ -10,14 +10,13 @@
     >
         <input
             type="text"
-            class="form-control"
-            maxlength="250"
-            autocomplete="new-password"
             :id="id"
             :value="inputValue"
             :disabled="disabled"
-            :placeholder="defaultValue"
             @input="onInput"
+            :placeholder="defaultValue"
+            class="form-control"
+            maxlength="250"
         />
     </form-group>
 </template>

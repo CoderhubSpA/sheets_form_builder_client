@@ -11,29 +11,26 @@
         >
             <v-select
                 v-if="this.input.options === null && this.input.entity_type_fk === null"
+                v-model="selected"
                 label="name"
+                class="sheets-select"
                 :id="id"
                 :options="optionsRemote"
                 :disabled="disabled"
                 :multiple="false"
-                v-model="selected"
                 :searchable="false"
                 :readonly="false"
-                @search="
-                    (search, loading) => {
-                        filterByFuncDebounce(search);
-                    }
-                "
+                @search="(search, loading) => { filterByFuncDebounce(search) }"
             >
             </v-select>
             <v-select
                 v-if="this.input.options !== null || this.input.entity_type_fk !== null"
+                v-model="selected"
                 label="name"
                 :id="id"
                 :options="options"
                 :disabled="disabled"
                 :multiple="false"
-                v-model="selected"
                 :searchable="true"
                 :readonly="false"
             >
@@ -63,6 +60,5 @@ export default {
     components: {
         'form-group': FormGroup,
     },
-    methods: {},
 };
 </script>

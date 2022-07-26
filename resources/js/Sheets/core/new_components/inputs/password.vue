@@ -10,13 +10,13 @@
     >
         <input
             type="password"
-            class="form-control"
-            maxlength="250"
-            autocomplete="new-password"
             :id="id"
             :value="inputValue"
             :placeholder="defaultValue"
             @input="onInput"
+            class="form-control"
+            maxlength="250"
+            autocomplete="no-cache-password"
         />
     </form-group>
 </template>

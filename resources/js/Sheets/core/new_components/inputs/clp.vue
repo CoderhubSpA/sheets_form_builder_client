@@ -10,13 +10,12 @@
     >
         <input
             type="number"
-            aria-describedby="basic-addon1"
-            aria-label="Username"
-            class="form-control"
             :id="id"
+            class="form-control"
+            aria-label="Username"
+            aria-describedby="basic-addon1"
             :placeholder="defaultValue"
             :value="inputValue"
-            :disabled="disabled"
             @input="onInput"
             @paste="onPaste"
         />

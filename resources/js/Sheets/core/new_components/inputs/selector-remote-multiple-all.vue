@@ -12,11 +12,12 @@
             <v-select
                 v-if="input.options === null && input.entity_type_fk === null"
                 label="name"
+                v-model="selected"
+                class="sheets-select"
                 :id="id"
                 :options="optionsRemote"
                 :disabled="disabled"
                 :multiple="true"
-                v-model="selected"
                 :searchable="false"
                 :readonly="false"
                 @search="(search, loading) => { filterByFuncDebounce(search); }"

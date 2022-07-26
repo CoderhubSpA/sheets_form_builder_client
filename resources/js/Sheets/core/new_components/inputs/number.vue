@@ -15,7 +15,6 @@
             aria-describedby="basic-addon1"
             :placeholder="defaultValue"
             :value="inputValue"
-            :disabled="disabled"
             @input="onInput"
             @paste="onPaste"
         />

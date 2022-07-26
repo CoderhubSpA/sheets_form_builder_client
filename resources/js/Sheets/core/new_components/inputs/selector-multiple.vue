@@ -11,6 +11,8 @@
         >
             <v-select
                 label="name"
+                v-model="selected"
+                class="sheets-select"
                 :id="id"
                 :options="
                     optionsFiltered.length === 0 &&
@@ -21,7 +23,6 @@
                 "
                 :disabled="disabled"
                 :multiple="multiple"
-                v-model="selected"
                 :searchable="searchable"
             >
             </v-select>

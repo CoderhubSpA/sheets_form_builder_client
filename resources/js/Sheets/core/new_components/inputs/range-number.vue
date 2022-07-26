@@ -12,13 +12,12 @@
             <div class="col-6">
                 <input
                     type="number"
+                    :id="`${id}-start`"
+                    class="form-control"
+                    :class="errorInput ? 'is-invalid' : ''"
                     aria-label="Username"
                     aria-describedby="basic-addon1"
                     placeholder="Valor inicial"
-                    class="form-control"
-                    :id="`${id}-start`"
-                    :class="errorInput ? 'is-invalid' : ''"
-                    :disabled="disabled"
                     :value="rangeValue.start"
                     @input="onInputStart"
                 />
@@ -26,14 +25,13 @@
             <div class="col-6">
                 <input
                     type="number"
+                    :id="`${id}-end`"
+                    class="form-control"
+                    :class="errorInput ? 'is-invalid' : ''"
                     aria-label="Username"
                     aria-describedby="basic-addon1"
                     placeholder="Valor final"
-                    class="form-control"
-                    :id="`${id}-end`"
-                    :class="errorInput ? 'is-invalid' : ''"
                     :value="rangeValue.end"
-                    :disabled="disabled"
                     @input="onInputEnd"
                 />
             </div>

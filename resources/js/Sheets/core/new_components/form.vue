@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div :class="setTheme">
         <loading-message :status="loadingForm"></loading-message>
         <h3 class="sheets-form-title">
             {{ form_title }}
         </h3>
-        <div :class="{scrolling: theme === 'sait'}">
+        <div class="sheets-rows sheets-form-scrolling">
             <sheets-row
                 v-for="(row, key) in formRows"
                 :key="key"
@@ -14,7 +14,6 @@
                 v-model="formAnswer[key]"
             />
         </div>
-
         <div class="row text-center sheets-actions-container">
             <div class="col" v-for="(action, key) in formActions" :key="key">
                 <sheets-action
@@ -35,7 +34,6 @@
 </template>
 
 <script>
-
 /* eslint-disable no-console */
 import Row from './grid/row.vue';
 import Action from './actions/button.vue';
@@ -87,12 +85,12 @@ export default {
         },
         theme: {
             type: String,
-            default: ''
+            default: '',
         },
         customStyles: {
             type: Object,
-            default: () => ({})
-        }
+            default: () => ({}),
+        },
     },
     components: {
         // "sheets-loading": Loading,
@@ -153,6 +151,9 @@ export default {
         },
         form_loaded() {
             return this.$store.getters[`${this.namespace}/form_loaded`];
+        },
+        setTheme() {
+            return `theme-${this.theme}`;
         },
     },
     watch: {
@@ -363,7 +364,6 @@ export default {
             ];
             let valid = true;
             smarequiredfields.forEach((rf) => {
-
                 if (fieldId === rf.fieldId) {
                     content.forEach((item) => {
                         const keys = Object.keys(item);
@@ -492,7 +492,7 @@ export default {
                             };
 
                             if (response.success) {
-                                console.log(this.action.refresh_form)
+                                console.log(this.action.refresh_form);
                                 if (this.action.refresh_form === 1) {
                                     this.resetForm();
                                 }
@@ -634,57 +634,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .sheets-actions-container {
     margin: 2rem 0;
 }
+
 .sheets-form-title {
     border: 1px solid gray;
     margin-bottom: 5px;
-}
-
-.scrolling {
-    height: 426px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-.scrolling::-webkit-scrollbar {
-    display: none;
-}
-
-.scrolling > .scrolling-758 {
-    height: 426px;
-}
-
-@media (min-height: 576px) {
-  .scrolling {
-    min-height: 426px;
-  }
-}
-
-@media (min-height: 665px) {
-  .scrolling {
-    min-height: 508px;
-  }
-}
-
-@media (min-height: 768px) {
-  .scrolling {
-    min-height: 684px;
-  }
-}
-
-@media (min-height: 992px) {
-  .scrolling {
-    min-height: 764px;
-  }
-}
-
-@media (min-height: 1200px) {
-  .scrolling {
-    min-height: 761px;
-  }
 }
 
 </style>
