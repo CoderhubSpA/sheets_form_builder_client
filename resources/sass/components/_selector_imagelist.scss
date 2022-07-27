@@ -21,11 +21,11 @@
     }
 
     .selected-indicator {
-        display: relative;
-        height: 16px;
+        height: 0;
         font-size: 12px;
         text-align: right;
-        padding: 0 4px;
+        padding: 0 2px;
+        overflow: visible;
     }
 
     .options {
@@ -48,13 +48,13 @@
     }
 
     .option-image {
-        max-width: 22px;
-        max-height: 16px;
+        max-width: 32px;
+        max-height: 38px;
         border-radius: 8px;
     }
 
     .option-only-name {
-        font-size: 7px;
+        font-size: 8px;
         line-height: normal;
         margin-bottom: 0;
     }
