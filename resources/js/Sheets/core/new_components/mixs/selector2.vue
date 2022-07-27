@@ -85,7 +85,7 @@ export default {
 
                 if (entities) {
                     if(entities.length > 0 && entities[0].image_src) {
-                        options = entities.map((e) => ({ id: e.id, name: e.name, image: this.base_url + e.image_src, selected: true }));
+                        options = entities.map((e) => ({ id: e.id, name: e.name, image: this.base_url + e.image_src, selected: false }));
                     } else {
                         options = entities.map((e) => ({ id: e.id, name: e[key] }));
                     }

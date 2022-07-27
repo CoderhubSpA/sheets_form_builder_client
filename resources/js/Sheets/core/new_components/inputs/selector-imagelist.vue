@@ -10,10 +10,10 @@
         <div class="container-fluid sheets-select-image">
             <div class="row">
                 <div class="col-md-12 p-0">
-                    <div class="container-options">
+                    <div v-if="availableOptions.length > 0" class="container-options">
                         <div class="container-option">
                             <div
-                                v-for="option in options"
+                                v-for="option in availableOptions"
                                 :key="option.id"
                                 :class="[
                                     { selected: option.selected },
@@ -92,6 +92,7 @@ export default {
         'form-group': FormGroup,
     },
     data: () => ({
+        availableOptions: [],
         selectedOptions: [],
         selectedAll: false,
     }),
@@ -100,14 +101,12 @@ export default {
     },
     watch: {
         options(val) {
-            val.map((opt) => {
-                return opt.selected = false;
-            })
+            this.availableOptions = val;
         }
     },
     methods: {
         optionSelect(option) {
-            this.options.map((opt) => {
+            this.availableOptions.map((opt) => {
                 return opt.id === option.id
                     ? opt.selected === false
                         ? (opt.selected = true)
@@ -127,23 +126,23 @@ export default {
                 this.selected.push(option);
             }
 
-            const ifOptionsAll = this.options.filter((opt) => opt.readOnly !== true);
+            const ifOptionsAll = this.availableOptions.filter((opt) => opt.readOnly !== true);
 
             if (ifOptionsAll.length === this.selected.length) {
                 this.selectedAll = true;
             }
         },
         optionAllSelect() {
-            this.options.map((option) => {
+            this.availableOptions.map((option) => {
                 return !option.readOnly ? (option.selected = true) : option;
             });
 
-            this.selected = this.options.filter((option) => option.readOnly !== true);
+            this.selected = this.availableOptions.filter((option) => option.readOnly !== true);
 
             this.selectedAll = true;
         },
         optionSelectedAllRemove() {
-            this.options.map((option) => {
+            this.availableOptions.map((option) => {
                 return (option.selected = false);
             });
 

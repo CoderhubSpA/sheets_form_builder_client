@@ -1,6 +1,4 @@
 .sheets-select-image {
-    background-color: rgba(0, 29, 9, 1);
-
     .container-options {
         display: flex;
         flex-direction: row;
@@ -24,115 +22,104 @@
 
     .selected-indicator {
         display: relative;
-        font-size: 1em;
+        height: 16px;
+        font-size: 12px;
         text-align: right;
         padding: 0 4px;
     }
 
     .options {
-        width: 100px;
-        height: 100px;
+        width: 64px;
+        height: 64px;
         margin: 4px;
         text-align: center;
-        color: #d2d2d2;
+        color: $theme-sait-csi__text-select-icons;
         border: solid 2px;
         border-radius: 8px;
-        border-color: #d2d2d2;
-    }
-
-    .container-option-image {
-        padding: 4px 0;
+        border-color: $theme-sait-csi__text-select-icons;
     }
 
     .container-option-icon {
-        font-size: 1.8em;
+        font-size: 14px;
+    }
+
+    .container-option-image {
+        margin-bottom: 4px;
     }
 
     .option-image {
-        max-width: 50px;
-        max-height: 35px;
-        border-radius: 2px;
+        max-width: 22px;
+        max-height: 16px;
+        border-radius: 8px;
     }
 
     .option-only-name {
-        font-size: 0.6em;
+        font-size: 7px;
         line-height: normal;
         margin-bottom: 0;
     }
 
     .options:hover {
-        color: #67f2a4;
-        border-color: #67f2a4;
-    }
-
-    .options:hover .option-image {
-        color: #67f2a4;
-        outline: #67f2a4 solid 2px;
+        color: $theme-sait-csi__selected-option-main-actions;
+        border-color: $theme-sait-csi__selected-option-main-actions;
     }
 
     .readonly,
     .readonly:hover,
     .readonly .option-image,
     .readonly:hover .option-image {
-        color: #d2d2d28e;
-        border-color: #d2d2d28e;
+        color: $theme-sait-csi__border-select-options;
+        border-color: $theme-sait-csi__border-select-options;
         opacity: 0.5;
     }
 
     .option-select {
-        width: 96px;
-        height: 96px;
-        border-radius: 6px;
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
         border: none;
         background-color: transparent;
     }
 
     .noimage,
     .noicon {
-        padding-top: 16px;
+        padding-top: 10px;
     }
 
     .indicator {
-        color: rgba(0, 29, 9, 1);
+        color: $theme-sait-csi__container-bg;
     }
 
     .selected {
-        color: #67f2a4;
-        border-color: #67f2a4;
+        color: $theme-sait-csi__selected-option-main-actions;
+        border-color: $theme-sait-csi__selected-option-main-actions;
     }
 
     .container-option-actions {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        padding-top: 2px
     }
 
     .actions {
-        width: 46px;
-        height: 46px;
-        margin: 4px;
-        padding: 3px 9px;
-        font-size: 1.5em;
-        color: #d2d2d2;
-        border: solid 2px #d2d2d2;
-        border-radius: 6px;
+        width: 30px;
+        height: 30px;
+        margin: 2px;
+        padding: 4px 6px;
+        font-size: 12px;
+        color: $theme-sait-csi__text-select-icons;
+        border: solid 2px $theme-sait-csi__text-select-icons;
+        border-radius: 8px;
         background-color: transparent;
     }
 
     .actions:hover {
-        color: #67f2a4;
-        border: solid 2px #67f2a4;
+        color: $theme-sait-csi__selected-option-main-actions;
+        border: solid 2px $theme-sait-csi__selected-option-main-actions;
     }
 
     .selectedAll {
-        width: 46px;
-        height: 46px;
-        margin: 4px;
-        padding: 3px 9px;
-        font-size: 1.5em;
-        color: #67f2a4;
-        border: solid 2px #67f2a4;
-        border-radius: 6px;
-        background-color: transparent;
+        color: $theme-sait-csi__selected-option-main-actions;
+        border: solid 2px $theme-sait-csi__selected-option-main-actions;
     }
 }

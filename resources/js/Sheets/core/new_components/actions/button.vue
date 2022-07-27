@@ -33,7 +33,6 @@ export default {
         },
         styles() {
             const styles = [
-                'sheets-action-btn',
                 'btn',
                 'btn-block',
                 this.action.cancel_form == 1 ? 'btn-warning' : 'btn-success',

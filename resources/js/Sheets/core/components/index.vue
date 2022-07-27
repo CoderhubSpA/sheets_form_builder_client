@@ -1,7 +1,7 @@
 <template>
     <div class="index-container">
         <loading-message :status="loading"></loading-message>
-        <div v-if="isPoll === false">
+        <div v-if="isPoll === false" class="not-is-poll">
             <sheets-form
                 :entityId="id"
                 :record_id="record_id"
@@ -13,7 +13,7 @@
                 :customStyles="customStyles"
             ></sheets-form>
         </div>
-        <div v-if="isPoll === true">
+        <div v-if="isPoll === true" class="is-poll">
             <sheets-poll-render :id="id" />
         </div>
     </div>
@@ -179,7 +179,7 @@ code {
     font-size: 20px;
 }
 
-.index-container {
+.index-container, .not-is-poll, .is-poll {
     height: 100%;
 }
 </style>
