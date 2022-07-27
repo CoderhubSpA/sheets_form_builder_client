@@ -1,4 +1,8 @@
 .theme-sait {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+
     font-family: $theme-sait-csi__font-family;
     font-style: $theme-sait-csi__font-style;
     font-weight: $theme-sait-csi__font-weight;
@@ -104,7 +108,7 @@
     /* vue2-datepicker */
 
     div.sheets-form-scrolling {
-        height: 426px;
+        height: 100%;
         overflow-y: auto;
         overflow-x: auto;
         scrollbar-color: $theme-sait-csi__selected-option-main-actions $theme-sait-csi__border-select-options;
@@ -125,7 +129,7 @@
         /* outline: 1px solid $theme-sait-csi__bg-select-options; */
     }
 
-    @media (min-height: 576px) {
+    /* @media (min-height: 576px) {
         div.sheets-form-scrolling {
             min-height: 426px;
         }
@@ -153,5 +157,5 @@
         div.sheets-form-scrolling {
             min-height: 761px;
         }
-    }
+    } */
 }
