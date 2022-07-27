@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="index-container">
         <loading-message :status="loading"></loading-message>
         <div v-if="isPoll === false">
             <sheets-form
@@ -177,5 +177,9 @@ code {
     text-align: center;
     font-weight: bolder;
     font-size: 20px;
+}
+
+.index-container {
+    height: 100%;
 }
 </style>
