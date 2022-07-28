@@ -53,6 +53,21 @@
         background: $theme-sait-csi__bg-select-options;
         border: solid 1px $theme-sait-csi__border-select-options;
         color: $theme-sait-csi__text-label-icon;
+        border-radius: 8px;
+    }
+
+    .sheets-select .vs__dropdown-menu::-webkit-scrollbar {
+        width: 0.5em;
+    }
+
+    .sheets-select .vs__dropdown-menu::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px $theme-sait-csi__bg-select-options;
+        border-radius: 8px;
+    }
+
+    .sheets-select .vs__dropdown-menu::-webkit-scrollbar-thumb {
+        background-color: $theme-sait-csi__selected-option-main-actions;
+        border-radius: 8px;
     }
 
     .sheets-select .vs__dropdown-toggle {

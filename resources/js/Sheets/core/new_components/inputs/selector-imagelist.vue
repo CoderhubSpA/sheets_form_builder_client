@@ -42,8 +42,8 @@
                                 </div>
                                 <div v-if="option.image" class="container-option-image">
                                     <img
-                                        width="50"
-                                        height="35"
+                                        width="32"
+                                        height="38"
                                         :src="option.image"
                                         alt="image-coderhub.png"
                                         class="option-image"
@@ -52,8 +52,8 @@
                                 <div v-if="!option.image && option.icon" class="container-option-icon">
                                     <i :class="option.icon"></i>
                                 </div>
-                                <div :class="[{ noimage: !option.image && !option.icon }]">
-                                    <p class="option-only-name">
+                                <div :class="[{ noimage: !option.image && !option.icon }, 'container-option-name']">
+                                    <p>
                                         {{ option.name }}
                                     </p>
                                 </div>
