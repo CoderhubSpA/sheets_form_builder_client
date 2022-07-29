@@ -20,17 +20,8 @@
                 :multiple="false"
                 :searchable="false"
                 :readonly="false"
-                v-on:open="getOptions()"
-                @input="deselectedSingleOption"
                 @search="(search, loading) => { filterByFuncDebounce(search) }"
             >
-                <template #list-header>
-                    <div v-if="loading" class="container-loading">
-                        <div class="spinner-border m-2" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-                </template>
             </v-select>
             <v-select
                 v-if="this.input.options !== null || this.input.entity_type_fk !== null"
@@ -42,20 +33,16 @@
                 :multiple="false"
                 :searchable="true"
                 :readonly="false"
-                v-on:open="getOptions()"
-                @input="deselectedSingleOption"
             >
-                <template #list-header>
-                    <div v-if="loading" class="container-loading">
-                        <div class="spinner-border m-2" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-                </template>
             </v-select>
             <div class="row" v-if="this.defaultOption !== null">
                 <div class="col">
                     <p class="input-placeholder">Por defecto: {{ defaultOption }}</p>
+                </div>
+            </div>
+            <div v-if="loading" class="clearfix" style="margin: 15px">
+                <div class="spinner-border float-right" role="status">
+                    <span class="sr-only">Loading...</span>
                 </div>
             </div>
         </form-group>
@@ -75,4 +62,3 @@ export default {
     },
 };
 </script>
-

@@ -38,9 +38,7 @@ export default {
         optionsRemote: [],
         loading: false,
         remotecolumn: null,
-        selectedOptions: [],
-        options: [],
-        urlrequest: '',
+        selectedOptions: []
     }),
     computed: {
         multiple() {
@@ -70,6 +68,82 @@ export default {
                 }
             }
             return result;
+        },
+        options() {
+            const contentInfo = this.$store.getters[`${this.state}/content_info`];
+            let options = [];
+            const key = this.input.col_name_fk || 'name';
+            if (contentInfo) {
+                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+                this.remotecolumn = column;
+                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' ? 'IN' : 'EQUAL';
+                let selectedValue = '';
+                if (this.selected !== null) {
+                    if (!this.multiple) {
+                        selectedValue = this.selected.id;
+                    } else {
+                        selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                    }
+                }
+                const filter = {
+                    column,
+                    id: `external-filter-${column.id}`,
+                    order: 1,
+                    search: selectedValue,
+                    type,
+                    remote: this.input.options === null && this.input.entity_type_fk === null,
+                };
+                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                const fk = this.input.entity_type_fk;
+                const entities = contentInfo.content.entities_fk[fk];
+                if (entities) {
+                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
+                } else {
+                    const opt = this.input.options ? JSON.parse(this.input.options) : {};
+                    Object.keys(opt).forEach((objKey) => {
+                        options.push({ id: objKey, name: opt[objKey] });
+                    });
+                }
+                if (this.input.default_value) {
+                    options.forEach((opt) => {
+                        if (this.input.default_value == opt.id) {
+                            this.defaultOption = opt.name;
+                        }
+                    });
+                }
+            }
+            options.sort((a, b) => {
+                if (a.name > b.name) {
+                    return 1;
+                }
+                if (b.name > a.name) {
+                    return -1;
+                }
+                return 0;
+            });
+            return options;
+        },
+        /**
+         * armado del url del request
+         */
+        urlrequest() {
+            let url = '';
+
+            const urlRequestFromStore = this.$store.getters[`${this.state}/url_selector_remote`];
+            const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
+            if (contentInfo) {
+                if (this.input.options === null && this.input.entity_type_fk === null) {
+                    const column = contentInfo.content.columns.find(
+                        (col) => col.id === this.input.id
+                    );
+                    url = urlRequestFromStore[column.id];
+                }
+            }
+
+            return url;
         },
         /**
          * receptor de se;al para el limpiado del campo
@@ -243,102 +317,6 @@ export default {
         this.cleanReadOnly();
     },
     methods: {
-        getOptions() {
-            console.log('getOptions');
-            this.loading = true;
-            const contentInfo = this.$store.getters[`${this.state}/content_info`];
-            let options = [];
-            const key = this.input.col_name_fk || 'name';
-            if (contentInfo) {
-                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
-                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-                this.remotecolumn = column;
-                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' ? 'IN' : 'EQUAL';
-                let selectedValue = '';
-                if (this.selected !== null) {
-                    if (!this.multiple) {
-                        selectedValue = this.selected.id;
-                    } else {
-                        selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
-                    }
-                }
-                const filter = {
-                    column,
-                    id: `external-filter-${column.id}`,
-                    order: 1,
-                    search: selectedValue,
-                    type,
-                    remote: this.input.options === null && this.input.entity_type_fk === null,
-                };
-                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
-                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
-                const fk = this.input.entity_type_fk;
-                const entities = contentInfo.content.entities_fk[fk];
-                if (entities) {
-                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
-                } else {
-                    const opt = this.input.options ? JSON.parse(this.input.options) : {};
-                    Object.keys(opt).forEach((objKey) => {
-                        options.push({ id: objKey, name: opt[objKey] });
-                    });
-                }
-                if (this.input.default_value) {
-                    options.forEach((opt) => {
-                        if (this.input.default_value == opt.id) {
-                            this.defaultOption = opt.name;
-                        }
-                    });
-                }
-            }
-            options.sort((a, b) => {
-                if (a.name > b.name) {
-                    return 1;
-                }
-                if (b.name > a.name) {
-                    return -1;
-                }
-                return 0;
-            });
-
-            this.options = options;
-
-            this.setUrlrequest();
-
-            this.loading = false;
-
-            return options;
-        },
-
-        deselectedSingleOption(event) {
-            if (!event) {
-                this.getOptions();
-            }
-        },
-
-        deselectedMultipleOption() {
-            this.getOptions();
-        },
-
-        async setUrlrequest() {
-            let url = '';
-
-            const urlRequestFromStore = await this.$store.getters[`${this.state}/url_selector_remote`];
-            const contentInfo = await this.$store.getters[`${this.state}/content_info`];
-
-            if (contentInfo) {
-                if (this.input.options === null && this.input.entity_type_fk === null) {
-                    const column = contentInfo.content.columns.find(
-                        (col) => col.id === this.input.id
-                    );
-                    url = urlRequestFromStore[column.id];
-                }
-            }
-
-            this.urlrequest = url;
-
-            return url;
-        },
-
         cleanReadOnly() {
             const searchInputs = document.getElementsByClassName('vs__search');
             for (const item of searchInputs) {
@@ -353,7 +331,7 @@ export default {
             } else this.selected = optionToSelect;
         },
         async getNewOptions(url) {
-            if (url && this.input.options === null && this.input.entity_type_fk === null) {
+            if (this.input.options === null && this.input.entity_type_fk === null) {
                 this.loading = true;
                 const preoptions = await this.$store.dispatch(`${this.state}/get_filters`, url);
 
