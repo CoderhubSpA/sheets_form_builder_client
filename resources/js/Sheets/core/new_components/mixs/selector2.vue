@@ -245,12 +245,12 @@ export default {
             }
 
 
-           /*  const dataToSelectorFilters = {
+            const dataToSelectorFilters = {
                 key: this.input.col_name,
                 value: data[this.id],
             };
 
-            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters); */
+            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
 
             /**
              * mostrar/ocultar section
