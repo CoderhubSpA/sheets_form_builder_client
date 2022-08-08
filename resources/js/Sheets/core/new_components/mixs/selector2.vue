@@ -294,7 +294,15 @@ export default {
         clear(val) {
             if (val) {
                 this.selected = null;
-                this.$store.commit(`${this.state}/CLEARFIELDS`, false);
+
+                if (this.input.format === 'SELECTOR[IMAGELIST]') {
+                    this.selected = [];
+                    this.optionSelectedAllRemove();
+                }
+
+                this.$nextTick(() => {
+                    this.$store.commit(`${this.state}/CLEARFIELDS`, false);
+                });
             }
         },
         options(val) {

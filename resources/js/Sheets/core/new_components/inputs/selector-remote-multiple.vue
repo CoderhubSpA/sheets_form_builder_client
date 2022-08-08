@@ -10,7 +10,7 @@
             v-if="show_field"
         >
             <v-select
-                v-if="this.input.options === null && this.input.entity_type_fk === null"
+                v-if="input.options === null && input.entity_type_fk === null"
                 label="name"
                 v-model="selected"
                 class="sheets-select"
@@ -25,15 +25,26 @@
                 @search="(search, loading) => { filterByFuncDebounce(search) }"
             >
                 <template #list-header>
-                    <div v-if="loading" class="container-loading">
-                        <div class="spinner-border text-success m-2" role="status">
-                            <span class="sr-only">Loading...</span>
+                    <div v-if="loading">
+                        <div class="container-loading">
+                            <div class="spinner-border m-2" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
                         </div>
+                        <div>
+                            <p class="text-center">Buscando...</p>
+                        </div>
+                    </div>
+                </template>
+                <template #no-options="{}">
+                    <div v-if="!loading"></div>
+                    <div v-if="!loading && optionsRemote.length === 0">
+                        <p class="mb-0">Sin datos.</p>
                     </div>
                 </template>
             </v-select>
             <v-select
-                v-if="this.input.options !== null || this.input.entity_type_fk !== null"
+                v-if="input.options !== null || input.entity_type_fk !== null"
                 label="name"
                 :id="id"
                 :options="options"
@@ -46,10 +57,21 @@
                 v-on:option:deselected="deselectedMultipleOption"
             >
                  <template #list-header>
-                    <div v-if="loading" class="container-loading">
-                        <div class="spinner-border text-success m-2" role="status">
-                            <span class="sr-only">Loading...</span>
+                    <div v-if="loading">
+                        <div class="container-loading">
+                            <div class="spinner-border m-2" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
                         </div>
+                        <div>
+                            <p class="text-center">Buscando...</p>
+                        </div>
+                    </div>
+                </template>
+                <template #no-options="{}">
+                    <div v-if="!loading"></div>
+                    <div v-if="!loading && options.length === 0">
+                        <p class="mb-0">Sin datos.</p>
                     </div>
                 </template>
             </v-select>

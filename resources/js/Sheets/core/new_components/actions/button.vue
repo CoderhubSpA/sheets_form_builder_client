@@ -35,7 +35,7 @@ export default {
             const styles = [
                 'btn',
                 'btn-block',
-                this.action.cancel_form == 1 ? 'btn-warning' : 'btn-success',
+                this.action.cancel_form == 1 ? 'btn-warning' : this.action.refresh_form === 1 ? 'btn-secondary' : 'btn-success',
             ];
             return styles.join(' ');
         },

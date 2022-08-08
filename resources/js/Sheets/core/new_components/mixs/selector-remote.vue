@@ -219,7 +219,10 @@ export default {
         clear(val) {
             if (val) {
                 this.selected = null;
-                this.$store.commit(`${this.state}/CLEARFIELDS`, false);
+
+                this.$nextTick(() => {
+                    this.$store.commit(`${this.state}/CLEARFIELDS`, false);
+                });
             }
         },
         options(val) {
@@ -244,11 +247,12 @@ export default {
     },
     methods: {
         getOptions() {
-            console.log('getOptions');
             this.loading = true;
+
             const contentInfo = this.$store.getters[`${this.state}/content_info`];
-            let options = [];
             const key = this.input.col_name_fk || 'name';
+            let options = [];
+
             if (contentInfo) {
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
                 // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -312,11 +316,15 @@ export default {
         deselectedSingleOption(event) {
             if (!event) {
                 this.getOptions();
+
+                this.$emit('input', {});
             }
         },
 
         deselectedMultipleOption() {
             this.getOptions();
+            
+            this.$emit('input', {});
         },
 
         async setUrlrequest() {
@@ -410,7 +418,7 @@ export default {
                     searched_col: this.remotecolumn,
                 };
                 await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
-            }
+            } 
         }, 400),
         addAllOptions() {
 

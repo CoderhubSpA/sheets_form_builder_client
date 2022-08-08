@@ -390,6 +390,9 @@ export default {
         UUID(state, uuid) {
             state.uuid = uuid;
         },
+        REMOTE_FILTERS_CLEAR(state, val) {
+            state.selector_remote_filter = val;
+        }
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -737,5 +740,8 @@ export default {
                     });
             });
         },
+        remote_filters_clear({ commit }, val) {
+            commit('REMOTE_FILTERS_CLEAR', val);
+        }
     },
 };
