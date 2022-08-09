@@ -11,11 +11,12 @@
         >
             <v-select
                 v-if="input.options === null && input.entity_type_fk === null"
-                label="name"
                 v-model="selected"
-                class="sheets-select"
+                label="name"
+                :class="[{'sheets-select-error': error_messages}, 'sheets-select']"
                 :id="id"
                 :options="optionsRemote"
+                :required="required"
                 :disabled="disabled"
                 :multiple="true"
                 :searchable="false"
@@ -45,12 +46,14 @@
             </v-select>
             <v-select
                 v-if="input.options !== null || input.entity_type_fk !== null"
+                v-model="selected"
                 label="name"
+                :class="[{'sheets-select-error': error_messages}, 'sheets-select']"
                 :id="id"
                 :options="options"
+                :required="required"
                 :disabled="disabled"
                 :multiple="true"
-                v-model="selected"
                 :searchable="true"
                 :readonly="false"
                 v-on:open="getOptions()"

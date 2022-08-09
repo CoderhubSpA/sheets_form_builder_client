@@ -95,6 +95,11 @@
         color: $theme-sait-csi__text-label-icon;
     }
 
+    .sheets-select-error .vs__dropdown-menu,
+    .sheets-select-error .vs__dropdown-toggle {
+        border: solid 1px red !important;
+    }
+
     a.all-remove-link,
     a.all-add-link {
         color: $theme-sait-csi__text-label-icon;

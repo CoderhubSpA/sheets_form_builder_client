@@ -125,6 +125,16 @@ export default {
         active_filter() {
             return this.$store.getters[`${this.state}/active_filter`];
         },
+        error_messages() {
+            const errors = this.$store.getters[`${this.state}/errors_fields`];
+            let result = '';
+
+            if (errors) {
+                result = errors[this.input.id];
+            }
+
+            return result;
+        },
     },
     watch: {
         /**

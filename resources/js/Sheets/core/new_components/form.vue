@@ -330,7 +330,8 @@ export default {
                                 if (
                                     resultValidator[field.id] === null ||
                                     resultValidator[field.id] === '' ||
-                                    resultValidator[field.id] === undefined
+                                    resultValidator[field.id] === undefined ||
+                                    (Array.isArray(resultValidator[field.id]) && resultValidator[field.id].length === 0)
                                 ) {
                                     this.errorRequiredFields = true;
                                     const errorOnRequired = {
@@ -492,7 +493,6 @@ export default {
                             };
 
                             if (response.success) {
-                                console.log(this.action.refresh_form);
                                 if (this.action.refresh_form === 1) {
                                     this.resetForm();
                                 }
@@ -581,32 +581,40 @@ export default {
         },
         // eslint-disable-next-line no-unused-vars
         async handlerAction(saveForm, action) {
-            if (this.form_type === 'filter') {
-                this.handlerFilterData();
-                return;
+            await this.validateAllFields();
+
+            if(action.refresh_form === 1) {
+                this.resetForm()
             }
-            this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
-            if (
-                action.id !== 'DEFAULT-ACTION' &&
-                action.id.indexOf('default') === -1 &&
-                action.id.indexOf('DEFAULT') === -1
-            ) {
-                this.formAnswer.push({ action_id: action.id });
-            }
-            if (saveForm) {
-                this.filesUploaded = [];
-                if (this.filesInForm) await this.sendFiles();
-                if (this.errorOnLoadFiles === false) {
-                    await this.save();
-                } else {
-                    this.snackbar = {
-                        success: false,
-                        show: true,
-                        message: 'Ocurrió un error al cargar los archivos',
-                    };
+
+            if (this.errorRequiredFields === false && this.errorsOnSMA === false) {
+                if (this.form_type === 'filter') {
+                    this.handlerFilterData();
+                    return;
                 }
+                this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
+                if (
+                    action.id !== 'DEFAULT-ACTION' &&
+                    action.id.indexOf('default') === -1 &&
+                    action.id.indexOf('DEFAULT') === -1
+                ) {
+                    this.formAnswer.push({ action_id: action.id });
+                }
+                if (saveForm) {
+                    this.filesUploaded = [];
+                    if (this.filesInForm) await this.sendFiles();
+                    if (this.errorOnLoadFiles === false) {
+                        await this.save();
+                    } else {
+                        this.snackbar = {
+                            success: false,
+                            show: true,
+                            message: 'Ocurrió un error al cargar los archivos',
+                        };
+                    }
+                }
+                this.action = action;
             }
-            this.action = action;
         },
         handlerFilterData() {
             const data = {
@@ -628,6 +636,9 @@ export default {
         },
         resetForm() {
             this.$store.commit(`${this.namespace}/CLEARFIELDS`, true);
+
+            this.$store.dispatch(`${this.namespace}/remote_filters_clear`, []);
+
             this.formAnswer = [];
         },
     },

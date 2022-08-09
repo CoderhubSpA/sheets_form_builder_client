@@ -13,9 +13,10 @@
                 v-if="input.options === null && input.entity_type_fk === null"
                 v-model="selected"
                 label="name"
-                class="sheets-select"
+                :class="[{'sheets-select-error': error_messages}, 'sheets-select']"
                 :id="id"
                 :options="optionsRemote"
+                :required="required"
                 :disabled="disabled"
                 :multiple="false"
                 :searchable="false"
@@ -47,8 +48,10 @@
                 v-if="input.options !== null || input.entity_type_fk !== null"
                 v-model="selected"
                 label="name"
+                :class="[{'sheets-select-error': error_messages}, 'sheets-select']"
                 :id="id"
                 :options="options"
+                :required="required"
                 :disabled="disabled"
                 :multiple="false"
                 :searchable="true"
@@ -97,4 +100,3 @@ export default {
     },
 };
 </script>
-
