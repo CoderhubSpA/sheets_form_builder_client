@@ -96,6 +96,7 @@ export default {
     }),
     mounted() {
         this.selected = [];
+        this.availableOptions = this.options;
     },
     watch: {
         options(val) {
