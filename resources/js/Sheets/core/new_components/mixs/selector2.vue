@@ -307,6 +307,8 @@ export default {
         },
         options(val) {
             if (val.length > 1) {
+                this.availableOptions = val;
+
                 if (this.inserted) {
                     const option = this.options.find((options) => options.id === this.inserted);
                     if (this.multiple) {

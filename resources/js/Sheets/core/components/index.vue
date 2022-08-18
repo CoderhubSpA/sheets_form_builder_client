@@ -70,7 +70,7 @@ export default {
 
     data: () => ({
         loading: false,
-        isPoll: undefined,
+        isPoll: false,
     }),
     mounted() {
         this.loading = true;
@@ -82,8 +82,9 @@ export default {
                     params: this.params,
                 })
                 .then((response) => {
+                    const formType = this.$store.getters[`myStore0/form_type`];
                     this.loading = false;
-                    switch (response.type) {
+                    switch (formType) {
                         case 'poll':
                             this.isPoll = true;
                             this.$store
