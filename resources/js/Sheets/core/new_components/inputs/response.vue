@@ -25,19 +25,16 @@ export default {
     }),
     computed: {
         options() {
-            let questionsId = this.$store.getters[`${this.state}/history`].map(h => {
+            let questionsId = this.$store.getters['formBuilder/history'].map(h => {
                 return h.question_id
             })
             questionsId.push(this.input.id)
 
             
-            /* const formProducts = this.$store.getters[`${this.state}/content_info`].content.entities_fk.form_products */
-            
-            const formProducts = this.$store.getters[`${this.state}/content_info`];
-            console.log("🚀 ~ file: response.vue ~ line 37 ~ options ~ formProducts", formProducts)
+            const formProducts = this.$store.getters['formBuilder/content_info'].content.entities_fk.form_products
 
             let options  = []
-            /* formProducts.map(fp => {
+            formProducts.map(fp => {
 
                 if (questionsId.includes(fp.id)) {
                     const position = options.map(o => o.id).indexOf(fp.id)
@@ -49,7 +46,7 @@ export default {
                         })
                     }
                 }
-            }) */
+            })
             return options
         }
     },

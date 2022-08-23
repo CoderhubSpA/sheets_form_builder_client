@@ -367,13 +367,6 @@ export default {
             this.$store
                 .dispatch("form/save_form", formData)
                 .then(response => {
-                    if (response.response.data.content.scripts[0].actions[0].type === 'update_column') {
-                        const getInfoId = Object.keys(response.response.data.content.content.json_sent)[0];
-
-                        this.$store.dispatch("myStore0/info", getInfoId);
-                        this.$store.dispatch("myStore0/is_file_on_demand", true);
-                    }
-
                     if (response.response.data.success === true) {
                         this.loading = false;
                         this.success = true;
