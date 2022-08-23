@@ -10,7 +10,6 @@
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
     >
-
         <div class="row">
             <div class="col">
                 <input
@@ -20,9 +19,10 @@
                     :accept="accept"
                     lang="es"
                     ref="inputFileRef"
+                    :disabled="disabled"
+                    :key="componentKey"
                     @input="onInput"
                     @change="onChange"
-
                 />
             </div>
             <div class="col" v-if="showDeleteBtn">
@@ -34,6 +34,11 @@
         <div class="row" v-if="input.default_value !== null">
             <div class="col">
                 <p class="input-placeholder">Por defecto: {{ input.default_value }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <a href="https://qa.miasalud.cl/storage/reportes/informe_5d4b3c63-c361-4095-ba9c-b344cbf9e920_20220818_120808.pdf" target="_blank" rel="noopener noreferrer" style="text-decoration: none">Visualizar archivo generado.</a>
             </div>
         </div>
     </file-template>
@@ -49,6 +54,9 @@ export default {
     mixins: [mix, mixFile],
     components: {
         'file-template': FileTemplate,
+    },
+    mounted() {
+        console.log(this.componentKey);
     },
     methods: {
         onChange(event) {

@@ -10,7 +10,8 @@ export default {
     },
     data: () => ({
         showDeleteBtn: false,
-        document_name: ''
+        document_name: '',
+        componentKey: 0
     }),
     computed: {
         /**
@@ -22,6 +23,7 @@ export default {
         existing_file() {
             let file = {};
             const fields = this.$store.getters[`${this.state}/fields`];
+
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
 
@@ -46,10 +48,14 @@ export default {
             }
             return file[this.id] ? file[this.id] : '';
         },
-
+        is_file_on_demand () {
+            console.log("this.$store.getters[`${this.state}/is_file_on_demand`]", this.$store.getters[`myStore0/is_file_on_demand`])
+            return this.$store.getters[`myStore0/is_file_on_demand`];
+        },
     },
     watch: {
         value(val) {
+            console.log("🚀 ~ file: files.vue ~ line 58 ~ value ~ val", val)
             if (Object.keys(val).length === 0) {
                 this.onDeleteFile()
             }
@@ -63,11 +69,16 @@ export default {
 
                     if (fileEntity) {
                         this.document_name = fileEntity.name;
-                        // this.can_select_sheets = false;
                     }
                 }
             }
-        }
+        },
+        is_file_on_demand (val) {
+            console.log("🚀 ~ file: files.vue ~ line 75 ~ file_on_demand ~ val", val)
+             if (val) {
+                this.forceRerender();
+            }
+        },
     },
     methods: {
         onChange(event) {
@@ -97,6 +108,10 @@ export default {
             const validation = {};
             validation[this.id] = null;
             this.$emit('input', validation);
+        },
+        forceRerender() {
+            this.componentKey += 1;
+            console.log("🚀 ~ file: files.vue ~ line 114 ~ forceRerender ~ this.componentKey", this.componentKey)
         }
     },
 };
