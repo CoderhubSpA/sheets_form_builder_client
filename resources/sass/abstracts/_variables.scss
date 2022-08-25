@@ -1,10 +1,11 @@
-/* Colors for theme sait csi */
-$theme-sait-csi__text-label-icon: #FFFFFF;
-$theme-sait-csi__container-bg: #001D09;
-$theme-sait-csi__border-main-actions: #17935BA7;
-$theme-sait-csi__selected-option-main-actions: #7EF0A6;
-$theme-sait-csi__action-icons: #6A6A6A22;
-$theme-sait-csi__text-select-icons: #D3D3D3;
-$theme-sait-csi__text-main-actions: #000000;
-$theme-sait-csi__bg-select-options: #073621f3;
-$theme-sait-csi__border-select-options: #626F63;
+$global-border-radius: 8px;
+
+$primary-color: #001D09;
+$primary-light-color: #626F63;
+$primary-light-text-color: #FFFFFF;
+$primary-dark-text-color: #D3D3D3;
+
+$secondary-color: #7EF0A6;
+$secondary-light-color: #17935BA7;
+$secondary-dark-color: #073621f3;
+$secondary-text-color: #000000;

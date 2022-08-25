@@ -11,21 +11,21 @@
     line-height: $theme-sait-csi__line-spacing;
 
     h3.sheets-form-title {
-        color: $theme-sait-csi__selected-option-main-actions;
+        color: $secondary-color;
         border: none;
     }
 
     div.sheets-rows {
         padding: 15px;
-        background: $theme-sait-csi__container-bg;
-        border-radius: 8px;
+        background: $primary-color;
+        border-radius: $global-border-radius;
     }
 
     div.sheets-row {
         border: none;
 
         label {
-            color: $theme-sait-csi__text-label-icon;
+            color: $primary-light-text-color;
             text-transform: lowercase;
         }
 
@@ -35,11 +35,11 @@
     }
 
     h3.sheets-row-title {
-        color: $theme-sait-csi__text-label-icon;
+        color: $primary-light-text-color;
     }
 
     h5.sheets-section-title {
-        color: $theme-sait-csi__text-label-icon;
+        color: $primary-light-text-color;
     }
 
     div.sheets-field {
@@ -50,10 +50,10 @@
     .sheets-select .vs__search::placeholder,
     .sheets-select .vs__dropdown-menu,
     .sheets-select .vs__dropdown-toggle {
-        background: $theme-sait-csi__bg-select-options;
-        border: solid 1px $theme-sait-csi__border-select-options;
-        color: $theme-sait-csi__text-label-icon;
-        border-radius: 8px;
+        background: $secondary-dark-color;
+        border: solid 1px $primary-light-color;
+        color: $primary-light-text-color;
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__dropdown-menu::-webkit-scrollbar {
@@ -61,38 +61,38 @@
     }
 
     .sheets-select .vs__dropdown-menu::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 6px $theme-sait-csi__bg-select-options;
-        border-radius: 8px;
+        box-shadow: inset 0 0 6px $secondary-dark-color;
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__dropdown-menu::-webkit-scrollbar-thumb {
-        background-color: $theme-sait-csi__selected-option-main-actions;
-        border-radius: 8px;
+        background-color: $secondary-color;
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__dropdown-toggle {
-        border-radius: 8px;
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__search {
-        color: $theme-sait-csi__text-label-icon;
+        color: $primary-light-text-color;
     }
 
     .sheets-select .vs__clear,
     .sheets-select .vs__open-indicator,
     .sheets-select .vs__deselect {
         font-size: 1em;
-        fill: $theme-sait-csi__text-label-icon;
+        fill: $primary-light-text-color;
     }
 
     .sheets-select .vs__dropdown-option {
-        color: $theme-sait-csi__text-label-icon;
+        color: $primary-light-text-color;
     }
 
     .sheets-select .vs__dropdown-option--highlight,
     .sheets-select .vs__selected {
-        background: $theme-sait-csi__border-main-actions;
-        color: $theme-sait-csi__text-label-icon;
+        background: $secondary-light-color;
+        color: $primary-light-text-color;
     }
 
     .sheets-select-error .vs__dropdown-menu,
@@ -102,7 +102,7 @@
 
     a.all-remove-link,
     a.all-add-link {
-        color: $theme-sait-csi__text-label-icon;
+        color: $primary-light-text-color;
     }
 
     /* vue-select */
@@ -111,14 +111,14 @@
     div.mx-datepicker {
         div.mx-input-wrapper {
             input.mx-input {
-                background-color: $theme-sait-csi__bg-select-options !important;
-                border-color: $theme-sait-csi__border-select-options;
-                color: $theme-sait-csi__text-label-icon;
+                background-color: $secondary-dark-color !important;
+                border-color: $primary-light-color;
+                color: $primary-light-text-color;
             }
 
             i.mx-icon-clear,
             i.mx-icon-calendar {
-                color: $theme-sait-csi__text-label-icon;
+                color: $primary-light-text-color;
             }
         }
     }
@@ -129,7 +129,7 @@
         height: 100%;
         overflow-y: auto;
         overflow-x: auto;
-        scrollbar-color: $theme-sait-csi__selected-option-main-actions $theme-sait-csi__border-select-options;
+        scrollbar-color: $secondary-color $primary-light-color;
     }
 
     div.sheets-form-scrolling::-webkit-scrollbar {
@@ -137,20 +137,20 @@
     }
 
     div.sheets-form-scrolling::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 6px $theme-sait-csi__bg-select-options;
-        border-radius: 8px;
+        box-shadow: inset 0 0 6px $secondary-dark-color;
+        border-radius: $global-border-radius;
     }
 
     div.sheets-form-scrolling::-webkit-scrollbar-thumb {
-        background-color: $theme-sait-csi__selected-option-main-actions;
-        border-radius: 8px;
+        background-color: $secondary-color;
+        border-radius: $global-border-radius;
     }
 
     button.btn-success {
         color: #000;
-        background-color: $theme-sait-csi__selected-option-main-actions;
-        border: solid 1px $theme-sait-csi__border-main-actions;
-        border-radius: 8px;
+        background-color: $secondary-color;
+        border: solid 1px $secondary-light-color;
+        border-radius: $global-border-radius;
         font-weight: 500;
     }
 

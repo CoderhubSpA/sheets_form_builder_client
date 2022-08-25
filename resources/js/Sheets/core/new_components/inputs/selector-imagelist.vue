@@ -33,8 +33,8 @@
                                 </div>
                                 <div class="selected-indicator">
                                     <i
-                                        :class="['bi bi-dash-circle-fill',
-                                            { indicator: !option.selected }
+                                        :class="['bi bi-dash-circle-fill', 'no-indicator',
+                                            { 'indicator': option.selected }
                                         ]"
                                     ></i>
                                 </div>
