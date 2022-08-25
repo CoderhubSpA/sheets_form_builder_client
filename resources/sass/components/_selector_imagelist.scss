@@ -1,4 +1,9 @@
 div.sheets-select-image {
+    border: solid 1px var(--primary-light-color);
+    background-color: var(--secondary-dark-color);
+    border-radius: var(--global-border-radius);
+    min-height: 34px;
+
     div.container-options {
         display: flex;
         flex-direction: row;
@@ -14,27 +19,27 @@ div.sheets-select-image {
                 height: 66px;
                 margin: 4px;
                 text-align: center;
-                color: $theme-sait-csi__text-select-icons;
+                color: var(--primary-dark-text-color);
                 border: solid 2px;
-                border-radius: 8px;
-                border-color: $theme-sait-csi__text-select-icons;
+                border-radius: var(--global-border-radius);
+                border-color: var(--primary-dark-text-color);
 
                 &:hover {
-                    color: $theme-sait-csi__selected-option-main-actions;
-                    border-color: $theme-sait-csi__selected-option-main-actions;
+                    color: var(--secondary-color);
+                    border-color: var(--secondary-color);
                 }
 
                 &.selected {
-                    color: $theme-sait-csi__selected-option-main-actions;
-                    border-color: $theme-sait-csi__selected-option-main-actions;
+                    color: var(--secondary-color);
+                    border-color: var(--secondary-color);
                 }
 
                 &.readonly,
                 &.readonly:hover,
                 &.readonly .option-image,
                 &.readonly:hover .option-image {
-                    color: $theme-sait-csi__border-select-options;
-                    border-color: $theme-sait-csi__border-select-options;
+                    color: var(--primary-light-color);
+                    border-color: var(--primary-light-color);
                     opacity: 0.5;
                 }
 
@@ -53,7 +58,7 @@ div.sheets-select-image {
                             width: 64px;
                             height: 64px;
                             padding: 0px;
-                            border-radius: 8px;
+                            border-radius: var(--global-border-radius);
                             border: none;
                             background-color: transparent;
                         }
@@ -67,8 +72,12 @@ div.sheets-select-image {
                     padding: 0 2px;
                     overflow: visible;
 
+                    i.no-indicator {
+                        color: transparent;
+                    }
+
                     i.indicator {
-                        color: $theme-sait-csi__container-bg;
+                        color: var(--secondary-color);
                     }
                 }
 
@@ -78,7 +87,7 @@ div.sheets-select-image {
                     img.option-image {
                         max-width: 32px;
                         max-height: 38px;
-                        border-radius: 8px;
+                        border-radius: var(--global-border-radius);
                     }
 
                     div.noimage {
@@ -114,20 +123,20 @@ div.sheets-select-image {
                 margin: 2px;
                 padding: 4px 6px;
                 font-size: 12px;
-                color: $theme-sait-csi__text-select-icons;
-                border: solid 2px $theme-sait-csi__text-select-icons;
-                border-radius: 8px;
+                color: var(--primary-dark-text-color);
+                border: solid 2px var(--primary-dark-text-color);
+                border-radius: var(--global-border-radius);
                 background-color: transparent;
             }
 
             button.actions:hover {
-                color: $theme-sait-csi__selected-option-main-actions;
-                border: solid 2px $theme-sait-csi__selected-option-main-actions;
+                color: var(--secondary-color);
+                border: solid 2px var(--secondary-color);
             }
         
             button.selectedAll {
-                color: $theme-sait-csi__selected-option-main-actions;
-                border: solid 2px $theme-sait-csi__selected-option-main-actions;
+                color: var(--secondary-color);
+                border: solid 2px var(--secondary-color);
             }
         }
     }
