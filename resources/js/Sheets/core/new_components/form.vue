@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="setTheme">
         <loading-message :status="loadingForm"></loading-message>
         <h3 class="sheets-form-title">
             {{ form_title }}
@@ -82,7 +82,15 @@ export default {
         params_actions: {
             type: String,
             default: '',
-        }
+        },
+        theme: {
+            type: String,
+            default: '',
+        },
+        customStyles: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     components: {
         // "sheets-loading": Loading,
@@ -143,6 +151,9 @@ export default {
         },
         form_loaded() {
             return this.$store.getters[`${this.namespace}/form_loaded`];
+        },
+        setTheme() {
+            return `theme-${this.theme}`;
         },
     },
     watch: {
@@ -572,10 +583,8 @@ export default {
         async handlerAction(saveForm, action) {
             await this.validateAllFields();
 
-            if(action.refresh_form === 1 && !action.save_form) {
-                this.resetForm();
-
-                return;
+            if(action.refresh_form === 1) {
+                this.resetForm()
             }
 
             if (this.errorRequiredFields === false && this.errorsOnSMA === false) {
