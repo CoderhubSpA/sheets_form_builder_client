@@ -583,8 +583,10 @@ export default {
         async handlerAction(saveForm, action) {
             await this.validateAllFields();
 
-            if(action.refresh_form === 1) {
-                this.resetForm()
+            if(action.refresh_form === 1 && !action.save_form) {
+                this.resetForm();
+
+                return;
             }
 
             if (this.errorRequiredFields === false && this.errorsOnSMA === false) {

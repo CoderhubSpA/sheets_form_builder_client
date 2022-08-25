@@ -10,7 +10,7 @@
         <div class="container-fluid sheets-select-image">
             <div class="row">
                 <div class="col-md-12 p-0">
-                    <div v-if="availableOptions.length > 0" class="container-options">
+                    <div class="container-options">
                         <div class="container-option">
                             <div
                                 v-for="option in availableOptions"
@@ -33,10 +33,8 @@
                                 </div>
                                 <div class="selected-indicator">
                                     <i
-                                        class="bi bi-dash-circle-fill"
-                                        :class="[
-                                            { indicator: !option.selected },
-                                            'bi bi-dash-circle-fill',
+                                        :class="['bi bi-dash-circle-fill',
+                                            { indicator: !option.selected }
                                         ]"
                                     ></i>
                                 </div>
@@ -59,7 +57,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="container-option-actions">
+                        <div v-if="availableOptions.length > 0" class="container-option-actions">
                             <div>
                                 <button
                                     v-on:click="optionAllSelect()"
@@ -98,6 +96,7 @@ export default {
     }),
     mounted() {
         this.selected = [];
+        this.availableOptions = this.options;
     },
     watch: {
         options(val) {
@@ -106,12 +105,12 @@ export default {
     },
     methods: {
         optionSelect(option) {
-            this.availableOptions.map((opt) => {
-                return opt.id === option.id
-                    ? opt.selected === false
-                        ? (opt.selected = true)
-                        : (opt.selected = false)
-                    : opt;
+           this.availableOptions.map((opt) => {
+                if (opt.id === option.id) {
+                    opt.selected = !opt.selected
+                }
+
+                return  opt;
             });
 
             const ifOptionExist = this.selected.find((select) => select.id === option.id);
