@@ -1,29 +1,49 @@
 $global-border-radius: 8px;
 
-$primary-color: #001D09;
-$primary-light-color: #626F63;
-$primary-dark-color: #001D09;
-$primary-light-text-color: #FFFFFF;
-$primary-dark-text-color: #D3D3D3;
+$form-builder-primary-color: #001D09;
+$form-builder-primary-light-color: #626F63;
+$form-builder-primary-dark-color: #001D09;
+$form-builder-primary-light-text-color: #FFFFFF;
+$form-builder-primary-dark-text-color: #D3D3D3;
 
-$secondary-color: #7EF0A6;
-$secondary-light-color: #17935BA7;
-$secondary-dark-color: #073621f3;
-$secondary-light-text-color: #000000;
-$secondary-dark-text-color: #000000;
+$form-builder-secondary-color: #7EF0A6;
+$form-builder-secondary-light-color: #17935BA7;
+$form-builder-secondary-dark-color: #073621f3;
+$form-builder-secondary-light-text-color: #242424;
+$form-builder-secondary-dark-text-color: #000000;
+
+$form-builder-primary-action-color: $form-builder-secondary-dark-text-color;
+$form-builder-primary-action-background: $form-builder-secondary-color;
+$form-builder-primary-action-border: solid 1px $form-builder-secondary-light-color;
+$form-builder-primary-action-border-radius: $global-border-radius;
+
+$form-builder-secondary-action-color: $form-builder-primary-light-text-color;
+$form-builder-secondary-action-background: none;
+$form-builder-secondary-action-border: none;
+$form-builder-secondary-action-border-radius: $global-border-radius;
 
 .index-container {
   --form-builder-global-border-radius: #{$global-border-radius};
 
-  --form-builder-primary-color: #{$primary-color};
-  --form-builder-primary-light-color: #{$primary-light-color};
-  --form-builder-primary-dark-color: #{$primary-dark-color};
-  --form-builder-primary-light-text-color: #{$primary-light-text-color};
-  --form-builder-primary-dark-text-color: #{$primary-dark-text-color};
+  --form-builder-primary-color: #{$form-builder-primary-color};
+  --form-builder-primary-light-color: #{$form-builder-primary-light-color};
+  --form-builder-primary-dark-color: #{$form-builder-primary-dark-color};
+  --form-builder-primary-light-text-color: #{$form-builder-primary-light-text-color};
+  --form-builder-primary-dark-text-color: #{$form-builder-primary-dark-text-color};
 
-  --form-builder-secondary-color: #{$secondary-color};
-  --form-builder-secondary-color: #{$secondary-light-color};
-  --form-builder-secondary-dark-color: #{$secondary-dark-color};
-  --form-builder-secondary-light-text-color: #{$secondary-light-text-color};
-  --form-builder-secondary-dark-text-color: #{$secondary-dark-text-color};
+  --form-builder-secondary-color: #{$form-builder-secondary-color};
+  --form-builder-secondary-light-color: #{$form-builder-secondary-light-color};
+  --form-builder-secondary-dark-color: #{$form-builder-secondary-dark-color};
+  --form-builder-form-builder-secondary-light-text-color: #{$form-builder-secondary-light-text-color};
+  --form-builder-secondary-dark-text-color: #{$form-builder-secondary-dark-text-color};
+
+  --form-builder-primary-action-color: #{$form-builder-primary-action-color};
+  --form-builder-primary-action-background: #{$form-builder-primary-action-background};
+  --form-builder-primary-action-border: #{$form-builder-primary-action-border};
+  --form-builder-primary-action-border-radius: #{$form-builder-primary-action-border-radius};
+
+  --form-builder-secondary-action-color: #{$form-builder-secondary-action-color};
+  --form-builder-secondary-action-background: #{$form-builder-secondary-action-background};
+  --form-builder-secondary-action-border: #{$form-builder-secondary-action-border};
+  --form-builder-secondary-action-border-radius: #{$form-builder-secondary-action-border-radius};
 }

@@ -1,9 +1,4 @@
 div.sheets-select-image {
-    border: solid 1px var(--form-builder-primary-light-color);
-    background-color: var(--form-builder-secondary-dark-color);
-    border-radius: var(--form-builder-global-border-radius);
-    min-height: 34px;
-
     div.container-options {
         display: flex;
         flex-direction: row;
@@ -20,9 +15,8 @@ div.sheets-select-image {
                 margin: 4px;
                 text-align: center;
                 color: var(--form-builder-primary-dark-text-color);
-                border: solid 2px;
+                border: solid 2px var(--form-builder-primary-light-color);
                 border-radius: var(--form-builder-global-border-radius);
-                border-color: var(--form-builder-primary-dark-text-color);
 
                 &:hover {
                     color: var(--form-builder-secondary-color);
@@ -124,7 +118,7 @@ div.sheets-select-image {
                 padding: 4px 6px;
                 font-size: 12px;
                 color: var(--form-builder-primary-dark-text-color);
-                border: solid 2px var(--form-builder-primary-dark-text-color);
+                border: solid 2px var(--form-builder-primary-light-color);
                 border-radius: var(--form-builder-global-border-radius);
                 background-color: transparent;
             }

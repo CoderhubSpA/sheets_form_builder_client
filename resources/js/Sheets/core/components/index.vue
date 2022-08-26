@@ -193,4 +193,10 @@ code {
 .index-container, .not-is-poll, .is-poll {
     height: 100%;
 }
+
+.not-is-poll > div{
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
 </style>

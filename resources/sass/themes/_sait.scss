@@ -138,7 +138,7 @@ $theme-sait-csi__line-spacing: 21px;
         height: 100%;
         overflow-y: auto;
         overflow-x: auto;
-        scrollbar-color: var(--form-builder-secondary-color $primary-light-color);
+        scrollbar-color: var(--form-builder-secondary-color);
     }
 
     div.sheets-form-scrolling::-webkit-scrollbar {
@@ -156,17 +156,16 @@ $theme-sait-csi__line-spacing: 21px;
     }
 
     button.btn-success {
-        color: #000;
-        background-color: var(--form-builder-secondary-color);
-        border: solid 1px var(--secondary-light-color);
-        border-radius: var(--form-builder-global-border-radius);
-        font-weight: 500;
+        color: var(--form-builder-primary-action-color);
+        background: var(--form-builder-primary-action-background);
+        border: var(--form-builder-primary-action-boder);
+        border-radius: var(--form-builder-primary-action-border-radius);
     }
 
     button.btn-secondary {
-        background: none;
-        border: none;
-        color: #FFFFFF;
-        box-shadow: none;
+        color: var(--form-builder-secondary-action-color);
+        background: var(--form-builder-secondary-action-background);
+        border: var(--form-builder-secondary-action-border);
+        border-radius: var(--form-builder-secondary-action-border-radius);
     }
 }
