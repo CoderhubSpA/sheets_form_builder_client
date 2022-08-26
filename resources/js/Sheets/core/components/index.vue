@@ -1,5 +1,5 @@
 <template>
-    <div class="index-container" :class="setTheme" :style="setStyles">
+    <div class="index-container">
         <loading-message :status="loading"></loading-message>
         <div v-if="isPoll === false" class="not-is-poll">
             <sheets-form
@@ -156,21 +156,7 @@ export default {
                     });
             }
         }
-    },
-    computed: {
-        setTheme() {
-            return `theme-${this.theme}`;
-        },
-        setStyles() {
-            if(this.custom_styles) {
-                return Object.fromEntries(Object.entries(JSON.parse(this.custom_styles)).map(([key, value]) =>
-                    [`--${key}`, value]
-                ));
-            }
-
-            return {};
-        }
-    },
+    }
 };
 </script>
 
