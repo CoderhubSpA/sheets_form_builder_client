@@ -190,6 +190,16 @@ export default {
             this.$emit('tooglefield', show_field);
             return show_field;
         },
+        error_messages() {
+            const errors = this.$store.getters[`${this.state}/errors_fields`];
+            let result = '';
+
+            if (errors) {
+                result = errors[this.input.id];
+            }
+
+            return result;
+        }
     },
     watch: {
         /**

@@ -10,7 +10,7 @@
                 :is_test="form_test"
                 :params_actions="actions"
                 :theme="theme"
-                :customStyles="customStyles"
+                :custom_styles="custom_styles"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true" class="is-poll">
@@ -62,7 +62,7 @@ export default {
             type: String,
             default: '',
         },
-        customStyles: {
+        custom_styles: {
             type: String,
             default: '',
         },
@@ -162,8 +162,8 @@ export default {
             return `theme-${this.theme}`;
         },
         setStyles() {
-            if(this.customStyles) {
-                return Object.fromEntries(Object.entries(JSON.parse(this.customStyles)).map(([key, value]) =>
+            if(this.custom_styles) {
+                return Object.fromEntries(Object.entries(JSON.parse(this.custom_styles)).map(([key, value]) =>
                     [`--${key}`, value]
                 ));
             }
