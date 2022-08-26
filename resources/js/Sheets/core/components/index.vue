@@ -1,5 +1,5 @@
 <template>
-    <div class="index-container">
+    <div class="index-container" :class="setTheme" :style="setStyles">
         <loading-message :status="loading"></loading-message>
         <div v-if="isPoll === false" class="not-is-poll">
             <sheets-form
@@ -9,8 +9,6 @@
                 :base_url="base_url"
                 :is_test="form_test"
                 :params_actions="actions"
-                :theme="theme"
-                :custom_styles="custom_styles"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true" class="is-poll">
@@ -155,6 +153,20 @@ export default {
                         console.error('error cargando formulario', err);
                     });
             }
+        }
+    },
+    computed: {
+        setTheme() {
+            return `theme-${this.theme}`;
+        },
+        setStyles() {
+            if(this.custom_styles) {
+                return Object.fromEntries(Object.entries(JSON.parse(this.custom_styles)).map(([key, value]) =>
+                    [`--${key}`, value]
+                ));
+            }
+
+            return {};
         }
     }
 };

@@ -12,18 +12,18 @@ $secondary-dark-color: #073621f3;
 $secondary-light-text-color: #000000;
 $secondary-dark-text-color: #000000;
 
-:root {
-  --global-border-radius: #{$global-border-radius};
+.index-container {
+  --form-builder-global-border-radius: #{$global-border-radius};
 
-  --primary-color: #{$primary-color};
-  --primary-light-color: #{$primary-light-color};
-  --primary-dark-color: #{$primary-dark-color};
-  --primary-light-text-color: #{$primary-light-text-color};
-  --primary-dark-text-color: #{$primary-dark-text-color};
+  --form-builder-primary-color: #{$primary-color};
+  --form-builder-primary-light-color: #{$primary-light-color};
+  --form-builder-primary-dark-color: #{$primary-dark-color};
+  --form-builder-primary-light-text-color: #{$primary-light-text-color};
+  --form-builder-primary-dark-text-color: #{$primary-dark-text-color};
 
-  --secondary-color: #{$secondary-color};
-  --secondary-light-color: #{$secondary-light-color};
-  --secondary-dark-color: #{$secondary-dark-color};
-  --secondary-light-text-color: #{$secondary-light-text-color};
-  --secondary-dark-text-color: #{$secondary-dark-text-color};
+  --form-builder-secondary-color: #{$secondary-color};
+  --form-builder-secondary-color: #{$secondary-light-color};
+  --form-builder-secondary-dark-color: #{$secondary-dark-color};
+  --form-builder-secondary-light-text-color: #{$secondary-light-text-color};
+  --form-builder-secondary-dark-text-color: #{$secondary-dark-text-color};
 }

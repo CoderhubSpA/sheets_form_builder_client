@@ -1,7 +1,7 @@
 div.sheets-select-image {
-    border: solid 1px var(--primary-light-color);
-    background-color: var(--secondary-dark-color);
-    border-radius: var(--global-border-radius);
+    border: solid 1px var(--form-builder-primary-light-color);
+    background-color: var(--form-builder-secondary-dark-color);
+    border-radius: var(--form-builder-global-border-radius);
     min-height: 34px;
 
     div.container-options {
@@ -19,27 +19,27 @@ div.sheets-select-image {
                 height: 66px;
                 margin: 4px;
                 text-align: center;
-                color: var(--primary-dark-text-color);
+                color: var(--form-builder-primary-dark-text-color);
                 border: solid 2px;
-                border-radius: var(--global-border-radius);
-                border-color: var(--primary-dark-text-color);
+                border-radius: var(--form-builder-global-border-radius);
+                border-color: var(--form-builder-primary-dark-text-color);
 
                 &:hover {
-                    color: var(--secondary-color);
-                    border-color: var(--secondary-color);
+                    color: var(--form-builder-secondary-color);
+                    border-color: var(--form-builder-secondary-color);
                 }
 
                 &.selected {
-                    color: var(--secondary-color);
-                    border-color: var(--secondary-color);
+                    color: var(--form-builder-secondary-color);
+                    border-color: var(--form-builder-secondary-color);
                 }
 
                 &.readonly,
                 &.readonly:hover,
                 &.readonly .option-image,
                 &.readonly:hover .option-image {
-                    color: var(--primary-light-color);
-                    border-color: var(--primary-light-color);
+                    color: var(--form-builder-primary-light-color);
+                    border-color: var(--form-builder-primary-light-color);
                     opacity: 0.5;
                 }
 
@@ -58,7 +58,7 @@ div.sheets-select-image {
                             width: 64px;
                             height: 64px;
                             padding: 0px;
-                            border-radius: var(--global-border-radius);
+                            border-radius: var(--form-builder-global-border-radius);
                             border: none;
                             background-color: transparent;
                         }
@@ -77,7 +77,7 @@ div.sheets-select-image {
                     }
 
                     i.indicator {
-                        color: var(--secondary-color);
+                        color: var(--form-builder-secondary-color);
                     }
                 }
 
@@ -87,7 +87,7 @@ div.sheets-select-image {
                     img.option-image {
                         max-width: 32px;
                         max-height: 38px;
-                        border-radius: var(--global-border-radius);
+                        border-radius: var(--form-builder-global-border-radius);
                     }
 
                     div.noimage {
@@ -123,20 +123,20 @@ div.sheets-select-image {
                 margin: 2px;
                 padding: 4px 6px;
                 font-size: 12px;
-                color: var(--primary-dark-text-color);
-                border: solid 2px var(--primary-dark-text-color);
-                border-radius: var(--global-border-radius);
+                color: var(--form-builder-primary-dark-text-color);
+                border: solid 2px var(--form-builder-primary-dark-text-color);
+                border-radius: var(--form-builder-global-border-radius);
                 background-color: transparent;
             }
 
             button.actions:hover {
-                color: var(--secondary-color);
-                border: solid 2px var(--secondary-color);
+                color: var(--form-builder-secondary-color);
+                border: solid 2px var(--form-builder-secondary-color);
             }
         
             button.selectedAll {
-                color: var(--secondary-color);
-                border: solid 2px var(--secondary-color);
+                color: var(--form-builder-secondary-color);
+                border: solid 2px var(--form-builder-secondary-color);
             }
         }
     }
