@@ -29,6 +29,8 @@ export default {
          */
         defaultOption: null,
         optionsFiltered: [],
+        openNested: false,
+        recordId: ''
     }),
     computed: {
         /**
@@ -355,11 +357,27 @@ export default {
     methods: {
         createdOption(id) {
             const optionToSelect = this.options.find((option) => option.id === id);
+
             if (this.multiple) {
+                const ifExistOption = this.selected.find((option) => option.id === id);
+
+                if (ifExistOption) this.selected = this.selected.filter(option => option.id !== id)
+
                 if (this.selected) this.selected.push(optionToSelect);
                 else this.selected = [optionToSelect];
             } else this.selected = optionToSelect;
+
+            this.recordId = '';
         },
+
+        openNestedForEdit(id) {
+            if (this.$refs['ref-' + this.id].$attrs.id === this.id) {
+               this.$refs['ref-' + this.id].searchEl.blur();
+            }
+
+            this.recordId = id;
+            this.openNested = !this.openNested;
+        }
     },
 };
 </script>
