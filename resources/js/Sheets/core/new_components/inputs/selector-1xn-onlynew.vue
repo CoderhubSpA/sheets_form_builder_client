@@ -21,14 +21,29 @@
                 "
                 :no-drop="true"
                 :multiple="multiple"
+                :ref="'ref-' + id"
                 v-model="selected"
                 @option:deselected="deselected"
             >
+                <template #selected-option="{ name, id }">
+                    <div style="display: inline-flex; justify-content: start">
+                        <span>{{ name }}</span>
+                        <span
+                            @click="openNestedForEdit(id)"
+                            style="margin-left: 6px; cursor: pointer; color: #969696"
+                            ><i class="bi bi-pencil-fill"></i
+                        ></span>
+                    </div>
+                </template>
             </v-select>
             <nested-form
                 v-if="has_entity_type_permission_fk"
                 :entity_type_permission_fk="entity_type_permission_fk"
                 :state="state"
+                :openForm="openNested"
+                :recordId="recordId"
+                v-on:opened-nested="recordId = ''"
+                v-on:closed-nested="openNested = false"
                 @inserted="createdOption"
             />
             <div class="row" v-if="this.input.default_value !== null">

@@ -10,10 +10,7 @@ export default {
     },
     data: () => ({
         showDeleteBtn: false,
-        document_name: '',
-        documentSrc: '',
-        showModal: false,
-        loading: false
+        document_name: ''
     }),
     computed: {
         /**
@@ -25,7 +22,6 @@ export default {
         existing_file() {
             let file = {};
             const fields = this.$store.getters[`${this.state}/fields`];
-
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
 
@@ -37,32 +33,25 @@ export default {
             }
             if (file[this.id]) {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
-                const baseURL = this.$store.getters[`myStore0/base_url`];
-
                 if (contentInfo) {
                     const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
                     const fileEntity = entities.find((ent) => ent.id === file[this.id]);
 
                     if (fileEntity) {
                         this.document_name = fileEntity.name;
-                        this.documentSrc = `${baseURL}${fileEntity.src}`;
                         this.showDeleteBtn = true;
+                        // this.can_select_sheets = false;
                     }
                 }
             }
             return file[this.id] ? file[this.id] : '';
         },
-        is_file_on_demand () {
-            return this.$store.getters[`myStore0/is_file_on_demand`];
-        },
-        content_info () {
-            return this.$store.getters[`myStore0/content_info`];
-        },
+
     },
     watch: {
         value(val) {
             if (Object.keys(val).length === 0) {
-                this.onDeleteFile();
+                this.onDeleteFile()
             }
         },
         existing_file(val) {
@@ -74,25 +63,8 @@ export default {
 
                     if (fileEntity) {
                         this.document_name = fileEntity.name;
+                        // this.can_select_sheets = false;
                     }
-                }
-            }
-        },
-        is_file_on_demand (val) {
-            if (val) {
-                this.loading = true;
-            }
-        },
-        content_info (val) {
-            if (val) {
-                const fileOnDemand = this.$store.getters[`myStore0/is_file_on_demand`];
-                const baseURL = this.$store.getters[`myStore0/base_url`];
-                const findDocument = val.content.entities_fk.document.find(doc => doc.id === fileOnDemand.value);
-
-                if (findDocument) {
-                    this.documentSrc = `${baseURL}${findDocument.src}`;
-                    this.document_name = findDocument.name;
-                    this.loading = false;
                 }
             }
         }
@@ -100,7 +72,7 @@ export default {
     methods: {
         onChange(event) {
             const file = event.target.files[0];
-            this.document_name = file.name;
+            this.document_name = file.name
             const data = { id: this.id, file: file };
             if (this.input.permission === 2) {
                 this.$store.commit(`${this.state}/FILES`, data);
@@ -125,12 +97,6 @@ export default {
             const validation = {};
             validation[this.id] = null;
             this.$emit('input', validation);
-        },
-        openModal() {
-            this.showModal = true;
-        },
-        closeModal() {
-            this.showModal = false;
         }
     },
 };

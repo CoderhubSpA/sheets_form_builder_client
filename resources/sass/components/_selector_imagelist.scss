@@ -1,9 +1,4 @@
 div.sheets-select-image {
-    border: solid 1px $primary-light-color;
-    background-color: $secondary-dark-color;
-    border-radius: $global-border-radius;
-    min-height: 34px;
-
     div.container-options {
         display: flex;
         flex-direction: row;
@@ -19,27 +14,26 @@ div.sheets-select-image {
                 height: 66px;
                 margin: 4px;
                 text-align: center;
-                color: $primary-dark-text-color;
-                border: solid 2px;
-                border-radius: $global-border-radius;
-                border-color: $primary-dark-text-color;
+                color: var(--form-builder-primary-dark-text-color);
+                border: solid 2px var(--form-builder-primary-light-color);
+                border-radius: var(--form-builder-global-border-radius);
 
                 &:hover {
-                    color: $secondary-color;
-                    border-color: $secondary-color;
+                    color: var(--form-builder-secondary-color);
+                    border-color: var(--form-builder-secondary-color);
                 }
 
                 &.selected {
-                    color: $secondary-color;
-                    border-color: $secondary-color;
+                    color: var(--form-builder-secondary-color);
+                    border-color: var(--form-builder-secondary-color);
                 }
 
                 &.readonly,
                 &.readonly:hover,
                 &.readonly .option-image,
                 &.readonly:hover .option-image {
-                    color: $primary-light-color;
-                    border-color: $primary-light-color;
+                    color: var(--form-builder-primary-light-color);
+                    border-color: var(--form-builder-primary-light-color);
                     opacity: 0.5;
                 }
 
@@ -58,7 +52,7 @@ div.sheets-select-image {
                             width: 64px;
                             height: 64px;
                             padding: 0px;
-                            border-radius: $global-border-radius;
+                            border-radius: var(--form-builder-global-border-radius);
                             border: none;
                             background-color: transparent;
                         }
@@ -77,7 +71,7 @@ div.sheets-select-image {
                     }
 
                     i.indicator {
-                        color: $secondary-color;
+                        color: var(--form-builder-secondary-color);
                     }
                 }
 
@@ -87,7 +81,7 @@ div.sheets-select-image {
                     img.option-image {
                         max-width: 32px;
                         max-height: 38px;
-                        border-radius: $global-border-radius;
+                        border-radius: var(--form-builder-global-border-radius);
                     }
 
                     div.noimage {
@@ -123,20 +117,20 @@ div.sheets-select-image {
                 margin: 2px;
                 padding: 4px 6px;
                 font-size: 12px;
-                color: $primary-dark-text-color;
-                border: solid 2px $primary-dark-text-color;
-                border-radius: $global-border-radius;
+                color: var(--form-builder-primary-dark-text-color);
+                border: solid 2px var(--form-builder-primary-light-color);
+                border-radius: var(--form-builder-global-border-radius);
                 background-color: transparent;
             }
 
             button.actions:hover {
-                color: $secondary-color;
-                border: solid 2px $secondary-color;
+                color: var(--form-builder-secondary-color);
+                border: solid 2px var(--form-builder-secondary-color);
             }
         
             button.selectedAll {
-                color: $secondary-color;
-                border: solid 2px $secondary-color;
+                color: var(--form-builder-secondary-color);
+                border: solid 2px var(--form-builder-secondary-color);
             }
         }
     }
