@@ -31,38 +31,19 @@ export default {
             type: String,
             require: true,
         },
-        openForm: {
-            type: Boolean,
-            require: false,
-            default: false
-        },
-        recordId: {
-            type: String,
-            require: false,
-            default: ''
-        }
     },
     data: () => ({
         show: false,
         form_name: '',
     }),
-    watch: {
-      openForm(val) {
-        if (val) {
-            this.open();
-        }
-      }
-    },
     methods: {
         open() {
             this.build();
             this.show = true;
-            this.$emit("opened-nested", this.show);
         },
         close() {
             this.show = false;
             this.$refs.nested.innerHTML = '';
-            this.$emit("closed-nested", this.show);
         },
         build() {
             const store = this.$store;
@@ -70,7 +51,6 @@ export default {
             const instance = new FormBuilderClass({
                 propsData: {
                     entityId: this.entity_type_permission_fk,
-                    record_id: this.recordId,
                     store: this.entity_type_permission_fk,
                     is_nested: true,
                 },

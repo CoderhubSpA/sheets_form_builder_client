@@ -85,7 +85,14 @@ export default {
                 if (this.optionsResponse) {
                     options = [...this.optionsResponse];
                     this.selected = [...this.optionsResponse];
-                    console.warn(this.selected);
+                    
+                    if (this.optionsResponse.length > 1) {
+                        this.selected = this.optionsResponse.filter((f) => {
+                            return f.id !== "e00" && f.id !== "XX"
+                        });
+                    }
+                    
+                    console.log("🚀 ~ file: question.vue ~ line 94 ~ this.selected=this.optionsResponse.filter ~ this.selected", this.selected)
                 }
             }
             options.sort((a, b) => {
