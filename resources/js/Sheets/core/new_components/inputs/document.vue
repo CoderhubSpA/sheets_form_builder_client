@@ -10,6 +10,7 @@
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
     >
+
         <div class="row">
             <div class="col">
                 <input
@@ -19,9 +20,9 @@
                     :accept="accept"
                     lang="es"
                     ref="inputFileRef"
-                    :disabled="disabled"
                     @input="onInput"
                     @change="onChange"
+
                 />
             </div>
             <div class="col" v-if="showDeleteBtn">
@@ -33,34 +34,6 @@
         <div class="row" v-if="input.default_value !== null">
             <div class="col">
                 <p class="input-placeholder">Por defecto: {{ input.default_value }}</p>
-            </div>
-        </div>
-        <div v-if="loading">
-            <div class="container-loading">
-                <div class="spinner-border m-2" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-            <div>
-                <p class="text-center">Generando documento...</p>
-            </div>
-        </div>
-        <div class="row" v-if="documentSrc">
-            <div class="col">
-                <button class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="openModal">Visualizar documento</button>
-                <div class="nested-form" v-show="showModal">
-                    <div class="content">
-                        <div class="header">
-                            <div class="header-title">
-                                Visualizador de documentos
-                            </div>
-                            <button @click="closeModal">&times;</button>
-                        </div>
-                        <div class="body">
-                            <document-visualizer :src="documentSrc" />
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </file-template>
@@ -75,7 +48,7 @@ import mixFile from '../mixs/files.vue';
 export default {
     mixins: [mix, mixFile],
     components: {
-        'file-template': FileTemplate
+        'file-template': FileTemplate,
     },
     methods: {
         onChange(event) {
@@ -99,38 +72,7 @@ export default {
                 validation[this.id] = 'file-pending';
                 this.$emit('input', validation);
             }
-        }
+        },
     },
 };
 </script>
-<style lang="scss">
-.nested-form {
-    position: fixed;
-    z-index: 170;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.151);
-    border: 1px solid rgb(240, 239, 239);
-    border-radius: 4px;
-
-    .content {
-        background-color: #fefefe;
-        margin: 10% auto;
-        padding: 20px;
-        width: 80%;
-
-        .header {
-            background-color: #fefefe;
-            margin-bottom: 3rem;
-
-            button {
-                float: right;
-            }
-        }
-    }
-}
-</style>
