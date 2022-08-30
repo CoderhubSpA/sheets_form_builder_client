@@ -93,6 +93,7 @@ export default {
         selector_remote_filter: [],
         url_selector_remote: {},
         uuid: null,
+        file_on_demand: {}
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -150,6 +151,7 @@ export default {
         selector_remote_filter: (state) => state.selector_remote_filter,
         url_selector_remote: (state) => state.url_selector_remote,
         uuid: (state) => state.uuid,
+        file_on_demand: (state) => state.file_on_demand,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -198,19 +200,6 @@ export default {
         },
         FIELDS(state, val) {
             Vue.set(state.fields, state.fields.length, val);
-            // state.fields.push(val);
-
-            // const newKey = Object.keys(val)[0];
-            // let found = false;
-            // state.fields.forEach((field, index) => {
-            //     if (Object.keys(field)[0] === newKey) {
-            //         state.fields[index] = val;
-            //         found = true;
-            //     }
-            // });
-            // if (!found) {
-            //     state.fields.push(val);
-            // }
         },
         SEARCH_MAP(state, val) {
             Vue.set(state.searchMap, val.col_name, val.text);
@@ -392,7 +381,12 @@ export default {
         },
         REMOTE_FILTERS_CLEAR(state, val) {
             state.selector_remote_filter = val;
-        }
+        },
+        FILE_ON_DEMAND(state, val) {
+            Object.keys(val).forEach(key => {
+                Vue.set(state.file_on_demand, key , val[key])
+            })
+        },
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -406,7 +400,6 @@ export default {
                 id: recordid,
             };
             const URL = recordid ? `/api/sheets/form/${id}/${recordid}` : `/api/sheets/form/${id}`;
-            // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
             return new Promise((resolve, reject) => {
                 axios
                     .get(URL)
@@ -472,7 +465,6 @@ export default {
                             return row;
                         });
                         rows.sort((a, b) => (a.order > b.order ? 1 : -1));
-                        // rows[rows.length - 1].sections[0].fields.push(DOCUMENT_EXCEL)
 
                         const form = {
                             rows,
@@ -498,7 +490,7 @@ export default {
                     });
             });
         },
-        async get_mock({ commit, dispatch }, payload) {
+        async get_mock({ commit }, payload) {
             commit('LOADING', true);
             const { response, contentinfo } = payload;
             const { recordid } = payload;
@@ -742,6 +734,9 @@ export default {
         },
         remote_filters_clear({ commit }, val) {
             commit('REMOTE_FILTERS_CLEAR', val);
-        }
+        },
+        file_on_demand({ commit }, val) {
+            commit('FILE_ON_DEMAND', val);
+        },
     },
 };

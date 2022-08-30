@@ -29,8 +29,6 @@ export default {
          */
         defaultOption: null,
         optionsFiltered: [],
-        openNested: false,
-        recordId: ''
     }),
     computed: {
         /**
@@ -192,16 +190,6 @@ export default {
             this.$emit('tooglefield', show_field);
             return show_field;
         },
-        error_messages() {
-            const errors = this.$store.getters[`${this.state}/errors_fields`];
-            let result = '';
-
-            if (errors) {
-                result = errors[this.input.id];
-            }
-
-            return result;
-        }
     },
     watch: {
         /**
@@ -319,6 +307,8 @@ export default {
         },
         options(val) {
             if (val.length > 1) {
+                this.availableOptions = val;
+
                 if (this.inserted) {
                     const option = this.options.find((options) => options.id === this.inserted);
                     if (this.multiple) {
@@ -357,27 +347,11 @@ export default {
     methods: {
         createdOption(id) {
             const optionToSelect = this.options.find((option) => option.id === id);
-
             if (this.multiple) {
-                const ifExistOption = this.selected.find((option) => option.id === id);
-
-                if (ifExistOption) this.selected = this.selected.filter(option => option.id !== id)
-
                 if (this.selected) this.selected.push(optionToSelect);
                 else this.selected = [optionToSelect];
             } else this.selected = optionToSelect;
-
-            this.recordId = '';
         },
-
-        openNestedForEdit(id) {
-            if (this.$refs['ref-' + this.id].$attrs.id === this.id) {
-               this.$refs['ref-' + this.id].searchEl.blur();
-            }
-
-            this.recordId = id;
-            this.openNested = !this.openNested;
-        }
     },
 };
 </script>

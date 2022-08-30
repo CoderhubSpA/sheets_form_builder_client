@@ -1,12 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
-
-$theme-sait-csi__font-family: 'Roboto', sans-serif;
-$theme-sait-csi__font-style: normal;
-$theme-sait-csi__font-weight: 300;
-$theme-sait-csi__font-size: 16px;
-$theme-sait-csi__character-spacing: 0px;
-$theme-sait-csi__line-spacing: 21px;
-
 .theme-sait {
     display: flex;
     flex-flow: column;
@@ -20,21 +11,21 @@ $theme-sait-csi__line-spacing: 21px;
     line-height: $theme-sait-csi__line-spacing;
 
     h3.sheets-form-title {
-        color: var(--form-builder-secondary-color);
+        color: $secondary-color;
         border: none;
     }
 
     div.sheets-rows {
         padding: 15px;
-        background: var(--form-builder-primary-color);
-        border-radius: var(--form-builder-global-border-radius);
+        background: $primary-color;
+        border-radius: $global-border-radius;
     }
 
     div.sheets-row {
         border: none;
 
         label {
-            color: var(--form-builder-primary-light-text-color);
+            color: $primary-light-text-color;
             text-transform: lowercase;
         }
 
@@ -44,11 +35,11 @@ $theme-sait-csi__line-spacing: 21px;
     }
 
     h3.sheets-row-title {
-        color: var(--form-builder-primary-light-text-color);
+        color: $primary-light-text-color;
     }
 
     h5.sheets-section-title {
-        color: var(--form-builder-primary-light-text-color);
+        color: $primary-light-text-color;
     }
 
     div.sheets-field {
@@ -59,10 +50,10 @@ $theme-sait-csi__line-spacing: 21px;
     .sheets-select .vs__search::placeholder,
     .sheets-select .vs__dropdown-menu,
     .sheets-select .vs__dropdown-toggle {
-        background: var(--form-builder-secondary-dark-color);
-        border: solid 1px var(--form-builder-primary-light-color);
-        color: var(--form-builder-primary-light-text-color);
-        border-radius: var(--form-builder-global-border-radius);
+        background: $secondary-dark-color;
+        border: solid 1px $primary-light-color;
+        color: $primary-light-text-color;
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__dropdown-menu::-webkit-scrollbar {
@@ -70,38 +61,38 @@ $theme-sait-csi__line-spacing: 21px;
     }
 
     .sheets-select .vs__dropdown-menu::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 6px var(--form-builder-secondary-dark-color);
-        border-radius: var(--form-builder-global-border-radius);
+        box-shadow: inset 0 0 6px $secondary-dark-color;
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__dropdown-menu::-webkit-scrollbar-thumb {
-        background-color: var(--form-builder-secondary-color);
-        border-radius: var(--form-builder-global-border-radius);
+        background-color: $secondary-color;
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__dropdown-toggle {
-        border-radius: var(--form-builder-global-border-radius);
+        border-radius: $global-border-radius;
     }
 
     .sheets-select .vs__search {
-        color: var(--form-builder-primary-light-text-color);
+        color: $primary-light-text-color;
     }
 
     .sheets-select .vs__clear,
     .sheets-select .vs__open-indicator,
     .sheets-select .vs__deselect {
         font-size: 1em;
-        fill: var(--form-builder-primary-light-text-color);
+        fill: $primary-light-text-color;
     }
 
     .sheets-select .vs__dropdown-option {
-        color: var(--form-builder-primary-light-text-color);
+        color: $primary-light-text-color;
     }
 
     .sheets-select .vs__dropdown-option--highlight,
     .sheets-select .vs__selected {
-        background: var(--secondary-light-color);
-        color: var(--form-builder-primary-light-text-color);
+        background: $secondary-light-color;
+        color: $primary-light-text-color;
     }
 
     .sheets-select-error .vs__dropdown-menu,
@@ -111,7 +102,7 @@ $theme-sait-csi__line-spacing: 21px;
 
     a.all-remove-link,
     a.all-add-link {
-        color: var(--form-builder-primary-light-text-color);
+        color: $primary-light-text-color;
     }
 
     /* vue-select */
@@ -120,14 +111,14 @@ $theme-sait-csi__line-spacing: 21px;
     div.mx-datepicker {
         div.mx-input-wrapper {
             input.mx-input {
-                background-color: var(--form-builder-secondary-dark-color !important);
-                border-color: var(--form-builder-primary-light-color);
-                color: var(--form-builder-primary-light-text-color);
+                background-color: $secondary-dark-color !important;
+                border-color: $primary-light-color;
+                color: $primary-light-text-color;
             }
 
             i.mx-icon-clear,
             i.mx-icon-calendar {
-                color: var(--form-builder-primary-light-text-color);
+                color: $primary-light-text-color;
             }
         }
     }
@@ -138,7 +129,7 @@ $theme-sait-csi__line-spacing: 21px;
         height: 100%;
         overflow-y: auto;
         overflow-x: auto;
-        scrollbar-color: var(--form-builder-secondary-color);
+        scrollbar-color: $secondary-color $primary-light-color;
     }
 
     div.sheets-form-scrolling::-webkit-scrollbar {
@@ -146,26 +137,27 @@ $theme-sait-csi__line-spacing: 21px;
     }
 
     div.sheets-form-scrolling::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 6px var(--form-builder-secondary-dark-color);
-        border-radius: var(--form-builder-global-border-radius);
+        box-shadow: inset 0 0 6px $secondary-dark-color;
+        border-radius: $global-border-radius;
     }
 
     div.sheets-form-scrolling::-webkit-scrollbar-thumb {
-        background-color: var(--form-builder-secondary-color);
-        border-radius: var(--form-builder-global-border-radius);
+        background-color: $secondary-color;
+        border-radius: $global-border-radius;
     }
 
     button.btn-success {
-        color: var(--form-builder-primary-action-color);
-        background: var(--form-builder-primary-action-background);
-        border: var(--form-builder-primary-action-boder);
-        border-radius: var(--form-builder-primary-action-border-radius);
+        color: #000;
+        background-color: $secondary-color;
+        border: solid 1px $secondary-light-color;
+        border-radius: $global-border-radius;
+        font-weight: 500;
     }
 
     button.btn-secondary {
-        color: var(--form-builder-secondary-action-color);
-        background: var(--form-builder-secondary-action-background);
-        border: var(--form-builder-secondary-action-border);
-        border-radius: var(--form-builder-secondary-action-border-radius);
+        background: none;
+        border: none;
+        color: #FFFFFF;
+        box-shadow: none;
     }
 }

@@ -367,6 +367,14 @@ export default {
             this.$store
                 .dispatch("form/save_form", formData)
                 .then(response => {
+                    //Pueden llegar varias acciones y varios scripts.
+                    if (response.response.data.content.scripts[0].actions[0].type === 'update_column') {
+                        const getInfoId = Object.keys(response.response.data.content.content.json_sent)[0];
+
+                        this.$store.dispatch("myStore0/info", getInfoId);
+                        this.$store.dispatch("myStore0/file_on_demand", response.response.data.content.scripts[0].actions[0].params[0]);
+                    }
+
                     if (response.response.data.success === true) {
                         this.loading = false;
                         this.success = true;
@@ -434,7 +442,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scope>
 .hide {
     display: none;
 }
@@ -492,5 +500,10 @@ export default {
         background-color: rgb(226, 226, 221);
         color: rgb(0, 0, 0);
     }
+}
+
+.sheets-field{
+    border: 1px solid #999999;
+    border-radius: 5px;
 }
 </style>
