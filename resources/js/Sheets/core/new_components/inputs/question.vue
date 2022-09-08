@@ -5,7 +5,7 @@
             :id="id"
             :options="options"
             v-model="selected"
-            :searchable="true">
+            :searchable="searchable">
         </v-select>
         <div v-if="options.length === 0">
             <b>Esta lista está vacía</b>
@@ -22,30 +22,16 @@ export default {
         'form-group': FormGroup
     },
     data: () => ({
-        selected: null,
+        selected: null
     }),
     computed: {
         options() {
-            const options = [];
-
-            if (this.input.options) {
-                Object.keys(this.input.options).map(key => {
-                    const option = {
-                        id: key,
-                        name: this.input.options[key]
-                    }
-                    options.push(option);
-
-                    return key;
-                })
-            }
-            return options;
-            /* return Object.keys(this.input.options).map(key => {
+            return Object.keys(this.input.options).map(key => {
                 return {
                     id: key,
                     name: this.input.options[key]
                 }
-            }) */
+            })
         }
     },
     watch: {

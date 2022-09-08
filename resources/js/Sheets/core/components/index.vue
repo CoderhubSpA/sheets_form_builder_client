@@ -1,5 +1,5 @@
 <template>
-    <div class="index-container">
+    <div class="index-container" :class="setTheme" :style="setStyles">
         <loading-message :status="loading"></loading-message>
         <div v-if="isPoll === false" class="not-is-poll">
             <sheets-form
@@ -9,8 +9,6 @@
                 :base_url="base_url"
                 :is_test="form_test"
                 :params_actions="actions"
-                :theme="theme"
-                :customStyles="customStyles"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true" class="is-poll">
@@ -60,17 +58,17 @@ export default {
         },
         theme: {
             type: String,
-            default: ''
+            default: '',
         },
-        customStyles: {
-            type: Object,
-            default: () => ({})
-        }
+        custom_styles: {
+            type: String,
+            default: '',
+        },
     },
 
     data: () => ({
         loading: false,
-        isPoll: false,
+        isPoll: undefined,
     }),
     mounted() {
         this.loading = true;
@@ -82,9 +80,8 @@ export default {
                     params: this.params,
                 })
                 .then((response) => {
-                    const formType = this.$store.getters[`myStore0/form_type`];
                     this.loading = false;
-                    switch (formType) {
+                    switch (response.type) {
                         case 'poll':
                             this.isPoll = true;
                             this.$store
@@ -158,7 +155,20 @@ export default {
             }
         }
     },
-    computed: {},
+    computed: {
+        setTheme() {
+            return `theme-${this.theme}`;
+        },
+        setStyles() {
+            if(this.custom_styles) {
+                return Object.fromEntries(Object.entries(JSON.parse(this.custom_styles)).map(([key, value]) =>
+                    [`--${key}`, value]
+                ));
+            }
+
+            return {};
+        }
+    }
 };
 </script>
 
@@ -181,6 +191,12 @@ code {
 }
 
 .index-container, .not-is-poll, .is-poll {
+    height: 100%;
+}
+
+.not-is-poll > div{
+    display: flex;
+    flex-flow: column;
     height: 100%;
 }
 </style>

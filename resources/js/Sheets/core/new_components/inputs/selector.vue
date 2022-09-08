@@ -10,6 +10,7 @@
     >
         <v-select
             label="name"
+            :class="[{'sheets-select-error': error_messages}, 'sheets-select']"
             :id="id"
             :options="
                 optionsFiltered.length === 0 &&

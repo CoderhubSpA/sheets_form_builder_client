@@ -141,7 +141,7 @@ export default {
         responses: [],
         errors_messages: [],
         model: [],
-        activeNewFields: ["RADIO", "DOCUMENT"],
+        activeNewFields: ["RADIO"],
         sectionModel: []
     }),
     computed: {
