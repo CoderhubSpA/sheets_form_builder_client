@@ -233,29 +233,44 @@ export default {
 
             this.$emit('input', data);
 
-            if (this.input.format === 'SELECTOR[IMAGELIST]' && this.selected.length > 0) {
+            if (this.input.format === 'SELECTOR[IMAGELIST]') {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
-                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
-                const type = 'IN';
-                let selectedValue = '';
+                
+                if (this.selected.length > 0 && contentInfo) {
+                    const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
 
-                if (this.selected !== null) {
-                    selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                    const type = 'IN';
+                    let selectedValue = '';
+
+                    if (this.selected !== null) {
+                        selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                    }
+
+                    const filter = {
+                        column,
+                        id: `external-filter-${column.id}`,
+                        order: 1,
+                        search: selectedValue,
+                        type,
+                        remote: this.input.options === null && this.input.entity_type_fk === null,
+                    };
+
+                    this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                    this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
                 }
 
-                const filter = {
-                    column,
-                    id: `external-filter-${column.id}`,
-                    order: 1,
-                    search: selectedValue,
-                    type,
-                    remote: this.input.options === null && this.input.entity_type_fk === null,
-                };
+                if (this.selected.length === 0 && contentInfo) {
+                    const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
 
-                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
-                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                    const filter = {
+                        column,
+                        id: `external-filter-${column.id}`
+                    };
+
+                    this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                    this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                }
             }
-
 
             const dataToSelectorFilters = {
                 key: this.input.col_name,

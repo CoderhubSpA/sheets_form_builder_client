@@ -581,8 +581,11 @@ export default {
             // cargar la data mediante el método loadData.
             // Esto puede pasar si los pivotes llegan tarde
             if (this.$refs.hotTableComponent) {
-                // eslint-disable-next-line no-console
-                // console.log('SMA 406', this.$refs.hotTableComponent.hotInstance.loadData(data));
+                // NO REMOVER!!!.
+                // Si la data llega tarde, el componente ya se renderizó y debe cargarse de esta manera.
+                // Si se elimina éste método. La data no se cargará y la tabla quedará vacía.
+                // Esta línea corrige error reportado en la CHNC-408.
+                this.$refs.hotTableComponent.hotInstance.loadData(data)
             }
         },
         addHooks() {

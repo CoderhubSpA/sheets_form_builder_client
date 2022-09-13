@@ -16,7 +16,7 @@
                     type="date"
                     v-model="dateStart"
                     format="DD/MM/YYYY"
-                    placeholder="Fecha inicial"
+                    placeholder="Desde DD/MM/YYY ~ Hasta DD/MM/YYY"
                     :disabled="disabled"
                     @input="selectedDateRange"
                 ></date-picker>
@@ -35,7 +35,7 @@ import DatePicker from 'vue2-datepicker';
 import FormGroup from '../templates/form-group.vue';
 import mix from '../mixs/range-date.vue';
 import mixInput from '../mixs/input.vue';
-import Moment from 'moment';
+import moment from 'moment';
 
 export default {
     mixins: [mixInput,mix],
