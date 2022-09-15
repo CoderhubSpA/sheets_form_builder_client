@@ -121,7 +121,43 @@ export default {
                 // eslint-disable-next-line camelcase
             } else show_section = true;
             // eslint-disable-next-line camelcase
+
+            if (!show_section) {
+                const remote_selectors = this.$store.getters[`${this.state}/selector_remote_filter`];
+                const active_filters = this.$store.getters[`${this.state}/active_filter`];
+
+                if (remote_selectors.length > 0) {
+                    this.clean_filters(remote_selectors, "SELECTOR_REMOTE_FILTER");
+                }
+
+                if (active_filters.length > 0) {
+                    this.clean_filters(active_filters, "ACTIVE_FILTERS");
+                }
+            }
+
             return show_section;
+        },
+    },
+    methods: {
+        clean_filters(filters, filterName) {
+            this.section.fields.forEach((field) => {
+                filters.forEach((selector) => {
+                    if (field.id === selector.column.id) {
+                        const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
+                        const column = contentInfo.content.columns.find(
+                            (col) => col.id === field.id
+                        );
+
+                        const filter = {
+                            column: column,
+                            id: `external-filter-${column.id}`,
+                        };
+
+                        this.$store.commit(`${this.state}/${filterName}`, filter);
+                    }
+                });
+            });
         },
     },
 };

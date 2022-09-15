@@ -105,6 +105,7 @@ export default {
         errorOnLoadFiles: false,
         uploadingForm: false,
         loadingForm: false,
+        CAN_SEE_EDIT: 2
     }),
     computed: {
         loading() {
@@ -433,9 +434,10 @@ export default {
                         });
                     }
                 }
+
                 let body = {};
 
-                await this.result.forEach((r) => {
+                this.checkFieldPermissions(this.result, this.CAN_SEE_EDIT).forEach((r) => {
                     if (r) {
                         // eslint-disable-next-line prefer-object-spread
                         const obj = Object.assign({}, r);
@@ -632,6 +634,27 @@ export default {
 
             this.formAnswer = [];
         },
+
+        /**
+         * Filter fields by permission attribute.
+         * @param  {Array} fieldsOfForm Field list, {"id": "value"}.
+         * @param  {Number} permission The permission number, e.g: 0, 1 or 2.
+         * @return {Array} Only fields with set permission param.
+         */
+        checkFieldPermissions(fieldsOfForm, permission) {
+            const fieldsInStore = this.$store.getters[`${this.namespace}/fields_as_object`];
+            const allowedFields = [];
+
+            fieldsOfForm.forEach((fof) => {
+                fieldsInStore.forEach((fis) => {
+                    if (Object.keys(fof)[0] === fis.id && fis.permission === permission) {
+                        allowedFields.push(fof);
+                    }
+                });
+            });
+
+            return allowedFields;
+        }
     },
 };
 </script>

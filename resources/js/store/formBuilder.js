@@ -18,44 +18,6 @@ const DEFAULT_ACTION = {
     text_color: null,
 };
 
-// eslint-disable-next-line no-unused-vars
-const DOCUMENT_EXCEL = {
-    form_field_id: 'b69c2ddf-8a8d-11eb-965c-ed7fb50d217e',
-    order: 2,
-    name: 'Descuento contrato',
-    permission: 2,
-    form_section_id: '4069f12f-56b8-4ac9-864c-41a4980a547b',
-    required: 0,
-    format: 'DOCUMENT[EXCEL]',
-    col_md: 3,
-    col_xl: 3,
-    col_sm: 6,
-    link_url: 'https://www.lipsum.com/',
-    link_name: 'Más sobre Descuento contrato',
-    description: 'Este es el campo de Descuento contrato',
-    show_by_field_id: null,
-    show_by_field_value: null,
-    id: 'b34fbc17-89f1-11eb-965c-ed7fb50d217e',
-    column_group_id: null,
-    entity_type_id: '2168fdd5-840f-11eb-965c-ed7fb50d217e',
-    col_name: 'contract_discount',
-    entity_type_fk: null,
-    entity_type_permission_fk: null,
-    col_name_fk: null,
-    pivot_table: null,
-    entity_type_pivot_fk: null,
-    default_value: null,
-    col_fk_1_n: null,
-    col_fk_n_1: null,
-    col_fk_filter: null,
-    col_filter_by: null,
-    options: null,
-    created_by: null,
-    width: null,
-    filter: null,
-    color: null,
-    text_color: null,
-};
 export default {
     namespaced: true,
     state: () => ({
@@ -93,6 +55,7 @@ export default {
         selector_remote_filter: [],
         url_selector_remote: {},
         uuid: null,
+        fields_as_object: []
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -150,6 +113,7 @@ export default {
         selector_remote_filter: (state) => state.selector_remote_filter,
         url_selector_remote: (state) => state.url_selector_remote,
         uuid: (state) => state.uuid,
+        fields_as_object: (state) => state.fields_as_object,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -198,19 +162,6 @@ export default {
         },
         FIELDS(state, val) {
             Vue.set(state.fields, state.fields.length, val);
-            // state.fields.push(val);
-
-            // const newKey = Object.keys(val)[0];
-            // let found = false;
-            // state.fields.forEach((field, index) => {
-            //     if (Object.keys(field)[0] === newKey) {
-            //         state.fields[index] = val;
-            //         found = true;
-            //     }
-            // });
-            // if (!found) {
-            //     state.fields.push(val);
-            // }
         },
         SEARCH_MAP(state, val) {
             Vue.set(state.searchMap, val.col_name, val.text);
@@ -392,7 +343,10 @@ export default {
         },
         REMOTE_FILTERS_CLEAR(state, val) {
             state.selector_remote_filter = val;
-        }
+        },
+        FIELDS_AS_OBJECT(state, val) {
+            val.forEach(v => state.fields_as_object.push(v));
+        },
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -406,7 +360,7 @@ export default {
                 id: recordid,
             };
             const URL = recordid ? `/api/sheets/form/${id}/${recordid}` : `/api/sheets/form/${id}`;
-            // const URL = req.record_id ? `/api/sheets/form/${req.entity}/${req.record_id}` :
+
             return new Promise((resolve, reject) => {
                 axios
                     .get(URL)
@@ -419,7 +373,7 @@ export default {
                         if (data.type) {
                             commit('FORM_TYPE', data.type);
                         }
-                        // const actions = data.actions.length > 0 ? data.actions : [DEFAULT_ACTION];
+
                         let actions = [];
                         if (data.actions.length > 0)
                             actions = data.actions.filter((action) => action.valid !== 0);
@@ -437,6 +391,9 @@ export default {
                                 });
                             });
                         }
+
+                        commit('FIELDS_AS_OBJECT', data.fields);
+
                         commit('FORM_ID', data.id);
 
                         commit('ENTITY_ID', data.entity_type_id);
@@ -472,7 +429,6 @@ export default {
                             return row;
                         });
                         rows.sort((a, b) => (a.order > b.order ? 1 : -1));
-                        // rows[rows.length - 1].sections[0].fields.push(DOCUMENT_EXCEL)
 
                         const form = {
                             rows,
