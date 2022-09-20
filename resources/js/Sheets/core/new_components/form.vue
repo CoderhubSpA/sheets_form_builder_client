@@ -650,6 +650,10 @@ export default {
                     if (Object.keys(fof)[0] === fis.id && fis.permission === permission) {
                         allowedFields.push(fof);
                     }
+                    // Allow Object.keys(fof)[0] form_id, form_fields,action_id 
+                    if(Object.keys(fof)[0] === 'form_id' || Object.keys(fof)[0] === 'form_fields' || Object.keys(fof)[0] === 'action_id') {
+                        allowedFields.push(fof);
+                    }
                 });
             });
 
