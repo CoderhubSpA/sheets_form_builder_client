@@ -16,17 +16,17 @@
                 <input
                     type="file"
                     class="custom-file-input"
+                    lang="es"
+                    :ref="dynamicRef"
                     :id="id"
                     :accept="accept"
-                    lang="es"
-                    ref="inputFileRef"
+                    :disabled="disabled"
                     @input="onInput"
                     @change="onChange"
-
                 />
             </div>
             <div class="col" v-if="showDeleteBtn">
-                <button class="btn btn-danger float-right" @click="onDeleteFile()">
+                <button :disabled="disabled" class="btn btn-danger float-right" @click="onDeleteFile()">
                     <i class="fa fa-trash"></i>
                 </button>
             </div>

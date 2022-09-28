@@ -13,7 +13,7 @@
             maxlength="250"
             class="form-control"
             :id="id"
-            :value="inputValue"
+            :value="rutValue"
             :placeholder="defaultValue"
             :disabled="disabled"
             @input="onInput"
@@ -31,37 +31,45 @@ export default {
         'form-group': FormGroup,
     },
     computed: {
-        // eslint-disable-next-line vue/return-in-computed-property, consistent-return
-        inputValue() {
-            if (this.value[this.id]) {
-                const actual = this.value[this.id].replace(/^0+/, '');
-                if (actual !== '' && actual.length > 1) {
-                    const sinPuntos = actual.replace(/\./g, '');
-                    const actualLimpio = sinPuntos.replace(/-/g, '');
-                    const inicio = actualLimpio.substring(0, actualLimpio.length - 1);
-                    let rutPuntos = '';
-                    let i = 0;
-                    let j = 1;
-                    // eslint-disable-next-line no-plusplus
-                    for (i = inicio.length - 1; i >= 0; i--) {
-                        const letra = inicio.charAt(i);
-                        rutPuntos = letra + rutPuntos;
-                        if (j % 3 === 0 && j <= inicio.length - 1) {
-                            rutPuntos = `.${rutPuntos}`;
+        rutValue() {
+            if (this.inputValue) {
+                const rutValue = this.inputValue.replace(/^0+/, '');
+
+                if (rutValue !== '' && rutValue.length > 1) {
+                    const withoutPoint = rutValue.replace(/\./g, '');
+                    const rutValueClean = withoutPoint.replace(/-/g, '');
+                    const start = rutValueClean.substring(0, rutValueClean.length - 1);
+                    let rutPoints = '';
+                    let iIndex = 0;
+                    let jIndex = 1;
+
+                    for (iIndex = start.length - 1; iIndex >= 0; iIndex--) {
+                        const letter = start.charAt(iIndex);
+
+                        rutPoints = letter + rutPoints;
+
+                        if (jIndex % 3 === 0 && jIndex <= start.length - 1) {
+                            rutPoints = `.${rutPoints}`;
                         }
-                        // eslint-disable-next-line no-plusplus
-                        j++;
+
+                        jIndex++;
                     }
-                    const dv = actualLimpio.substring(actualLimpio.length - 1);
-                    rutPuntos = `${rutPuntos}-${dv}`;
-                    return rutPuntos;
+
+                    const dv = rutValueClean.substring(rutValueClean.length - 1);
+
+                    rutPoints = `${rutPoints}-${dv}`;
+
+                    return rutPoints;
                 }
+
                 const dataToSelectorFilters = {
                     key: this.input.col_name,
-                    value: actual,
+                    value: rutValue,
                 };
+
                 this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
-                return actual;
+
+                return rutValue;
             }
         },
     },

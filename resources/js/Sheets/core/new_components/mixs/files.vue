@@ -21,7 +21,9 @@ export default {
         },
         existing_file() {
             let file = {};
+
             const fields = this.$store.getters[`${this.state}/fields`];
+
             if (fields && fields.length > 0) {
                 const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
 
@@ -31,6 +33,7 @@ export default {
                     this.$emit('input', file);
                 }
             }
+
             if (file[this.id]) {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
                 if (contentInfo) {
@@ -40,13 +43,15 @@ export default {
                     if (fileEntity) {
                         this.document_name = fileEntity.name;
                         this.showDeleteBtn = true;
-                        // this.can_select_sheets = false;
                     }
                 }
             }
+
             return file[this.id] ? file[this.id] : '';
         },
-
+        dynamicRef() {
+            return `file-${this.id}`;
+        }
     },
     watch: {
         value(val) {
@@ -63,7 +68,6 @@ export default {
 
                     if (fileEntity) {
                         this.document_name = fileEntity.name;
-                        // this.can_select_sheets = false;
                     }
                 }
             }
@@ -80,7 +84,7 @@ export default {
         },
         onDeleteFile() {
             this.showDeleteBtn = false;
-            this.$refs.inputFileRef.value = null;
+            this.$refs[this.dynamicRef].value = null;
             this.document_name = '';
 
             if (this.preview) {
