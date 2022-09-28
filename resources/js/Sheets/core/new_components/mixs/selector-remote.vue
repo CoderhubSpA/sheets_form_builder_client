@@ -170,21 +170,8 @@ export default {
                     }
                 }
 
-                let type = null;
-
-                switch(this.input.format) {
-                    case 'SELECTOR[REMOTE][MULTIPLE]':
-                    case 'SELECTOR[REMOTE][MULTIPLE][ALL]':
-                        type = "IN";
-                        break;
-                    case 'SELECTOR[METRIC]':
-                        type = "METRIC";
-                        break;
-                    default:
-                        type = "EQUAL";
-                        break;
-                }
-
+                const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' ? 'IN' : 'EQUAL';
+                
                 const filter = {
                     column,
                     id: `external-filter-${column.id}`,
@@ -193,7 +180,7 @@ export default {
                     type,
                     remote: this.input.options === null && this.input.entity_type_fk === null,
                 };
-
+                
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
                 
                 this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
@@ -302,11 +289,11 @@ export default {
                 const fk = this.input.entity_type_fk;
                 const entities = contentInfo.content.entities_fk[fk];
                 if (entities) {
-                    options = entities.map((e) => ({ id: e.id, name: e[key], order: e.order }));
+                    options = entities.map((e) => ({ id: e.id, name: e[key] }));
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
                     Object.keys(opt).forEach((objKey) => {
-                        options.push({ id: objKey, name: opt[objKey], order: e.order });
+                        options.push({ id: objKey, name: opt[objKey] });
                     });
                 }
                 if (this.input.default_value) {
@@ -317,12 +304,11 @@ export default {
                     });
                 }
             }
-
             options.sort((a, b) => {
-                if (a.order > b.order) {
+                if (a.name > b.name) {
                     return 1;
                 }
-                if (b.order > a.order) {
+                if (b.name > a.name) {
                     return -1;
                 }
                 return 0;

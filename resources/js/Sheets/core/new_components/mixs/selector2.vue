@@ -87,9 +87,9 @@ export default {
 
                 if (entities) {
                     if(entities.length > 0 && entities[0].image_src) {
-                        options = entities.map((e) => ({ id: e.id, name: e.name, image: this.base_url + e.image_src, selected: false, order: e.order }));
+                        options = entities.map((e) => ({ id: e.id, name: e.name, image: this.base_url + e.image_src, selected: false }));
                     } else {
-                        options = entities.map((e) => ({ id: e.id, name: e[key], order: e.order }));
+                        options = entities.map((e) => ({ id: e.id, name: e[key] }));
                     }
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
@@ -107,12 +107,14 @@ export default {
                 }
             }
             options.sort((a, b) => {
-                if (a.order > b.order) {
+                if (a.name > b.name) {
                     return 1;
                 }
-                if (b.order > a.order) {
+
+                if (b.name > a.name) {
                     return -1;
                 }
+
                 return 0;
             });
 
