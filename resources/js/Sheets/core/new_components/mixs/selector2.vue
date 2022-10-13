@@ -86,8 +86,14 @@ export default {
                 const entities = contentInfo.content.entities_fk[fk];
 
                 if (entities) {
-                    if(entities.length > 0 && entities[0].image_src) {
-                        options = entities.map((e) => ({ id: e.id, name: e.name, image: this.base_url + e.image_src, selected: false, order: e.order }));
+                    if (entities.length > 0 && entities[0].image_src) {
+                        options = entities.map((e) => ({
+                            id: e.id,
+                            name: e.name,
+                            image: this.base_url + e.image_src,
+                            selected: false,
+                            order: e.order,
+                        }));
                     } else {
                         options = entities.map((e) => ({ id: e.id, name: e[key], order: e.order }));
                     }
@@ -209,90 +215,112 @@ export default {
          * para ser enviado al server
          */
         selected(val) {
-            const data = {};
+            if (val) {
+                const data = {};
 
-            if (this.multiple) {
-                data[this.id] = [];
-            } else {
-                data[this.id] = null;
-            }
-
-            if (val !== undefined && val !== null) {
                 if (this.multiple) {
-                    if (val[0] !== undefined) {
-                        data[this.id] = val.map((v) => v.id);
-                    }
+                    data[this.id] = [];
                 } else {
-                    data[this.id] = val.id;
+                    data[this.id] = null;
                 }
-            }
-            // eslint-disable-next-line prefer-object-spread
-            this.selectorvmodelsample = Object.assign({}, data);
 
-            this.$emit('input', data);
-
-            if (this.input.format === 'SELECTOR[IMAGELIST]') {
-                const contentInfo = this.$store.getters[`${this.state}/content_info`];
-                
-                if (this.selected.length > 0 && contentInfo) {
-                    const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
-
-                    const type = 'IN';
-                    let selectedValue = '';
-
-                    if (this.selected !== null) {
-                        selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                if (val !== undefined && val !== null) {
+                    if (this.multiple) {
+                        if (val[0] !== undefined) {
+                            data[this.id] = val.map((v) => v.id);
+                        }
+                    } else {
+                        data[this.id] = val.id;
                     }
+                }
+                // eslint-disable-next-line prefer-object-spread
+                this.selectorvmodelsample = Object.assign({}, data);
 
-                    const filter = {
-                        column,
-                        id: `external-filter-${column.id}`,
-                        order: 1,
-                        search: selectedValue,
-                        type,
-                        remote: this.input.options === null && this.input.entity_type_fk === null,
-                    };
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
 
-                    this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
-                    this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                if (contentInfo) {
+                    const column = contentInfo.content.columns.find(
+                        (col) => col.id === this.input.id
+                    );
+
+                    if (Array.isArray(this.selected) && this.selected.length > 0) {
+                        if (this.input.format === 'SELECTOR[IMAGELIST]') {
+                            const type = 'IN';
+                            let selectedValue = '';
+
+                            if (this.selected !== null) {
+                                selectedValue =
+                                    this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
+                            }
+
+                            const filter = {
+                                column,
+                                id: `external-filter-${column.id}`,
+                                order: 1,
+                                search: selectedValue,
+                                type,
+                                remote:
+                                    this.input.options === null && this.input.entity_type_fk === null,
+                            };
+
+                            this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                            this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                        }
+                    } else if (Array.isArray(this.selected) && this.selected.length === 0) {
+                        const column = contentInfo.content.columns.find(
+                            (col) => col.id === this.input.id
+                        );
+
+                        const filter = {
+                            column,
+                            id: `external-filter-${column.id}`,
+                        };
+
+                        this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                        this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                    } else {
+                        const type = 'EQUAL';
+
+                        const filter = {
+                            column,
+                            id: `external-filter-${column.id}`,
+                            order: 1,
+                            search: this.selected.id,
+                            type,
+                            remote: this.input.options === null && this.input.entity_type_fk === null,
+                        };
+
+                        this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                        this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+                    }
                 }
 
-                if (this.selected.length === 0 && contentInfo) {
-                    const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+                const dataToSelectorFilters = {
+                    key: this.input.col_name,
+                    value: data[this.id],
+                };
 
-                    const filter = {
-                        column,
-                        id: `external-filter-${column.id}`
-                    };
+                this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
 
-                    this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
-                    this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
-                }
+                /**
+                 * mostrar/ocultar section
+                 */
+                // eslint-disable-next-line camelcase
+                const field_section_show_hide = {};
+
+                field_section_show_hide[this.form_field_id] = data[this.id];
+
+                this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
+
+                // eslint-disable-next-line camelcase
+                const field_show_hide = {};
+
+                field_show_hide[this.form_field_id] = data[this.id];
+
+                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
+
+                this.$emit('input', data);
             }
-
-            const dataToSelectorFilters = {
-                key: this.input.col_name,
-                value: data[this.id],
-            };
-
-            this.$store.commit(`${this.state}/SELECTORFILTERS`, dataToSelectorFilters);
-
-            /**
-             * mostrar/ocultar section
-             */
-            // eslint-disable-next-line camelcase
-            const field_section_show_hide = {};
-
-            field_section_show_hide[this.form_field_id] = data[this.id];
-
-            this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
-
-            // eslint-disable-next-line camelcase
-            const field_show_hide = {};
-
-            field_show_hide[this.form_field_id] = data[this.id];
-
-            this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
         },
         /**
          * Observador para selectedValue
@@ -305,7 +333,7 @@ export default {
             handler: function (val) {
                 if (!this.multiple) {
                     this.selected = val;
-                } else if(val && val.length > 0 && !this.selected) {
+                } else if (val && val.length > 0 && !this.selected) {
                     this.selected = val;
                 }
             },
@@ -374,7 +402,8 @@ export default {
             if (this.multiple) {
                 const ifExistOption = this.selected.find((option) => option.id === id);
 
-                if (ifExistOption) this.selected = this.selected.filter(option => option.id !== id)
+                if (ifExistOption)
+                    this.selected = this.selected.filter((option) => option.id !== id);
 
                 if (this.selected) this.selected.push(optionToSelect);
                 else this.selected = [optionToSelect];

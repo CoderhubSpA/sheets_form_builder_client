@@ -1,10 +1,13 @@
 <template>
-    <selector-remote
-        :input="input"
-        :value="value"
-        :state="state"
-        :base_url="base_url"
-    ></selector-remote>
+    <div>
+        <selector-remote
+            :input="input"
+            :value="value"
+            :state="state"
+            :base_url="base_url"
+            v-on:input="emitData"
+        ></selector-remote>
+    </div>
 </template>
 
 <script>
@@ -14,7 +17,12 @@ import SelectorRemote from './selector-remote.vue';
 export default {
     mixins: [mix],
     components: {
-        'selector-remote': SelectorRemote,
+        'selector-remote': SelectorRemote
     },
+    methods: {
+        emitData(data) {
+            this.$emit('input', data);
+        }
+    }
 };
 </script>

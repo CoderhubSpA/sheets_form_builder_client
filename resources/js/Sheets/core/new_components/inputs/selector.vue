@@ -21,6 +21,7 @@
             "
             :disabled="disabled"
             v-model="selected"
+            :clearable="false"
         >
         </v-select>
         <nested-form

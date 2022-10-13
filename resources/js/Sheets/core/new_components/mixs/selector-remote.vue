@@ -90,38 +90,6 @@ export default {
         form_field_id() {
             return this.input.form_field_id;
         },
-        show_field() {
-            const fields = this.$store.getters[`${this.state}/field_show_hide`];
-            // eslint-disable-next-line camelcase
-            let show_field = false;
-            if (this.show_by_field_id) {
-                // eslint-disable-next-line eqeqeq
-                if ((fields[this.show_by_field_id] || false) == this.show_by_field_value) {
-                    // eslint-disable-next-line camelcase
-                    show_field = true;
-                }
-                try {
-                    // Permite validar si entre un selector multiple existe el
-                    // valor que condiciona que el elemento se vea o no
-                    if (
-                        Array.isArray(fields[this.show_by_field_id]) &&
-                        fields[this.show_by_field_id]
-                            .map((d) => d.id)
-                            .includes(this.show_by_field_value)
-                    ) {
-                        // eslint-disable-next-line camelcase, no-undef
-                        show_section = true;
-                    }
-                } catch (e) {
-                    // eslint-disable-next-line no-console
-                    console.warn(e);
-                }
-                // eslint-disable-next-line camelcase
-            } else show_field = true;
-            // eslint-disable-next-line camelcase
-            this.$emit('tooglefield', show_field);
-            return show_field;
-        },
         active_filter() {
             return this.$store.getters[`${this.state}/active_filter`];
         },
@@ -135,6 +103,51 @@ export default {
 
             return result;
         },
+         selectorFilters() {
+            const selectorfilters = this.$store.getters[`${this.state}/selectorfilters`];
+            return selectorfilters;
+        },
+        optionsByColFilter() {
+            const contentInfo = this.$store.getters[`${this.state}/content_info`];
+            const key = this.input.col_name_fk || 'name';
+            let options = [];
+
+            this.selected = null;
+
+            if (contentInfo) {
+                const fk = this.input.entity_type_fk;
+
+                const entities = contentInfo.content.entities_fk[fk];
+
+                if (entities) {
+                    if (this.input.col_filter_by === null && this.input.col_fk_filter === null) {
+                        options = entities.map((e) => ({ id: e.id, name: e[key] }));
+                    } else {
+                        options = [];
+                        if (
+                            Object.keys(this.selectorFilters).indexOf(this.input.col_filter_by) >= 0
+                        ) {
+                            if (this.selectorFilters[this.input.col_filter_by]) {
+                                // eslint-disable-next-line array-callback-return,  consistent-return
+                                const optionsfiltered = entities.filter(
+                                    (e) =>
+                                        e[this.input.col_fk_filter] ===
+                                        this.selectorFilters[this.input.col_filter_by].toString()
+                                );
+                                options = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));
+                            }
+                        }
+                    }
+                } else {
+                    const opt = this.input.options ? JSON.parse(this.input.options) : {};
+
+                    Object.keys(opt).forEach((optKey) => {
+                        options.push({ id: optKey, name: opt[optKey] });
+                    });
+                }
+            }
+            return options;
+        }
     },
     watch: {
         /**
@@ -171,7 +184,6 @@ export default {
                 }
 
                 let type = null;
-
                 switch(this.input.format) {
                     case 'SELECTOR[REMOTE][MULTIPLE]':
                     case 'SELECTOR[REMOTE][MULTIPLE][ALL]':
@@ -191,11 +203,10 @@ export default {
                     order: 1,
                     search: selectedValue,
                     type,
-                    remote: this.input.options === null && this.input.entity_type_fk === null,
+                    remote: this.input.options === null && this.input.entity_type_fk === null
                 };
 
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
-                
                 this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
                 
                 this.$emit('input', data);
@@ -216,6 +227,27 @@ export default {
                 const field_show_hide = {};
 
                 field_show_hide[this.form_field_id] = data[this.id];
+
+                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
+
+                if (type === "METRIC") {
+                        const remote_selectors = this.$store.getters[`${this.state}/selector_remote_filter`];
+                        const active_filters = this.$store.getters[`${this.state}/active_filter`];
+
+                        if (remote_selectors.length > 0) {
+                            this.clean_filters_for_dimensions(remote_selectors, "SELECTOR_REMOTE_FILTER", data[this.id]);
+                        }
+
+                        if (active_filters.length > 0) {
+                            this.clean_filters_for_dimensions(active_filters, "ACTIVE_FILTERS", data[this.id]);
+                    }
+                }
+            }
+
+            if (!val) {
+                const field_show_hide = {};
+
+                field_show_hide[this.form_field_id] = null;
 
                 this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
             }
@@ -302,11 +334,11 @@ export default {
                 const fk = this.input.entity_type_fk;
                 const entities = contentInfo.content.entities_fk[fk];
                 if (entities) {
-                    options = entities.map((e) => ({ id: e.id, name: e[key], order: e.order }));
+                    options = entities.map((e) => ({ id: e.id, name: e[key], order: e.order ? e.order : null }));
                 } else {
                     const opt = this.input.options ? JSON.parse(this.input.options) : {};
                     Object.keys(opt).forEach((objKey) => {
-                        options.push({ id: objKey, name: opt[objKey], order: e.order });
+                        options.push({ id: objKey, name: opt[objKey], order: opt[objKey] ? opt[objKey] : null});
                     });
                 }
                 if (this.input.default_value) {
@@ -387,21 +419,37 @@ export default {
         async getNewOptions(url) {
             if (url && this.input.options === null && this.input.entity_type_fk === null) {
                 this.loading = true;
-                const preoptions = await this.$store.dispatch(`${this.state}/get_filters`, url);
+
+                let preoptions = null;
+
+                if (this.input.format === 'DIMENSION') {
+                    const params = {
+                        show_by_field_value: this.input.show_by_field_value,
+                        col_name: this.input.col_name
+                    }
+
+                   preoptions = await this.$store.dispatch(`${this.state}/get_dimensions`, params);
+                } else {
+                    preoptions = await this.$store.dispatch(`${this.state}/get_filters`, url);
+                }
 
                 if (preoptions.success) {
                     const optionsToSet = [];
-                    preoptions.response.forEach((pre) => {
-                        if (pre.id !== null && pre.text !== null) {
-                            optionsToSet.push({
-                                id: pre.id,
-                                name: pre.text,
-                            });
-                            if (this.input.default_value == pre.id) {
-                                this.defaultOption = pre.text;
+
+                    if (preoptions.response && preoptions.response.length > 0) {
+                        preoptions.response.forEach((pre) => {
+                            if (pre.id !== null && pre.text !== null) {
+                                optionsToSet.push({
+                                    id: pre.id,
+                                    name: this.input.format === 'DIMENSION' ? pre.value : pre.text,
+                                });
+                                if (this.input.default_value == pre.id) {
+                                    this.defaultOption = this.input.format === 'DIMENSION' ? pre.value : pre.text;
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+
                     this.optionsRemote = optionsToSet;
                 }
             }
@@ -445,7 +493,6 @@ export default {
             } 
         }, 400),
         addAllOptions() {
-
             if (this.optionsRemote.length > 0) {
                 const allOptions = [];
 
@@ -486,7 +533,31 @@ export default {
             searchEl ? searchEl.blur() : null;
 
             this.seleted ? this.selected : this.selectedOptions = [];
-        }
+        },
+        clean_filters_for_dimensions(filters, filterName, selected_value) {
+            const fields_as_object = this.$store.getters[`${this.state}/fields_as_object`];
+
+            const get_fields_by_selected_value = fields_as_object.filter((fis) => fis.show_by_field_value === selected_value);
+
+            filters.forEach((filter) => {
+                get_fields_by_selected_value.forEach((field)=> {
+                    if (field.id !== filter.column.id) {
+                        const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
+                        const column = contentInfo.content.columns.find(
+                            (col) => col.id === field.id
+                        );
+
+                        const filter = {
+                            column: column,
+                            id: `external-filter-${column.id}`,
+                        };
+
+                        this.$store.commit(`${this.state}/${filterName}`, filter);
+                    }
+                });
+            });
+        },
     },
 };
 </script>

@@ -236,6 +236,11 @@ export default {
                 const key = Object.keys(val);
                 Vue.set(state.field_show_hide, key, val[key]);
             }
+
+            if (!val) {
+                const key = Object.keys(val);
+                Vue.delete(state.field_show_hide, key);
+            }
         },
         BASE_URL(state, val) {
             state.base_url = val;
@@ -575,6 +580,28 @@ export default {
                     .then((response) => {
                         resolve({
                             response: response.data.content.content,
+                            success: true,
+                        });
+                    })
+                    .catch((error) => {
+                        resolve({
+                            response: null,
+                            success: false,
+                        });
+                    })
+                    .finally(() => {
+                        commit('LOADING', false);
+                    });
+            });
+        },
+        get_dimensions({ commit }, params) {
+            commit('LOADING', true);
+            return new Promise((resolve, reject) => {
+                axios
+                    .post(`/api/sheets/getDimensions`, params)
+                    .then((response) => {
+                        resolve({
+                            response: response.data.content,
                             success: true,
                         });
                     })
