@@ -40,6 +40,15 @@ export default {
         close() {
             const sidebar = this.$refs.sidebar;
             sidebar.style.display = 'none'
+
+            window.postMessage('message', {
+                type: 'shrink_modal_container',
+                params: [
+                    {
+                        close: true
+                    }
+                ],
+            })
             this.$emit('input', false)
         }
     }
