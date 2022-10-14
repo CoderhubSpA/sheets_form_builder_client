@@ -11,31 +11,31 @@
         :showDeleteButton="showDeleteBtn"
     >
 
-        <div class="row">
-            <div class="col">
-                <input
-                    type="file"
-                    class="custom-file-input"
-                    lang="es"
-                    :ref="dynamicRef"
-                    :id="id"
-                    :accept="accept"
-                    :disabled="disabled"
-                    @input="onInput"
-                    @change="onChange"
-                />
-            </div>
-            <div class="col" v-if="showDeleteBtn">
-                <button :disabled="disabled" class="btn btn-danger float-right" @click="onDeleteFile()">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </div>
-        </div>
-        <div class="row" v-if="input.default_value !== null">
-            <div class="col">
-                <p class="input-placeholder">Por defecto: {{ input.default_value }}</p>
-            </div>
-        </div>
+    <div class="input-group-prepend" v-if="previewLink">
+        <span class="input-group-text bg-white text-info" @click="onShowFile()">
+            <i class="fa fa-eye"></i>
+        </span>
+    </div>
+    <div class="custom-file">
+        <input type="file" class="custom-file-input"
+            :id="id"
+            :aria-describedby="id"
+            :disabled="disabled"
+            :accept="accept"
+            @input="onInput"
+            @change="onChange"
+            lang="es"
+            :ref="dynamicRef">
+        <label class="custom-file-label"
+            :for="id"
+            v-text="document_name || input.default_value || ''" />
+    </div>
+    <div class="input-group-append" v-if="showDeleteBtn">
+        <span class="input-group-text bg-danger text-light"  @click="onDeleteFile()" :disabled="disabled">
+            <i class="fa fa-trash"></i>
+        </span>
+    </div>
+    <div ref="preview"></div>
     </file-template>
 </template>
 
@@ -49,6 +49,29 @@ export default {
     mixins: [mix, mixFile],
     components: {
         'file-template': FileTemplate,
+    },
+    computed: {
+        previewLink() {
+            const fields = this.$store.getters[`${this.state}/fields`];
+
+            if (fields && fields.length > 0) {
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (val) {
+                    this.$emit('input', val);
+                    const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
+                    if (contentInfo) {
+                        const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
+                        const imgPre = entities.find((ent) => ent.id === val[this.id]);
+
+                        (imgPre && imgPre.src) ? this.showDeleteBtn = true : '';
+
+                        return (imgPre && imgPre.src) ? `${this.base_url}${imgPre.src}` : '';
+                    }
+                }
+            }
+            return null;
+        },
     },
     methods: {
         onChange(event) {

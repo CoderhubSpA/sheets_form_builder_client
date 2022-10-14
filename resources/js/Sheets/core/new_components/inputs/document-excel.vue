@@ -7,26 +7,31 @@
             :placeholder="document_name"
             :showDeleteButton="showDeleteBtn"
         >
-            <div class="row">
-                <div class="col">
-                    <input
-                        type="file"
-                        class="custom-file-input"
-                        :id="id"
-                        :accept="accept"
-                        lang="es"
-                        ref="inputFileRef"
-                        @change="onChange"
-                    />
-                </div>
-                <div class="col" v-if="showDeleteBtn">
-                    <button class="btn btn-danger float-right" @click="onDeleteFile()">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>
-            </div>
+        <div class="input-group-prepend" v-if="previewLink">
+            <span class="input-group-text bg-white text-info" @click="onShowFile()">
+                <i class="fa fa-eye"></i>
+            </span>
+        </div>
+        <div class="custom-file">
+            <input
+                type="file"
+                class="custom-file-input"
+                :id="id"
+                :accept="accept"
+                lang="es"
+                :ref="dynamicRef"
+                @change="onChange"
+            />
+            <label class="custom-file-label" :for="id" v-text="document_name" />
+        </div>
+        <div class="input-group-append" v-if="showDeleteBtn">
+            <span class="input-group-text bg-danger text-light"  @click="onDeleteFile()">
+                <i class="fa fa-trash"></i>
+            </span>
+        </div>
         </file-template>
-        <div class="form-group" v-if="can_select_sheets">
+        <div ref="preview"></div>
+        <!-- <div class="form-group" v-if="can_select_sheets">
             <label :for="id"> Página del Excel </label>
             <v-select
                 label="name"
@@ -41,7 +46,7 @@
             <div class="col">
                 <p class="input-placeholder">Por defecto: {{ input.default_value }}</p>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -66,6 +71,30 @@ export default {
         showDeleteBtn: false,
     }),
     computed: {
+        previewLink() {
+            const fields = this.$store.getters[`${this.state}/fields`];
+
+            if (fields && fields.length > 0) {
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (val) {
+                    /* const prevVal = {};
+                    prevVal[this.id] = val;
+                    this.$emit('input', prevVal); */
+
+                    this.$emit('input', val);
+                    const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
+                    if (contentInfo) {
+                        const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
+                        const imgPre = entities.find((ent) => ent.id === val[this.id]);
+
+                        (imgPre && imgPre.src) ? this.showDeleteBtn = true : '';
+                        return (imgPre && imgPre.src) ? `${this.base_url}${imgPre.src}` : '';
+                    }
+                }
+            }
+            return null;
+        },
         // @override
         accept() {
             return '.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,vnd.ms-excel';
@@ -146,6 +175,42 @@ export default {
         // this.readPreFile();
     },
     methods: {
+        onShowFile() {
+
+            if (process.env.MIX_SHOW_DOCUMENT_OUTSIDE_IFRAME === 'true') {
+                window.postMessage({
+                    type: 'show_document_visualizer',
+                    params: [
+                        {
+                            filename: this.document_name,
+                            src: this.previewLink
+                        }
+                    ],
+                })
+
+            } else {
+                window.postMessage({
+                    type: 'expand_modal_container',
+                    params: [
+                        {
+                            filename: this.document_name,
+                            src: this.previewLink
+                        }
+                    ],
+                })
+                const documentViewerClass = Vue.extend(DocumentViewer);
+                const instance = new documentViewerClass({
+                    propsData: {
+                        filename: this.document_name,
+                        src: this.previewLink,
+                        value: true
+                    }
+                });
+                instance.$mount();
+                this.$refs.preview.appendChild(instance.$el);
+            }
+
+        },
         readPreFile() {
             if (this.preFile) {
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];

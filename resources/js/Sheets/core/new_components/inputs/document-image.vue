@@ -10,32 +10,28 @@
         :showDeleteButton="showDeleteBtn"
         :placeholder="document_name"
     >
-        <div class="row">
-            <div class="col">
-                <input
-                    type="file"
-                    class="custom-file-input"
-                    :id="id"
-                    :accept="accept"
-                    lang="es"
-                    ref="inputFileRef"
-                    @input="onInput"
-                    @change="onChange"
-                />
-            </div>
-            <div class="col" v-if="showDeleteBtn">
-                <button class="btn btn-danger float-right" @click="onDeleteFile()">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="preview-container hide" id="preview-image-container">
-                    <img :src="preview" :class="`preview-image-${id}`" />
-                </div>
-            </div>
-        </div>
+    <div class="input-group-prepend" v-if="previewLink">
+        <span class="input-group-text bg-white text-info" @click="onShowFile()">
+            <i class="fa fa-eye"></i>
+        </span>
+    </div>
+    <div class="custom-file">
+        <input type="file" class="custom-file-input"
+            :id="id"
+            :aria-describedby="id"
+            :disabled="disabled"
+            :accept="accept"
+            @input="onInput"
+            @change="onChange"
+            :ref="dynamicRef">
+        <label class="custom-file-label" :for="id" v-text="document_name" />
+    </div>
+    <div class="input-group-append" v-if="showDeleteBtn">
+        <span class="input-group-text bg-danger text-light"  @click="onDeleteFile()">
+            <i class="fa fa-trash"></i>
+        </span>
+    </div>
+    <div ref="preview"></div>
     </file-template>
 </template>
 
@@ -43,7 +39,8 @@
 import FileTemplate from '../templates/file.vue';
 import mix from '../mixs/input.vue';
 import mixFile from '../mixs/files.vue';
-
+import DocumentViewer from '../utils/DocumentViewer.vue';
+import Vue from 'vue';
 export default {
     mixins: [mix, mixFile],
     components: {
@@ -92,29 +89,16 @@ export default {
         },
     },
     watch: {
-        previewLink(val) {
-            this.preview = val;
-            if (val) {
-                const container = document.getElementById('preview-image-container');
-                container.classList.remove('hide');
-                container.classList.add('show');
-            }
-        },
         value(val) {
             if (Object.keys(val).length === 0)
                 this.onDeleteFile()
         }
     },
-
     methods: {
         onChange(event) {
             this.showDeleteBtn = true;
             const f = event.target.files[0];
             this.document_name = f.name
-            const container = document.getElementById('preview-image-container');
-            this.preview = URL.createObjectURL(f);
-            container.classList.remove('hide');
-            container.classList.add('show');
             //
             const data = {
                 id: this.id,
@@ -129,6 +113,42 @@ export default {
                 this.$emit('input', validation);
             }
         },
+        onShowFile() {
+
+            if (process.env.MIX_SHOW_DOCUMENT_OUTSIDE_IFRAME === 'true') {
+                window.postMessage({
+                    type: 'show_document_visualizer',
+                    params: [
+                        {
+                            filename: this.document_name,
+                            src: this.previewLink
+                        }
+                    ],
+                })
+
+            } else {
+                window.postMessage({
+                    type: 'expand_modal_container',
+                    params: [
+                        {
+                            filename: this.document_name,
+                            src: this.previewLink
+                        }
+                    ],
+                })
+                const documentViewerClass = Vue.extend(DocumentViewer);
+                const instance = new documentViewerClass({
+                    propsData: {
+                        filename: this.document_name,
+                        src: this.previewLink,
+                        value: true
+                    }
+                });
+                instance.$mount();
+                this.$refs.preview.appendChild(instance.$el);
+            }
+
+        }
     },
 };
 </script>

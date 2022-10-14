@@ -21,7 +21,10 @@
                 </span>
             </div>
         </div>
-        <div class="custom-file">
+        <div class="input-group">
+            <slot />
+        </div>
+        <!-- <div class="custom-file">
             <slot />
             <label
                 class="custom-file-label"
@@ -30,7 +33,7 @@
             >
                 {{ placeholder }}
             </label>
-        </div>
+        </div> -->
     </div>
 </template>
 
