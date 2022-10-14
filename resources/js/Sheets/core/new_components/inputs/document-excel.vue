@@ -56,6 +56,8 @@ import ExcelJs from 'exceljs';
 import FileTemplate from '../templates/file.vue';
 import mix from '../mixs/input.vue';
 import mixFile from '../mixs/files.vue';
+import DocumentViewer from '../utils/DocumentViewer.vue';
+
 export default {
     mixins: [mix, mixFile],
     components: {
