@@ -18,6 +18,8 @@
                     format="DD/MM/YYYY"
                     placeholder="Desde DD/MM/YYY ~ Hasta DD/MM/YYY"
                     :disabled="disabled"
+                    :default-value="showDateAfterMonth()"
+                    :disabled-date="datesAvailableUntil"
                     @input="selectedDateRange"
                 ></date-picker>
             </div>
@@ -33,27 +35,48 @@
 <script>
 import DatePicker from 'vue2-datepicker';
 import FormGroup from '../templates/form-group.vue';
-import mix from '../mixs/range-date.vue';
+import mixDate from '../mixs/range.vue';
+import mixRangeDate from '../mixs/range-date.vue';
 import mixInput from '../mixs/input.vue';
 import moment from 'moment';
 
 export default {
-    mixins: [mixInput,mix],
+    mixins: [mixInput,mixDate, mixRangeDate],
     components: {
         'form-group': FormGroup,
         'date-picker': DatePicker
     },
     methods: {
-        selectedDateRange(val){
+        selectedDateRange (val) {
             if (val && val[0] && val[1]) {
                 this.rangeValue.start = moment(val[0]).format('YYYY-MM-DD');
-                this.rangeValue.end = moment(val[1]).format('YYYY-MM-DD');;
+                this.rangeValue.end = moment(val[1]).format('YYYY-MM-DD');
             } else {
                 this.rangeValue.start = null;
                 this.rangeValue.end = null;
             }
 
             this.handleInputData();
+        },
+        showDateAfterMonth () {
+            if (this.dateRangeBeforeMonth) {
+                return new Date().setMonth(this.getNewDateFormat(this.dateRangeBeforeMonth).getMonth() - 1);
+            }
+
+            return new Date();
+        },
+        datesAvailableUntil (date) {
+            if (this.dateRangeAvailableUntil) {
+                return date > this.getNewDateFormat(this.dateRangeAvailableUntil);
+            }
+
+            return date > new Date("3000, 01, 01");
+        },
+        getNewDateFormat (date) {
+            let splitDate = date.split("/");
+            splitDate = `${splitDate[2]}, ${splitDate[1]}, ${splitDate[0]}`;
+
+            return new Date(splitDate);
         }
     }
 };
