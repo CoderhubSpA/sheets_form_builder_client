@@ -4,26 +4,63 @@
         <h3 class="sheets-form-title">
             {{ form_title }}
         </h3>
-        <div class="sheets-rows sheets-form-scrolling">
-            <sheets-row
-                v-for="(row, key) in formRows"
-                :key="key"
-                :row="row"
-                :state="namespace"
-                :base_url="base_url"
-                v-model="formAnswer[key]"
-            />
-        </div>
-        <div class="row text-center sheets-actions-container">
-            <div class="col" v-for="(action, key) in formActions" :key="key">
-                <sheets-action
-                    :disabledaction="disabledAction"
-                    :action="action"
-                    :uploading="uploadingForm"
-                    @trigger="handlerAction"
-                ></sheets-action>
+        <div v-if="is_step_row === 'false'">
+            <div class="sheets-rows sheets-form-scrolling">
+                <sheets-row
+                    v-for="(row, key) in formRows"
+                    :key="key"
+                    :row="row"
+                    :state="namespace"
+                    :base_url="base_url"
+                    v-model="formAnswer[key]"
+                />
+            </div>
+            <div class="row text-center sheets-actions-container">
+                <div class="col" v-for="(action, key) in formActions" :key="key">
+                    <sheets-action
+                        :disabledaction="disabledAction"
+                        :action="action"
+                        :uploading="uploadingForm"
+                        @trigger="handlerAction"
+                    ></sheets-action>
+                </div>
             </div>
         </div>
+
+        <div v-if="is_step_row === 'true'">
+            <div class="sheets-rows sheets-form-scrolling">
+                <sheets-row-as-step
+                    :formRows="formRows"
+                    :state="namespace"
+                    :base_url="base_url"
+                    :is_strict="is_strict_step_row"
+                    v-model="formAnswer"
+                    v-on:show-actions="showActionsFromStep"
+                    v-on:sections-with-errors="sectionsWithErrors"
+                />
+            </div>
+            <div class="row text-center sheets-actions-container" v-if="is_strict_step_row === 'true' && show_actions_from_step">
+                <div class="col" v-for="(action, key) in formActions" :key="key">
+                    <sheets-action
+                        :disabledaction="disabledAction"
+                        :action="action"
+                        :uploading="uploadingForm"
+                        @trigger="handlerAction"
+                    ></sheets-action>
+                </div>
+            </div>
+            <div class="row text-center sheets-actions-container" v-if="is_strict_step_row === 'false'">
+                <div class="col" v-for="(action, key) in formActions" :key="key">
+                    <sheets-action
+                        :disabledaction="disabledAction"
+                        :action="action"
+                        :uploading="uploadingForm"
+                        @trigger="handlerAction"
+                    ></sheets-action>
+                </div>
+            </div>
+        </div>
+
         <!-- <sheets-loading :status="loading" /> -->
         <sheets-snackbar
             :message="snackbar.message"
@@ -44,6 +81,7 @@ import registerStore from './utils/reusabale-store';
 import FormBuilderResponseTest from '../../resources/formbuildertest.json';
 import FormBuilderEntityInfoTest from '../../resources/entityinfotest.json';
 import { v4 as uuidv4 } from 'uuid';
+import RowAsStep from './grid/row-as-step.vue';
 
 export default {
     name: 'sheets-form',
@@ -83,12 +121,21 @@ export default {
             type: String,
             default: '',
         },
+        is_step_row: {
+            type: String,
+            default: 'false',
+        },
+        is_strict_step_row: {
+            type: String,
+            default: 'false'
+        }
     },
     components: {
         // "sheets-loading": Loading,
         'sheets-row': Row,
         'sheets-action': Action,
         'sheets-snackbar': Snackbar,
+        'sheets-row-as-step': RowAsStep,
         LoadingMessage,
     },
     data: () => ({
@@ -105,7 +152,8 @@ export default {
         errorOnLoadFiles: false,
         uploadingForm: false,
         loadingForm: false,
-        CAN_SEE_EDIT: 2
+        CAN_SEE_EDIT: 2,
+        show_actions_from_step: false
     }),
     computed: {
         loading() {
@@ -144,14 +192,14 @@ export default {
         },
         form_loaded() {
             return this.$store.getters[`${this.namespace}/form_loaded`];
-        }
+        },
     },
     watch: {
         name(val) {
             this.$emit('name', val);
         },
         formAnswer() {
-            //   console.log(this.formAnswer);
+            
         },
         form_loaded(val) {
             if (val) {
@@ -321,7 +369,8 @@ export default {
                                     resultValidator[field.id] === null ||
                                     resultValidator[field.id] === '' ||
                                     resultValidator[field.id] === undefined ||
-                                    (Array.isArray(resultValidator[field.id]) && resultValidator[field.id].length === 0)
+                                    (Array.isArray(resultValidator[field.id]) &&
+                                        resultValidator[field.id].length === 0)
                                 ) {
                                     this.errorRequiredFields = true;
                                     const errorOnRequired = {
@@ -574,7 +623,7 @@ export default {
         async handlerAction(saveForm, action) {
             await this.validateAllFields();
 
-            if(action.refresh_form === 1 && !action.save_form) {
+            if (action.refresh_form === 1 && !action.save_form) {
                 this.resetForm();
 
                 return;
@@ -585,7 +634,11 @@ export default {
                     this.handlerFilterData();
                     return;
                 }
+
                 this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
+
+                this.$store.commit(`${this.namespace}/CLEAR_ERRORS_FIELDS`);
+
                 if (
                     action.id !== 'DEFAULT-ACTION' &&
                     action.id.indexOf('default') === -1 &&
@@ -650,14 +703,24 @@ export default {
                     if (Object.keys(fof)[0] === fis.id && fis.permission === permission) {
                         allowedFields.push(fof);
                     }
-                    // Allow Object.keys(fof)[0] form_id, form_fields,action_id 
-                    if(Object.keys(fof)[0] === 'form_id' || Object.keys(fof)[0] === 'form_fields' || Object.keys(fof)[0] === 'action_id') {
+                    // Allow Object.keys(fof)[0] form_id, form_fields,action_id
+                    if (
+                        Object.keys(fof)[0] === 'form_id' ||
+                        Object.keys(fof)[0] === 'form_fields' ||
+                        Object.keys(fof)[0] === 'action_id'
+                    ) {
                         allowedFields.push(fof);
                     }
                 });
             });
 
             return allowedFields;
+        },
+        showActionsFromStep (value) {
+            this.show_actions_from_step = value;
+        },
+        sectionsWithErrors(sections) {
+            this.formRows = sections;
         }
     },
 };
@@ -672,5 +735,4 @@ export default {
     border: 1px solid gray;
     margin-bottom: 5px;
 }
-
 </style>

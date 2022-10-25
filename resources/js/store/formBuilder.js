@@ -184,9 +184,6 @@ export default {
         DELETE_LAST_HISTORY(state) {
             state.history.pop();
         },
-        CLEARFIELDS(state, val) {
-            state.clearfields = val;
-        },
         FORM_ID(state, val) {
             state.form_id = val;
         },
@@ -198,6 +195,12 @@ export default {
         },
         CLEAR_ERROR_FIELD(state, keyfield) {
             state.errors_fields[keyfield] = '';
+        },
+        CLEAR_ERRORS_FIELDS(state) {
+            state.errors_fields = {};
+        },
+        CLEARFIELDS(state, val) {
+            state.clearfields = val;
         },
         DEFAULT_FORM(state, val) {
             state.default_form = val;

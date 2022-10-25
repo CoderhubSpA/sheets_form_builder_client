@@ -9,6 +9,8 @@
                 :base_url="base_url"
                 :is_test="form_test"
                 :params_actions="actions"
+                :is_step_row="is_step_row"
+                :is_strict_step_row="is_strict_step_row"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true" class="is-poll">
@@ -64,6 +66,14 @@ export default {
             type: String,
             default: '',
         },
+        is_step_row: {
+            type: String,
+            default: 'false'
+        },
+        is_strict_step_row: {
+            type: String,
+            default: 'false'
+        }
     },
 
     data: () => ({
