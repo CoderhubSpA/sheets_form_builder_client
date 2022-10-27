@@ -208,7 +208,6 @@ export default {
             licenseKey: 'non-commercial-and-evaluation',
         },
         hotTableLoaded: false,
-        optionsFilteredByEntityTypeFk: '',
         optionsFiltered: [],
         optionsFilteredEntitiesId: [],
         optionsFilteredPreviousIndex: null,
@@ -375,20 +374,34 @@ export default {
                                         label: value
                                     });
                                 }
-                            } else  if (column.column.col_fk_filter) {
-                                this.optionsFilteredByEntityTypeFk = column.column.entity_type_fk;
-
-                                selectOptions = () => {
-                                    let options = this.optionsFiltered || [];
-
-                                    if (options.length > 0) {
-                                        return options.map((option) => {
-                                            return {
-                                                value: option.id,
-                                                label: option.name
-                                            }
-                                        });
+                            } else if (column.column.col_fk_filter) {
+                                selectOptions = (row) => {
+                                    // Guardamos la columna por la cual se debe filtrar
+                                    const colFkFilter = column.column.col_fk_filter;
+                                    // Guardamos tipo de entidad foránea de donde tomar las opciones
+                                    const entityTypeFk = column.column.entity_type_fk
+                                    // Obtenemos la lista de entidades foráneas
+                                    let entitiesFk = this.entityInfo.entities_fk[entityTypeFk];
+                                    
+                                    // Solo podemos filtrar si tenemos la fila actual
+                                    if(row > -1) {
+                                        // Buscamos el id de la columna por la cual se debe filtrar
+                                        const colFkFilterId = this.entityInfo.columns.find((col) => col.col_name === colFkFilter)?.id;
+                                        // Obtenemos el valor de la columna por el cual filtrar
+                                        const hotDataAtRowProp = this.$refs.hotTableComponent.hotInstance.getDataAtRowProp(row, colFkFilterId);
+                                        // Filtramos las entidades foráneas por solo las que tengan el valor de la columna por la cual filtrar
+                                        entitiesFk = entitiesFk.filter((entity) => { return entity[colFkFilter] === hotDataAtRowProp});
                                     }
+
+                                    // Retornamos la lista de opciones
+                                    const options = entitiesFk.map((entity) => {
+                                        return {
+                                            value: entity.id,
+                                            label: entity[column.column.col_name_fk || 'name']
+                                        }
+                                    });
+                                    
+                                    return options;
                                 }
                             } else {
                                 options = this.entityInfo.entities_fk[column.column.entity_type_fk];
@@ -663,14 +676,6 @@ export default {
                             if (multipleFormats.indexOf(formatFinder.column.format) > -1) {
                                 dataToPush[key] = hotData[key].split(';');
                             } else {
-                                if (this.optionsFilteredByEntityTypeFk) {
-                                    const entities = this.entityInfo.entities_fk[this.optionsFilteredByEntityTypeFk];
-
-                                    entities.filter((entity) => {
-                                        return entity.area_id === hotData[key] ? this.optionsFiltered.push(entity) : null
-                                    })
-                                }
-
                                 dataToPush[key] = hotData[key];
                             }
                         } else {
