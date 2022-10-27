@@ -1,5 +1,5 @@
 <template>
-    <button :class="styles" @click="trigger" :disabled="disabledaction || uploading">
+    <button :class="styles" @click="trigger" :disabled="disabledaction || uploading || !mandatoryFieldsAccepted">
         <span
             :class="!uploading ? 'transparentcolor' : ''"
             class="spinner-border spinner-border-sm"
@@ -26,6 +26,17 @@ export default {
             type: Boolean,
             default: false,
         },
+        state: {
+            type: String,
+            require: true,
+        }
+    },
+    data: () => ({
+        mandatoryFields: [],
+        mandatoryFieldsAccepted: true
+    }),
+    mounted() {
+        this.findMandatoryFields();
     },
     computed: {
         name() {
@@ -39,6 +50,30 @@ export default {
             ];
             return styles.join(' ');
         },
+        selectorFilters () {
+            return this.$store.getters[`${this.state}/selectorfilters`];
+        }
+    },
+    watch: {
+        selectorFilters (val) {
+            if (val) {
+                let countMandatoryFieldsAccepted = 0;
+
+                this.mandatoryFields.forEach(field => {
+                    Object.keys(val).forEach((objKey) => {
+                        if (objKey === field.col_name && val[objKey] === "true") {
+                            countMandatoryFieldsAccepted++;
+                        }
+                    });
+                });
+
+                if(countMandatoryFieldsAccepted === this.mandatoryFields.length) {
+                    this.mandatoryFieldsAccepted = true;
+                } else {
+                    this.mandatoryFieldsAccepted = false;
+                }
+            }
+        }
     },
     methods: {
         trigger() {
@@ -48,6 +83,18 @@ export default {
                 } else {
                     this.$emit('trigger', false, this.action);
                 }
+            }
+        },
+        findMandatoryFields () {
+            let getMandatoryFields = this.$store.getters[`${this.state}/fields_as_object`];
+
+            getMandatoryFields = getMandatoryFields.filter((field) => {
+                return field.format === "CHECKBOX[MANDATORY]" && field.visible === 1 && field.permission === 2;
+            });
+
+            if(getMandatoryFields.length > 0 && this.action.id === "id-default-action-1") {
+                this.mandatoryFields = getMandatoryFields;
+                this.mandatoryFieldsAccepted = false;
             }
         },
     },

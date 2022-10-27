@@ -21,12 +21,12 @@
                         :disabledaction="disabledAction"
                         :action="action"
                         :uploading="uploadingForm"
+                        :state="namespace"
                         @trigger="handlerAction"
                     ></sheets-action>
                 </div>
             </div>
         </div>
-
         <div v-if="is_step_row === 'true'">
             <div class="sheets-rows sheets-form-scrolling">
                 <sheets-row-as-step
@@ -45,6 +45,7 @@
                         :disabledaction="disabledAction"
                         :action="action"
                         :uploading="uploadingForm"
+                        :state="namespace"
                         @trigger="handlerAction"
                     ></sheets-action>
                 </div>
@@ -55,6 +56,7 @@
                         :disabledaction="disabledAction"
                         :action="action"
                         :uploading="uploadingForm"
+                        :state="namespace"
                         @trigger="handlerAction"
                     ></sheets-action>
                 </div>
