@@ -41,6 +41,7 @@ export default {
         selectedOptions: [],
         options: [],
         urlrequest: '',
+        searchingNow: false
     }),
     computed: {
         multiple() {
@@ -453,12 +454,22 @@ export default {
                     this.optionsRemote = optionsToSet;
                 }
             }
+
             this.loading = false;
             this.cleanReadOnly();
+            this.searchingNow = false;
         },
         // eslint-disable-next-line prefer-arrow-callback
         filterByFuncDebounce: _.debounce(async function handleFilterBy(search) {
             this.cleanReadOnly();
+
+            if (this.searchingNow) {
+                this.$store.dispatch(`${this.state}/cancel_request`, { cancel_request: true });
+                this.searchingNow = false;
+            }
+
+            this.searchingNow = true;
+
             if (
                 this.input.options === null &&
                 this.input.entity_type_fk === null &&
@@ -490,8 +501,8 @@ export default {
                     searched_col: this.remotecolumn,
                 };
                 await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
-            } 
-        }, 400),
+            }
+        }, 1000),
         addAllOptions() {
             if (this.optionsRemote.length > 0) {
                 const allOptions = [];

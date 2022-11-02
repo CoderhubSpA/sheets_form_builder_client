@@ -337,7 +337,7 @@ export default {
                     this.selected = val;
                 }
 
-                if (Array.isArray(val) && val.length > 0 && !this.selected) {
+                if (this.multiple && Array.isArray(val) && val.length > 0) {
                     this.selected = val;
                 }
             },

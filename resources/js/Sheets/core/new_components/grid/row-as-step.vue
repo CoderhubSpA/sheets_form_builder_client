@@ -8,7 +8,7 @@
                     :id="row.id"
                     :class="[
                         { active: key === currentStep },
-                        { 'cursor-disabled': is_strict === 'true' },
+                        { 'cursor-disabled': is_strict === '2' },
                         { 'errors-fields': row.errorsFields },
                         'progress-number',
                     ]"
@@ -38,7 +38,7 @@
                     v-show="key === currentStep"
                     :class="[
                         { active: key === currentStep },
-                        { 'cursor-disabled': is_strict === 'true' },
+                        { 'cursor-disabled': is_strict === '2' },
                         'progress-item-mobile',
                     ]"
                 >
@@ -166,11 +166,11 @@ export default {
         },
         currentStep (val) {
             if (val ) {
-                if (val + 1 !== this.formRows.length && this.is_strict) {
+                if (val + 1 !== this.formRows.length && this.is_strict === '2') {
                     this.$emit('show-actions', false);
                 }
 
-                if (val + 1 === this.formRows.length && this.is_strict) {
+                if (val + 1 === this.formRows.length && this.is_strict === '2') {
                     this.$emit('show-actions', true);
                 }
             }
@@ -178,7 +178,7 @@ export default {
     },
     methods: {
         clickInProgressNumber(key) {
-            if (this.is_strict !== 'true') {
+            if (this.is_strict !== '2') {
                 this.currentStep = key;
             }
         },

@@ -4,7 +4,7 @@
         <h3 class="sheets-form-title">
             {{ form_title }}
         </h3>
-        <div v-if="is_step_row === 'false'">
+        <div v-if="is_step_row === '0' || is_step_row === null">
             <div class="sheets-rows sheets-form-scrolling">
                 <sheets-row
                     v-for="(row, key) in formRows"
@@ -27,19 +27,19 @@
                 </div>
             </div>
         </div>
-        <div v-if="is_step_row === 'true'">
+        <div v-if="is_step_row === '1' || is_step_row === '2'">
             <div class="sheets-rows sheets-form-scrolling">
                 <sheets-row-as-step
                     :formRows="formRows"
                     :state="namespace"
                     :base_url="base_url"
-                    :is_strict="is_strict_step_row"
+                    :is_strict="is_step_row"
                     v-model="formAnswer"
                     v-on:show-actions="showActionsFromStep"
                     v-on:sections-with-errors="sectionsWithErrors"
                 />
             </div>
-            <div class="row text-center sheets-actions-container" v-if="is_strict_step_row === 'true' && show_actions_from_step">
+            <div class="row text-center sheets-actions-container" v-if="is_step_row === '2' && show_actions_from_step">
                 <div class="col" v-for="(action, key) in formActions" :key="key">
                     <sheets-action
                         :disabledaction="disabledAction"
@@ -50,7 +50,7 @@
                     ></sheets-action>
                 </div>
             </div>
-            <div class="row text-center sheets-actions-container" v-if="is_strict_step_row === 'false'">
+            <div class="row text-center sheets-actions-container" v-if="is_step_row === '1'">
                 <div class="col" v-for="(action, key) in formActions" :key="key">
                     <sheets-action
                         :disabledaction="disabledAction"
@@ -126,10 +126,6 @@ export default {
         is_step_row: {
             type: String,
             default: 'false',
-        },
-        is_strict_step_row: {
-            type: String,
-            default: 'false'
         }
     },
     components: {

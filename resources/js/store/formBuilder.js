@@ -18,6 +18,8 @@ const DEFAULT_ACTION = {
     text_color: null,
 };
 
+let abort_request;
+
 export default {
     namespaced: true,
     state: () => ({
@@ -576,10 +578,13 @@ export default {
             params = params.toString().replace(/,\s*$/, '');
             params = JSON.parse(params);
 
+            abort_request = new AbortController()
+            const signal = abort_request.signal;
+
             commit('LOADING', true);
             return new Promise((resolve, reject) => {
                 axios
-                    .post(`/api/sheets/getfilters`, params)
+                    .post(`/api/sheets/getfilters`, params, { signal: signal })
                     .then((response) => {
                         resolve({
                             response: response.data.content.content,
@@ -728,6 +733,13 @@ export default {
         },
         remote_filters_clear({ commit }, val) {
             commit('REMOTE_FILTERS_CLEAR', val);
-        }
+        },
+        cancel_request({}, data) {
+            if (data.cancel_request) {
+                if (abort_request) {
+                    abort_request.abort();
+                }
+            }
+        },
     },
 };

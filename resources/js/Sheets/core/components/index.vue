@@ -10,7 +10,6 @@
                 :is_test="form_test"
                 :params_actions="actions"
                 :is_step_row="is_step_row"
-                :is_strict_step_row="is_strict_step_row"
             ></sheets-form>
         </div>
         <div v-if="isPoll === true" class="is-poll">
@@ -66,19 +65,12 @@ export default {
             type: String,
             default: '',
         },
-        is_step_row: {
-            type: String,
-            default: 'false'
-        },
-        is_strict_step_row: {
-            type: String,
-            default: 'false'
-        }
     },
 
     data: () => ({
         loading: false,
         isPoll: undefined,
+        is_step_row: null,
     }),
     mounted() {
         this.loading = true;
@@ -91,6 +83,7 @@ export default {
                 })
                 .then((response) => {
                     this.loading = false;
+
                     switch (response.type) {
                         case 'poll':
                             this.isPoll = true;
@@ -107,6 +100,11 @@ export default {
 
                         default:
                             this.isPoll = false;
+
+                            if (response.fullResponse.data.content.is_step) {
+                                this.is_step_row = response.fullResponse.data.content.is_step
+                            }
+
                             this.$store
                                 .dispatch('form/load_form', response.fullResponse.data)
                                 .then(() => {
