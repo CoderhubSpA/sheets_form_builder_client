@@ -89,10 +89,10 @@ export default {
             let getMandatoryFields = this.$store.getters[`${this.state}/fields_as_object`];
 
             getMandatoryFields = getMandatoryFields.filter((field) => {
-                return field.format === "CHECKBOX[MANDATORY]" && field.visible === 1 && field.permission === 2;
+                return field.format === "CHECKBOX[MANDATORY]" && field.permission === 2 && (field.visible === undefined || field.visible === 1);
             });
 
-            if(getMandatoryFields.length > 0 && this.action.id === "id-default-action-1") {
+            if(getMandatoryFields.length > 0 && this.action.save_form === 1) {
                 this.mandatoryFields = getMandatoryFields;
                 this.mandatoryFieldsAccepted = false;
             }

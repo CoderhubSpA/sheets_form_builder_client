@@ -60,23 +60,22 @@ export default {
         },
         showDateAfterMonth () {
             if (this.dateRangeBeforeMonth) {
-                return new Date().setMonth(this.getNewDateFormat(this.dateRangeBeforeMonth).getMonth() - 1);
+                return new Date().setMonth(this.getNewDate(this.dateRangeBeforeMonth).getMonth() - 1);
             }
 
-            return new Date();
+            return new Date().setMonth(new Date().getMonth() - 1);
         },
         datesAvailableUntil (date) {
             if (this.dateRangeAvailableUntil) {
-                return date > this.getNewDateFormat(this.dateRangeAvailableUntil);
+                return date > this.getNewDate(this.dateRangeAvailableUntil);
             }
 
-            return date > new Date("3000, 01, 01");
+            return date > new Date();
         },
-        getNewDateFormat (date) {
-            let splitDate = date.split("/");
-            splitDate = `${splitDate[2]}, ${splitDate[1]}, ${splitDate[0]}`;
+        getNewDate (date) {
+            const formatedDate = moment(date, "DD-MM-YYYY");
 
-            return new Date(splitDate);
+            return new Date(`${formatedDate.format('YYYY')}, ${formatedDate.format('M')}, ${formatedDate.format('D')}`);
         }
     }
 };
