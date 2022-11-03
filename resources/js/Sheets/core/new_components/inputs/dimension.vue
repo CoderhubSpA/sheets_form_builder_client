@@ -5,6 +5,7 @@
         :value="value"
         :state="state"
         :base_url="base_url"
+        v-on:input="emitData"
     ></selector-remote>
 </template>
 
@@ -16,6 +17,11 @@ export default {
     mixins: [mix],
     components: {
         'selector-remote': SelectorRemote,
+    },
+    methods: {
+        emitData(data) {
+            this.$emit('input', data);
+        }
     }
 };
 </script>
