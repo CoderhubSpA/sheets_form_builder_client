@@ -46,9 +46,9 @@ export default {
             const styles = [
                 'btn',
                 'btn-block',
-                this.action.save_form === 1 ? 'btn-success' :
-                this.action.cancel_form === 1 ? 'btn-warning' :
-                this.action.refresh_form === 1 || this.action.close_form === 1 ? 'btn-secondary' : 'btn-info'
+                this.action.refresh_form === 1 ||
+                this.action.close_form === 1 ||
+                this.action.cancel_form === 1 ? 'btn-secondary' : 'btn-success'
             ];
 
             return styles.join(' ');
