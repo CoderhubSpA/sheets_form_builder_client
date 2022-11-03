@@ -1,4 +1,9 @@
 import Handsontable from 'handsontable';
+import FormBuilder from '../form';
+import GenericModal from '../utils/GenericModal';
+import FormBuilderStore from '../../../../store/formBuilder';
+import Vue from 'vue';
+import Vuex from 'vuex';
 
 export function clpRenderer(instance, td, row, col, prop, value, cellProperties) {
     const span = document.createElement('SPAN');
@@ -133,3 +138,98 @@ export function customTextRenderer(instance, td, row, col, prop, value, cellProp
 
     return td;
 }
+
+function getEntityFk(entities_fk, entity_fk_id, id) {
+    let entity = {};
+    let entity_arr = entities_fk[entity_fk_id] || [];
+    try {
+        entity = entity_arr.filter((e) => e.id == id).shift();
+    } catch (e) {
+        console.warn(e);
+    }
+
+    return entity;
+}
+function getEscaped(entity_fk, name_fk) {
+    let value = undefined;
+    try {
+        if (entity_fk) {
+            value = Handsontable.helper.stringify(entity_fk[name_fk]);
+            value = value.replaceAll("\n", "<br>");
+        }
+    } catch (e) {
+        console.warn(e);
+    }
+
+    return value;
+}
+export function customRenderFormButton(instance, td, row, column, prop, value, cellProperties) {
+    const main = cellProperties.main;
+    const result = cellProperties.entityInfo.columns.find(c => c.col_name === main.col_name_fk)
+    const col_id = !!result ? result.id : null;
+
+    if (!col_id) {
+        td.innerHTML = '???'
+        td.height = 22;
+        return ;
+    }
+
+    const entity_id = instance.getDataAtCell(row, col_id);
+    const entities_fk = cellProperties.entityInfo.entities_fk;
+    const entity_fk = cellProperties.main.entity_type_id;
+    const entity = entities_fk.entity_type.find(e => e.id == entity_fk);
+
+    if (entity) {
+        Handsontable.dom.empty(td);
+
+        const span = document.createElement('span')
+        span.classList.add(['w-100','btn','btn-custom-white'])
+        span.innerHTML = entity.name || '???';
+
+        td.appendChild(span)
+        td.classList.add('htCenter');
+        td.classList.add('htMiddle');
+        td.classList.add('custom-hot-oneclick-trigger');
+        // td.classList.add('custom-hot-select');
+
+        span.addEventListener('click', () => {
+            const container = document.getElementById('modal-container')
+            const divModal = document.createElement('div')
+            divModal.id = `ref-${value}`
+            container.appendChild(divModal);
+
+            const form_id = value;
+            const record_id = instance.getDataAtCell(row, col_id);
+
+            const GenericModalClass = Vue.extend(GenericModal);
+            const genericModal = new GenericModalClass({
+                propsData: {
+                    show: true,
+                }
+            });
+            genericModal.$on('show', (val) => {
+                if (!val) {
+                    const el = document.getElementById(`ref-${value}`);
+                    el.remove();
+                }
+            })
+            const FormBuilderClass = Vue.extend(FormBuilder);
+
+            const formBuilderInstance = new FormBuilderClass({
+                propsData: {
+                    entityId: form_id,
+                    record_id: record_id,
+                    // is_nested: true
+                },
+                store: FormBuilderStore
+            });
+            formBuilderInstance.$mount()
+            genericModal.$mount();
+            genericModal.$refs.content.appendChild(formBuilderInstance.$el);
+            divModal.appendChild(genericModal.$el)
+        })
+    }
+    td.height = 22;
+}
+
+

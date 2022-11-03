@@ -69,6 +69,8 @@
             v-model="snackbar.show"
             :type="snackbar.success"
         />
+        <!-- div contenedor para modal -->
+        <div id="modal-container"></div>
     </div>
 </template>
 

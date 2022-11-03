@@ -1,4 +1,3 @@
-use GuzzleHttp\Promise\Promise;
 <script>
 /* eslint-disable camelcase */
 import Handsontable from 'handsontable';
@@ -10,9 +9,13 @@ import {
     customSelectRenderer,
     customMultiSelectRenderer,
     customTextRenderer,
+    customRenderFormButton
 } from '../handsontableCustom/renderers';
 import 'handsontable-multi-select/dist/css/handsontable-multi-select.css';
 import 'handsontable/dist/handsontable.full.css';
+import Vue from 'vue';
+import FormBuilder from '../form';
+import GenericModal from '../utils/GenericModal';
 
 export default {
     props: {
@@ -498,6 +501,83 @@ export default {
                                 licenseKey: 'non-commercial-and-evaluation',
                             };
                             columnToPush.readOnly = column.readonly || this.input.permission === 1;
+                            break;
+                        case 'FORM':
+                            // const colNameToId = {};
+                            columnToPush.main = { ...column.column };
+                            columnToPush.entityInfo = { ...this.entityInfo }
+                            // columnToPush.main = this;
+                            columnToPush.data = column.id;
+
+                            columnToPush.name = column.name;
+                            columnToPush.renderer = (instance, td, row, column, prop, value, cellProperties) => {
+                                const main = cellProperties.main;
+                                const result = cellProperties.entityInfo.columns.find(c => c.col_name === main.col_name_fk)
+                                const col_id = !!result ? result.id : null;
+
+                                if (!col_id) {
+                                    td.innerHTML = '???'
+                                    td.height = 22;
+                                    return ;
+                                }
+
+                                const entity_id = instance.getDataAtCell(row, col_id);
+                                const entities_fk = cellProperties.entityInfo.entities_fk;
+                                const entity_fk = cellProperties.main.entity_type_id;
+                                const entity = entities_fk.entity_type.find(e => e.id == entity_fk);
+
+                                if (entity) {
+                                    Handsontable.dom.empty(td);
+
+                                    const span = document.createElement('span')
+                                    span.classList.add(['w-100','btn','btn-custom-white'])
+                                    span.innerHTML = entity.name || '???';
+
+                                    td.appendChild(span)
+                                    td.classList.add('htCenter');
+                                    td.classList.add('htMiddle');
+                                    td.classList.add('custom-hot-oneclick-trigger');
+                                    // td.classList.add('custom-hot-select');
+
+                                    span.addEventListener('click', () => {
+                                        const container = document.getElementById('modal-container')
+                                        const divModal = document.createElement('div')
+                                        divModal.id = `ref-${value}`
+                                        container.appendChild(divModal);
+
+                                        const form_id = value;
+                                        const record_id = instance.getDataAtCell(row, col_id);
+
+                                        const GenericModalClass = Vue.extend(GenericModal);
+                                        const genericModal = new GenericModalClass({
+                                            propsData: {
+                                                show: true,
+                                            }
+                                        });
+                                        genericModal.$on('show', (val) => {
+                                            if (!val) {
+                                                const el = document.getElementById(`ref-${value}`);
+                                                el.remove();
+                                            }
+                                        })
+                                        const FormBuilderClass = Vue.extend(FormBuilder);
+                                        const store = this.$store;
+                                        const formBuilderInstance = new FormBuilderClass({
+                                            propsData: {
+                                                entityId: form_id,
+                                                record_id: record_id,
+                                                // is_nested: true
+                                            },
+                                            store
+                                        });
+                                        formBuilderInstance.$mount()
+                                        genericModal.$mount();
+                                        genericModal.$refs.content.appendChild(formBuilderInstance.$el);
+                                        divModal.appendChild(genericModal.$el)
+                                    })
+                                }
+                                td.height = 22;
+                            }
                             break;
                         default:
                             columnToPush.data = column.id;
