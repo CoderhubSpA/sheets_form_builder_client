@@ -621,6 +621,15 @@ export default {
         async handlerAction(saveForm, action) {
             await this.validateAllFields();
 
+            if (action.close_form === 1) {
+                this.action = action;
+
+                this.window.parent.postMessage({
+                    "type": "close_form",
+                    "params": []
+                }, '*');
+            }
+
             if (action.refresh_form === 1 && !action.save_form) {
                 this.resetForm();
 

@@ -46,8 +46,11 @@ export default {
             const styles = [
                 'btn',
                 'btn-block',
-                this.action.cancel_form == 1 ? 'btn-warning' : (this.action.refresh_form === 1 && this.action.save_form === null) ? 'btn-secondary' : 'btn-success',
+                this.action.save_form === 1 ? 'btn-success' :
+                this.action.cancel_form === 1 ? 'btn-warning' :
+                this.action.refresh_form === 1 || this.action.close_form === 1 ? 'btn-secondary' : 'btn-info'
             ];
+
             return styles.join(' ');
         },
         selectorFilters () {
