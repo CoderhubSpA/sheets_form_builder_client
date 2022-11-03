@@ -23,7 +23,7 @@
                         </span>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-sm" @click="addRow">&plus;</button>
+                <button class="btn btn-primary btn-sm" @click="addRow" :disabled="disableAddRow">&plus;</button>
             </div>
         </div>
         <div class="row" v-if="hotTableLoaded">

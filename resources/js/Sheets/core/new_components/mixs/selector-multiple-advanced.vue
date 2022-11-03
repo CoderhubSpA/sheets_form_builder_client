@@ -165,30 +165,6 @@ export default {
                 columns: [0, 1],
                 indicators: false,
             },
-            contextMenu: {
-                items: {
-                    remove_row: {
-                        name: 'Eliminar fila',
-                    },
-                },
-            },
-            beforeOnCellContextMenu(event, coords) {
-                if (coords.row === -1) {
-                    this.updateSettings({
-                        contextMenu: false,
-                    });
-                } else {
-                    this.updateSettings({
-                        contextMenu: {
-                            items: {
-                                remove_row: {
-                                    name: 'Eliminar fila',
-                                },
-                            },
-                        },
-                    });
-                }
-            },
             afterOnCellMouseUp(event, coords, TD) {
                 if (
                     TD.classList.contains('custom-hot-oneclick-trigger') &&
@@ -198,23 +174,21 @@ export default {
                     this.getActiveEditor().setValue(this.getInstance().getValue());
                 }
             },
-            /* afterOnCellMouseOver(event, coords, TD){
-                if(TD.classList.contains('custom-hot-select')){
-                    this.selectCell(coords.row, coords.col);
-                    this.getActiveEditor().setValue(this.getInstance().getValue());
-                    this.getActiveEditor().beginEditing();
-                }
-            }, */
             licenseKey: 'non-commercial-and-evaluation',
         },
         hotTableLoaded: false,
         optionsFiltered: [],
         optionsFilteredEntitiesId: [],
         optionsFilteredPreviousIndex: null,
-        mainLabel: ""
+        mainLabel: "",
+        disableAddRow: false
     }),
     mounted() {
         this.getEntityInfo();
+
+        if (this.input.permission === 1) {
+            this.disableAddRow = true;
+        }
     },
     methods: {
         getEntityInfo() {
@@ -342,17 +316,17 @@ export default {
                             columnToPush.data = column.id;
                             columnToPush.type = 'numeric';
                             columnToPush.renderer = clpRenderer;
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             break;
                         case 'NUMBER':
                             columnToPush.data = column.id;
                             columnToPush.type = 'numeric';
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             break;
                         case 'TEXT':
                             columnToPush.data = column.id;
                             columnToPush.type = 'text';
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             columnToPush.isRequired = column.isRequired;
                             columnToPush.renderer = customTextRenderer;
                             break;
@@ -421,7 +395,7 @@ export default {
                             columnToPush.editor = KeyValueSelect;
                             columnToPush.renderer = customSelectRenderer;
                             columnToPush.selectOptions = selectOptions;
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             columnToPush.isRequired = column.isRequired;
 
                             break;
@@ -456,7 +430,7 @@ export default {
                                 columnId: column.column.id,
                             };
                             columnToPush.selectOptions = selectOptions;
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             columnToPush.isRequired = column.isRequired;
                             break;
                         case 'SELECTOR[1XN][AVAILABLES]':
@@ -490,13 +464,13 @@ export default {
                                 columnId: column.column.id,
                             };
                             columnToPush.selectOptions = selectOptions;
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             columnToPush.isRequired = column.isRequired;
                             break;
                         case 'SiNo':
                             columnToPush.data = column.id;
                             columnToPush.type = 'checkbox';
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             break;
                         case 'DATE':
                             columnToPush.data = column.id;
@@ -510,7 +484,7 @@ export default {
                                 numberOfMonths: 3,
                                 licenseKey: 'non-commercial-and-evaluation',
                             };
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             break;
                         case 'DATETIME':
                             columnToPush.data = column.id;
@@ -523,12 +497,12 @@ export default {
                                 numberOfMonths: 3,
                                 licenseKey: 'non-commercial-and-evaluation',
                             };
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             break;
                         default:
                             columnToPush.data = column.id;
                             columnToPush.type = 'text';
-                            columnToPush.readOnly = column.readonly;
+                            columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             break;
                     }
                 }
@@ -612,11 +586,23 @@ export default {
                     this.deleteOptionsSeleted(index);
                 });
 
-                /* this.$refs.hotTableComponent.hotInstance.addHook('afterOnCellMouseOver', (event, coords, TD) => {
-                    if(coords.row !== -1) {
-                        console.log(coords)
+                this.$refs.hotTableComponent.hotInstance.addHook('beforeOnCellContextMenu', (event, coords) => {
+                    if (coords.row === -1 || this.input.permission === 1) {
+                    this.$refs.hotTableComponent.hotInstance.updateSettings({
+                        contextMenu: false,
+                    });
+                    } else {
+                        this.$refs.hotTableComponent.hotInstance.updateSettings({
+                            contextMenu: {
+                                items: {
+                                    remove_row: {
+                                        name: 'Eliminar fila',
+                                    },
+                                },
+                            },
+                        });
                     }
-                }); */
+                });
 
                 this.$store.commit(`${this.state}/LOADING`, false);
 
