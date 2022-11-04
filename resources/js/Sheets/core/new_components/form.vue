@@ -623,7 +623,7 @@ export default {
         async handlerAction(saveForm, action) {
             await this.validateAllFields();
 
-            if (action.close_form === 1) {
+            if (action.close_form === 1 && !action.save_form) {
                 this.action = action;
 
                 this.window.parent.postMessage({
