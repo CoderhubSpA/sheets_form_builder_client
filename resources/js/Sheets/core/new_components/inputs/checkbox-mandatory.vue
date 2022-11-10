@@ -1,5 +1,11 @@
 <template>
-    <sino :input="input" :value="value" :state="state" :base_url="base_url" />
+    <sino
+        :input="input"
+        :value="value"
+        :state="state"
+        :base_url="base_url"
+        v-on:input="emitData"
+    />
 </template>
 
 <script>
@@ -11,6 +17,11 @@ export default {
     components: {
         sino: sino,
     },
+    methods: {
+        emitData(data) {
+            this.$emit('input', data);
+        }
+    }
 };
 </script>
 
