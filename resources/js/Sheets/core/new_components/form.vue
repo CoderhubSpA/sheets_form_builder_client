@@ -372,6 +372,20 @@ export default {
                                     (Array.isArray(resultValidator[field.id]) &&
                                         resultValidator[field.id].length === 0)
                                 ) {
+                                    if(this.verifyIfFieldIsVisibleNow(field.id)) {
+                                        this.errorRequiredFields = true;
+                                        const errorOnRequired = {
+                                            key: field.id,
+                                            value: `El campo ${field.name} es requerido`,
+                                        };
+                                        await this.$store.commit(
+                                            `${this.namespace}/ERRORS_FIELD`,
+                                            errorOnRequired
+                                        );
+                                    }
+                                }
+                            } else {
+                                if (this.verifyIfFieldIsVisibleNow(field.id)) {
                                     this.errorRequiredFields = true;
                                     const errorOnRequired = {
                                         key: field.id,
@@ -382,16 +396,6 @@ export default {
                                         errorOnRequired
                                     );
                                 }
-                            } else {
-                                this.errorRequiredFields = true;
-                                const errorOnRequired = {
-                                    key: field.id,
-                                    value: `El campo ${field.name} es requerido`,
-                                };
-                                await this.$store.commit(
-                                    `${this.namespace}/ERRORS_FIELD`,
-                                    errorOnRequired
-                                );
                             }
                         }
                     });
@@ -638,12 +642,12 @@ export default {
                 return;
             }
 
-            if (this.errorRequiredFields === false && this.errorsOnSMA === false) {
-                if (this.form_type === 'filter') {
-                    this.handlerFilterData();
-                    return;
-                }
+            if (this.form_type === 'filter' && !this.errorRequiredFields) {
+                this.handlerFilterData();
+                return;
+            }
 
+            if (this.errorRequiredFields === false && this.errorsOnSMA === false) {
                 this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
 
                 this.$store.commit(`${this.namespace}/CLEAR_ERRORS_FIELDS`);
@@ -730,6 +734,27 @@ export default {
         },
         sectionsWithErrors(sections) {
             this.formRows = sections;
+        },
+        verifyIfFieldIsVisibleNow(field_id) {
+            const field_show_hide = this.$store.getters[`${this.namespace}/field_show_hide`];
+            const fields_as_object = this.$store.getters[`${this.namespace}/fields_as_object`].filter((fso) => {
+                return fso.id === field_id;
+            });
+            let showFieldNow = false;
+
+            fields_as_object.forEach((fao) => {
+                Object.values(field_show_hide).forEach((value) => {
+                    if (fao.show_by_field_value === value) {
+                        showFieldNow = true;
+                    }
+                });
+
+                if (!fao.show_by_field_value && fao.required === 1) {
+                    showFieldNow = true;
+                }
+            });
+
+            return showFieldNow;
         }
     },
 };
