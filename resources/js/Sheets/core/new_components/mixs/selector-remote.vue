@@ -45,7 +45,7 @@ export default {
     }),
     computed: {
         multiple() {
-            const isMultiple = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]';
+            const isMultiple = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' || this.input.format === 'DIMENSION[MULTIPLE]';
 
             return isMultiple;
         },
@@ -151,6 +151,16 @@ export default {
         }
     },
     watch: {
+        optionsByColFilter() {
+            if(this.optionsByColFilter.length > 0){
+                this.setSelectedFromOptions(this.optionsByColFilter)
+            }
+        },
+        options(optionsValue) {
+            if(optionsValue.length > 0) {
+                this.setSelectedFromOptions(this.options)
+            }
+        },
         /**
          * cuando una opcion es seleccionada
          * emite un @input para completar el vmodel
@@ -160,22 +170,22 @@ export default {
         selected(val) {
             if (val) {
                 const data = {};
-                
+
                 if (this.multiple) {
                     data[this.id] = val.map((v) => v.id);
                 } else {
                     data[this.id] = val.id;
                 }
-                
+
                 // eslint-disable-next-line prefer-object-spread
                 this.selectorvmodelsample = Object.assign({}, data);
-                
+
                 const contentInfo = this.$store.getters[`${this.state}/content_info`];
-                
+
                 const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
-                
+
                 let selectedValue = '';
-                
+
                 if (val !== null) {
                     if (!this.multiple) {
                         selectedValue = val.id;
@@ -188,6 +198,7 @@ export default {
                 switch(this.input.format) {
                     case 'SELECTOR[REMOTE][MULTIPLE]':
                     case 'SELECTOR[REMOTE][MULTIPLE][ALL]':
+                    case 'DIMENSION[MULTIPLE]':
                         type = "IN";
                         break;
                     case 'SELECTOR[METRIC]':
@@ -209,14 +220,14 @@ export default {
 
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
                 this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
-                
+
                 this.$emit('input', data);
                 /**
                  * mostrar/ocultar section
                  */
                 // eslint-disable-next-line camelcase
                 const field_section_show_hide = {};
-                
+
                 field_section_show_hide[this.form_field_id] = data[this.id];
 
                 this.$store.commit(
@@ -302,6 +313,11 @@ export default {
         this.cleanReadOnly();
     },
     methods: {
+        setSelectedFromOptions(options){
+            const fields = this.$store.getters[`${this.state}/fields`];
+            const optionId = fields.find(field => field[this.id] !== undefined)?.[this.id];
+            this.selected = options.find(option => option.id === optionId);
+        },
         getOptions() {
             this.loading = true;
 
@@ -380,7 +396,7 @@ export default {
 
         deselectedMultipleOption() {
             this.getOptions();
-            
+
             this.$emit('input', {});
         },
 
@@ -423,7 +439,7 @@ export default {
 
                 let preoptions = null;
 
-                if (this.input.format === 'DIMENSION') {
+                if (this.input.format === 'DIMENSION' || this.input.format === 'DIMENSION[MULTIPLE]') {
                     const params = {
                         show_by_field_value: this.input.show_by_field_value,
                         col_name: this.input.col_name
@@ -442,10 +458,10 @@ export default {
                             if (pre.id !== null && pre.text !== null) {
                                 optionsToSet.push({
                                     id: pre.id,
-                                    name: this.input.format === 'DIMENSION' ? pre.value : pre.text,
+                                    name: (this.input.format === 'DIMENSION' || this.input.format === 'DIMENSION[MULTIPLE]') ? pre.value : pre.text,
                                 });
                                 if (this.input.default_value == pre.id) {
-                                    this.defaultOption = this.input.format === 'DIMENSION' ? pre.value : pre.text;
+                                    this.defaultOption = (this.input.format === 'DIMENSION' || this.input.format === 'DIMENSION[MULTIPLE]') ? pre.value : pre.text;
                                 }
                             }
                         });

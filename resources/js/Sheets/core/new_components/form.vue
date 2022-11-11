@@ -4,7 +4,7 @@
         <h3 class="sheets-form-title">
             {{ form_title }}
         </h3>
-        <div v-if="is_step_row != '1' && is_step_row != '2'">
+        <div v-if="is_step_row != '1' && is_step_row != '2'" class="is-step-row">
             <div class="sheets-rows sheets-form-scrolling">
                 <sheets-row
                     v-for="(row, key) in formRows"
@@ -27,7 +27,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="is_step_row == '1' || is_step_row == '2'">
+        <div v-if="is_step_row == '1' || is_step_row == '2'" class="is-step-row">
             <div class="sheets-rows sheets-form-scrolling">
                 <sheets-row-as-step
                     :formRows="formRows"
