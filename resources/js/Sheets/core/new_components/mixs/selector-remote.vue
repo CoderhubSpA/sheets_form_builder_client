@@ -331,9 +331,9 @@ export default {
                 this.remotecolumn = column;
                 const type = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' ? 'IN' : 'EQUAL';
                 let selectedValue = '';
-                if (this.selected !== null) {
+                 if (this.selected && typeof this.selected === 'object') {
                     if (!this.multiple) {
-                        selectedValue = this.selected.id;
+                        selectedValue = this.selected?.id || '';
                     } else {
                         selectedValue = this.selected.length > 0 ? this.selected.map((v) => v.id) : '';
                     }
