@@ -37,7 +37,7 @@
                 </template>
             </v-select>
             <nested-form
-                v-if="has_entity_type_permission_fk"
+                v-if="has_permissions_for_create"
                 :entity_type_permission_fk="entity_type_permission_fk"
                 :state="state"
                 :openForm="openNested"

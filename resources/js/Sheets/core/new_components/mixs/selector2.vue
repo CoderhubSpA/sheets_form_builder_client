@@ -30,7 +30,8 @@ export default {
         defaultOption: null,
         optionsFiltered: [],
         openNested: false,
-        recordId: ''
+        recordId: '',
+        has_permissions_for_create: false
     }),
     computed: {
         /**
@@ -155,9 +156,6 @@ export default {
          * Condicion para mostrar el btn +
          * y permitir la apertura de un nuevo form
          */
-        has_entity_type_permission_fk() {
-            return !!this.input.entity_type_permission_fk;
-        },
         entity_type_permission_fk() {
             return this.input.entity_type_permission_fk;
         },
@@ -205,6 +203,9 @@ export default {
             }
 
             return result;
+        },
+        entity_permissions() {
+            return this.$store.getters[`${this.state}/entity_permissions`];
         }
     },
     watch: {
@@ -398,6 +399,18 @@ export default {
                 this.optionsFiltered = optionsFil;
             }
         },
+        entity_permissions(val) {
+            if (val) {
+                val.forEach((permission) => {
+                    if (permission.create == "1" && permission.entity_type_id == this.input.entity_type_permission_fk) {
+                        this.has_permissions_for_create = true;
+                    }
+                })
+            }
+        }
+    },
+    mounted() {
+        this.getPermissionsForCreate();
     },
     methods: {
         createdOption(id) {
@@ -423,7 +436,12 @@ export default {
 
             this.recordId = id;
             this.openNested = !this.openNested;
-        }
+        },
+        async getPermissionsForCreate () {
+            if (this.input.entity_type_permission_fk) {
+               await this.$store.dispatch(`${this.state}/get_entity_permissions`, this.input.entity_type_permission_fk);
+            }
+        },
     },
 };
 </script>

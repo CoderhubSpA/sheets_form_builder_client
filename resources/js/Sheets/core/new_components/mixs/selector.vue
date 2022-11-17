@@ -121,13 +121,6 @@ export default {
         searchable() {
             return window.outerWidth > 1024;
         },
-        /**
-         * Condicion para mostrar el btn +
-         * y permitir la apertura de un nuevo form
-         */
-        has_entity_type_permission_fk() {
-            return !!this.input.entity_type_permission_fk;
-        },
         entity_type_permission_fk() {
             return this.input.entity_type_permission_fk;
         },

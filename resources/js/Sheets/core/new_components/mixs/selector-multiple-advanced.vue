@@ -643,6 +643,18 @@ export default {
                 });
             });
 
+            data.sort((a, b) => {
+                if (a.order > b.order) {
+                    return 1;
+                }
+
+                if (b.order > a.order) {
+                    return -1;
+                }
+
+                return 0;
+            });
+
             this.handsontableData = data;
             // En caso de que la llegada de la data fue tardía y ya el componente se renderizó
             // cargar la data mediante el método loadData.

@@ -61,10 +61,23 @@ export default {
                 if (field) {
                     const key = Object.keys(field)[0];
                     const search = this.multiple ? JSON.parse(field[key]) : field[key];
+
+                    if (this.options.length === 0) {
+                        this.getOptions();
+                    }
+
                     if (this.multiple && !!search) {
                         result = Object.entries(search).map((s) =>
-                            this.options.find((o) => o.id == s[1])
+                            this.options.find((o) => {
+                                return o.id == s[1]
+                            })
                         );
+
+                        if (result.length === 0) {
+                            result = this.options.filter((o) => {
+                                return o.id == search
+                            });
+                        }
                     } else if (!this.multiple && !!search) {
                         result = this.options.find((o) => o.id == search);
                     }
@@ -77,13 +90,6 @@ export default {
          */
         clear() {
             return this.$store.getters[`${this.state}/clearfields`];
-        },
-        /**
-         * Condicion para mostrar el btn +
-         * y permitir la apertura de un nuevo form
-         */
-        has_entity_type_permission_fk() {
-            return !!this.input.entity_type_permission_fk;
         },
         entity_type_permission_fk() {
             return this.input.entity_type_permission_fk;
@@ -161,6 +167,12 @@ export default {
                 this.setSelectedFromOptions(this.options)
             }
         },
+         optionsRemote (val) {
+            if (val.length > 0) {
+                this.setSelectedFromOptions(this.optionsRemote)
+            }
+        },
+
         /**
          * cuando una opcion es seleccionada
          * emite un @input para completar el vmodel

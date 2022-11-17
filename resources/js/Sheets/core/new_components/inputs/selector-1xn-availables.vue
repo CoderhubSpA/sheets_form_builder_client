@@ -25,7 +25,7 @@
         >
         </v-select>
         <nested-form
-            v-if="has_entity_type_permission_fk"
+            v-if="has_permissions_for_create"
             :entity_type_permission_fk="entity_type_permission_fk"
             :state="state"
             @inserted="createdOption"
@@ -87,9 +87,6 @@ export default {
         },
         multiple() {
             return true;
-        },
-        has_entity_type_permission_fk() {
-            return !!this.input.entity_type_permission_fk;
         },
         entity_type_permission_fk() {
             return this.input.entity_type_permission_fk;

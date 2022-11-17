@@ -57,7 +57,8 @@ export default {
         selector_remote_filter: [],
         url_selector_remote: {},
         uuid: null,
-        fields_as_object: []
+        fields_as_object: [],
+        entityPermissions: null
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -116,6 +117,7 @@ export default {
         url_selector_remote: (state) => state.url_selector_remote,
         uuid: (state) => state.uuid,
         fields_as_object: (state) => state.fields_as_object,
+        entity_permissions: (state) => state.entityPermissions,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -356,6 +358,9 @@ export default {
         },
         FIELDS_AS_OBJECT(state, val) {
             val.forEach(v => state.fields_as_object.push(v));
+        },
+        ENTITY_PERMISSIONS(state, val) {
+            state.entityPermissions = val;
         },
     },
     actions: {
@@ -631,6 +636,7 @@ export default {
                     .get(`/api/sheets/entity/info/${id}`)
                     .then((response) => {
                         commit('CONTENT_INFO', response.data.content);
+                        return response.data.content;
                     })
                     .catch((error) => {
                         // eslint-disable-next-line no-console
@@ -739,6 +745,24 @@ export default {
                 if (abort_request) {
                     abort_request.abort();
                 }
+            }
+        },
+        async get_entity_permissions({ commit }, id) {
+            if (id) {
+                commit('LOADING', true);
+                await axios
+                    .get(`/api/sheets/entity/info/${id}`)
+                    .then((response) => {
+                        commit('ENTITY_PERMISSIONS', response.data.content.content.entity_type_permission);
+                    })
+                    .catch((error) => {
+                        // eslint-disable-next-line no-console
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        commit('FORM_LOADED', true);
+                        commit('LOADING', false);
+                    });
             }
         },
     },
