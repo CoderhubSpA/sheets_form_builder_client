@@ -483,7 +483,8 @@ export default {
                 }
             }
 
-            this.loading = false;
+            if (!this.searchingNow) this.loading = false;
+
             this.cleanReadOnly();
             this.searchingNow = false;
         },
@@ -528,6 +529,7 @@ export default {
                     active_filters: filters,
                     searched_col: this.remotecolumn,
                 };
+
                 await this.getNewOptions(encodeURIComponent(JSON.stringify(mainfilter)));
             }
         }, 1000),

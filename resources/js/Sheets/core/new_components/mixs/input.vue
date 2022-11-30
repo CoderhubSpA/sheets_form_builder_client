@@ -162,7 +162,7 @@ export default {
             const formatWithMaxLength = Object.keys(this.maxlengths);
             let valueParsed;
             if (formatWithMaxLength.indexOf(this.input.format) > -1) {
-                valueParsed = e.target.value.substring(0, this.maxlengths[this.input.format]);
+                valueParsed = e.target.value.toString().substring(0, this.maxlengths[this.input.format]);
             } else if (this.input.format === 'TEXT[AREA]') {
                 valueParsed = e.target.value.substring(0, 1000);
             } else {
