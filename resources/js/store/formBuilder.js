@@ -254,6 +254,7 @@ export default {
         },
         ACTIVE_FILTERS(state, val) {
             if (val.remote) {
+                // Construye item de filtro activo
                 const item = {
                     column: val.column,
                     id: `external-filter-${val.column.id}`,
@@ -261,36 +262,54 @@ export default {
                     search: val.search,
                     type: val.type,
                 };
+                // Busca si el item ya existe en el array de filtros activos
                 const preitem = state.active_filter.find((it) => it.id === item.id);
+                // Si el valor del filtro es diferente de vacio, null o undefined
                 if (val.search !== '' && val.search !== null && val.search !== undefined) {
+                    // Si el item ya existe en el array de filtros activos
                     if (preitem) {
+                        // Busca el indice del item en el array de filtros activos
                         const preindex = state.active_filter.indexOf(preitem);
+                        // Reemplaza el item en el array de filtros activos
                         state.active_filter[preindex] = item;
                     } else {
+                        // Si no existe el item en el array de filtros activos
+                        // Agrega el item al array de filtros activos
                         state.active_filter.push(item);
                     }
                 } else {
+                    // Si el valor del filtro es vacio, null o undefined
+                    // Y si el item ya existe en el array de filtros activos
                     if (preitem) {
+                        // Busca el indice del item en el array de filtros activos
                         const preindex = state.active_filter.indexOf(preitem);
+                        // Si lo encuentra
                         if (preindex > -1) {
+                            // Elimina el item del array de filtros activos
                             state.active_filter.splice(preindex, 1);
                         }
                     }
                 }
+                // Reordena los filtros activos
                 state.active_filter.forEach((it, key) => {
                     it.order = key + 1;
                 });
+                // Construye el objeto de filtros activos
+                // con solo los filtros que tienen valor (no vacios)
                 const mainfilter = {
                     active_filters: state.active_filter.filter((f) => f.value !== ''),
                     searched_col: val.column,
                 };
+                // Codifica el objeto de filtros activos en formato JSON
                 const url = `${encodeURIComponent(JSON.stringify(mainfilter))}`;
+                
+                // Comienza a construir el objeto de filtros activos a enviar al servidor
                 Vue.set(state.url_selector_remote, val.column.id, url);
                 Object.keys(state.url_selector_remote).forEach((key) => {
                     // Obtenemos la columna del filtro desde el entity_info
                     const column = state.contentInfo.content.columns.find((col) => col.id === key);
-
-                    // Obtenmos el filtro actual (si es que se ha filtrado)
+                    // Obtenemos el filtro actual (si es que se ha filtrado)
+                    // TO DO: Deberia ser un find()
                     const filter = _.first(
                         (_.cloneDeep(state.active_filter) || []).filter(
                             (af) => af.column.id == column.id

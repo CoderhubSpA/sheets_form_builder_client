@@ -227,7 +227,7 @@ export default {
                     order: 1,
                     search: selectedValue,
                     type,
-                    remote: this.input.options === null && this.input.entity_type_fk === null
+                    remote: true
                 };
 
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
@@ -356,7 +356,7 @@ export default {
                     order: 1,
                     search: selectedValue,
                     type,
-                    remote: this.input.options === null && this.input.entity_type_fk === null,
+                    remote: true
                 };
                 this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
                 this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
