@@ -31,7 +31,8 @@ export default {
         optionsFiltered: [],
         openNested: false,
         recordId: '',
-        has_permissions_for_create: false
+        has_permissions_for_create: false,
+        deselectedOptions: []
     }),
     computed: {
         /**
@@ -339,7 +340,22 @@ export default {
                 }
 
                 if (this.multiple && Array.isArray(val) && val.length > 0) {
-                    this.selected = val;
+                    if(this.deselectedOptions.length > 0) {
+                        val.forEach((value) => {
+                            let existOption = false;
+
+                            this.deselectedOptions.forEach((option) => {
+                                if (value.id === option.id) {
+                                    existOption = true
+                                }
+                            })
+
+                            if (!existOption) this.selected = val;
+                        })
+
+                    } else {
+                        this.selected = val
+                    }
                 }
             },
             /**
@@ -441,6 +457,9 @@ export default {
             if (this.input.entity_type_permission_fk) {
                await this.$store.dispatch(`${this.state}/get_entity_permissions`, this.input.entity_type_permission_fk);
             }
+        },
+        deselected(val) {
+            this.deselectedOptions.push(val);
         },
     },
 };

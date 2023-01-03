@@ -114,6 +114,10 @@
                         <p class="mb-0">Sin datos.</p>
                     </div>
                 </template>
+                <template #selected-option="{ name }">
+                    <span v-if="name.length > 25">{{ name.slice(0, 25) }}...</span>
+                    <span v-if="name.length < 25">{{ name }}</span>
+                </template>
             </v-select>
             <div class="row" v-if="this.defaultOption !== null">
                 <div class="col">

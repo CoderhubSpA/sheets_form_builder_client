@@ -67,19 +67,9 @@ export default {
         NestedForm,
     },
     mixins: [mix, mixSelector],
-    data: () => ({
-        selected: [],
-    }),
     computed: {
         multiple() {
             return true;
-        },
-    },
-    methods: {
-        deselected(val) {
-            const item = this.selected.find((option) => option.id === val.id);
-            const index = this.selected.indexOf(item);
-            this.selected.splice(index, 1);
         },
     },
 };
