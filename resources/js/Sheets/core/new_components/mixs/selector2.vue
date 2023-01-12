@@ -433,6 +433,10 @@ export default {
             const optionToSelect = this.options.find((option) => option.id === id);
 
             if (this.multiple) {
+                if (!this.selected) {
+                    this.selected = [];
+                }
+
                 const ifExistOption = this.selected.find((option) => option.id === id);
 
                 if (ifExistOption)
