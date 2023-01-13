@@ -341,20 +341,15 @@ export default {
 
                 if (this.multiple && Array.isArray(val) && val.length > 0) {
                     if(this.deselectedOptions.length > 0) {
-                        val.forEach((value) => {
-                            let existOption = false;
+                        this.deselectedOptions.forEach((option) => {
+                            let findOption = val.find(value => value.id === option.id);
 
-                            this.deselectedOptions.forEach((option) => {
-                                if (value.id === option.id) {
-                                    existOption = true
-                                }
-                            })
-
-                            if (!existOption) this.selected = val;
+                            if (findOption) {
+                                return;
+                            }
                         })
-
                     } else {
-                        this.selected = val
+                        this.selected = val;
                     }
                 }
             },
