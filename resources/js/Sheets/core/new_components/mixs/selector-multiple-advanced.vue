@@ -181,8 +181,6 @@ export default {
         },
         hotTableLoaded: false,
         optionsFiltered: [],
-        optionsFilteredEntitiesId: [],
-        optionsFilteredPreviousIndex: null,
         mainLabel: "",
         disableAddRow: false
     }),
@@ -694,6 +692,31 @@ export default {
                             },
                         });
                     }
+                });
+
+                this.$refs.hotTableComponent.hotInstance.addHook("afterChange", (changes) => {
+                    const [[row, prop, oldVal, newVal]] = changes;
+                    const currentRow = row;
+                    
+                    if(currentRow < 0) return;
+                    
+                    const findColName = this.columnsIds.find((column) => column.column.id === prop)?.column?.col_name;
+                    this.columnsIds.map((column) => {
+                        if (column.column.col_fk_filter === findColName) {
+                            const colIndex = this.$refs.hotTableComponent.hotInstance.propToCol(column.column.id);
+
+                            setTimeout(() => {
+                                this.$refs.hotTableComponent.hotInstance.selectCell(currentRow, colIndex);
+
+                                let activeEditor = this.$refs.hotTableComponent.hotInstance.getActiveEditor();
+
+                                activeEditor.beginEditing();
+                                activeEditor.enableFullEditMode();
+                                activeEditor.finishEditing();
+                            }, 100);
+
+                        }
+                    });
                 });
 
                 this.$store.commit(`${this.state}/LOADING`, false);
