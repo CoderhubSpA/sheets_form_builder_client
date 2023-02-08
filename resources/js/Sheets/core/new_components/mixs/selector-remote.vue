@@ -328,7 +328,9 @@ export default {
         setSelectedFromOptions(options){
             const fields = this.$store.getters[`${this.state}/fields`];
             const optionId = fields.find(field => field[this.id] !== undefined)?.[this.id];
-            this.selected = options.find(option => option.id === optionId);
+            if (!this.selected && optionId) {
+                this.selected = options.find(option => option.id === optionId);
+            }
         },
         getOptions() {
             this.loading = true;
