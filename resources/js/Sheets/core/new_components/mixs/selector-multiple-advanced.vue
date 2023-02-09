@@ -357,7 +357,7 @@ export default {
                                     const entityTypeFk = column.column.entity_type_fk
                                     // Obtenemos la lista de entidades foráneas
                                     let entitiesFk = this.entityInfo.entities_fk[entityTypeFk];
-                                    
+
                                     // Solo podemos filtrar si tenemos la fila actual
                                     if(row > -1) {
                                         // Buscamos el id de la columna por la cual se debe filtrar
@@ -375,7 +375,7 @@ export default {
                                             label: entity[column.column.col_name_fk || 'name']
                                         }
                                     });
-                                    
+
                                     return options;
                                 }
                             } else {
@@ -510,19 +510,18 @@ export default {
                             columnToPush.name = column.name;
                             columnToPush.renderer = (instance, td, row, column, prop, value, cellProperties) => {
                                 const main = cellProperties.main;
+                                const form_id = value;
                                 const result = cellProperties.entityInfo.columns.find(c => c.col_name === main.col_name_fk)
                                 const col_id = !!result ? result.id : null;
 
                                 if (!col_id) {
-                                    td.innerHTML = '???'
-                                    td.height = 22;
-                                    return ;
+                                    console.warn('col_id not Found🥲')
                                 }
 
                                 const entity_id = instance.getDataAtCell(row, col_id);
                                 const entities_fk = cellProperties.entityInfo.entities_fk;
                                 const entity_fk = cellProperties.main.entity_type_id;
-                                const entity = entities_fk.entity_type.find(e => e.id == entity_fk);
+                                const entity = entities_fk[main.entity_type_fk].find(e => e.id == form_id);
 
                                 if (entity) {
                                     Handsontable.dom.empty(td);
@@ -540,10 +539,9 @@ export default {
                                     span.addEventListener('click', () => {
                                         const container = document.getElementById('modal-container')
                                         const divModal = document.createElement('div')
-                                        divModal.id = `ref-${value}`
+                                        divModal.id = `ref-${form_id}`
                                         container.appendChild(divModal);
 
-                                        const form_id = value;
                                         const record_id = instance.getDataAtCell(row, col_id);
 
                                         const GenericModalClass = Vue.extend(GenericModal);
@@ -697,9 +695,9 @@ export default {
                 this.$refs.hotTableComponent.hotInstance.addHook("afterChange", (changes) => {
                     const [[row, prop, oldVal, newVal]] = changes;
                     const currentRow = row;
-                    
+
                     if(currentRow < 0) return;
-                    
+
                     const findColName = this.columnsIds.find((column) => column.column.id === prop)?.column?.col_name;
                     this.columnsIds.map((column) => {
                         if (column.column.col_fk_filter === findColName) {
