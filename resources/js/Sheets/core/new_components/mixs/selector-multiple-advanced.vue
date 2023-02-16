@@ -693,6 +693,8 @@ export default {
                 });
 
                 this.$refs.hotTableComponent.hotInstance.addHook("afterChange", (changes) => {
+                    if(!changes) return;
+
                     const [[row, prop, oldVal, newVal]] = changes;
                     const currentRow = row;
 
