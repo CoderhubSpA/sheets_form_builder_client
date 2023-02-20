@@ -533,6 +533,7 @@ export default {
                                     td.appendChild(span)
                                     td.classList.add('htCenter');
                                     td.classList.add('htMiddle');
+                                    td.classList.add('form-trigger')
                                     td.classList.add('custom-hot-oneclick-trigger');
                                     // td.classList.add('custom-hot-select');
 
@@ -814,6 +815,11 @@ export default {
 };
 </script>
 <style>
+.form-trigger {
+    cursor: pointer;
+    border: 2px solid #ccc !important;
+    font-weight: 600;
+}
 .min-height-150 {
     min-height: 350px;
 }
