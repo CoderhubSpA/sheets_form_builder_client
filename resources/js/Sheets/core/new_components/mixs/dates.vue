@@ -19,6 +19,13 @@ export default {
         // VERIFICACIÓN DEL MODEL PARA LOS TEST
         vmodelcurrentvalue: {},
     }),
+    mounted(){
+        if(this.input.assign_default_value === 1 && this.input.default_value) {
+            this.picker = moment(this.input.default_value).toDate();
+            this.onInput(this.picker);
+
+        }
+    },
     computed: {
         dateFormat() {
             return this.input.format === 'DATE' ? 'DD/MM/YYYY' : 'DD/MM/YYYY HH:mm';

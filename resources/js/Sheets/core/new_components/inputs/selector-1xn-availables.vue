@@ -83,6 +83,10 @@ export default {
                 this.selected = result;
             }
 
+            if(result.length === 0 && this.input.assign_default_value === 1) {
+                this.selected = this.options.find((o) => o.id == this.input.default_value);
+            }
+
             return result;
         },
         multiple() {

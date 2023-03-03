@@ -78,6 +78,8 @@ export default {
                     this.onInput(e);
 
                     return result[this.id];
+                } else if(this.input.assign_default_value == 1) {
+                    return this.input.default_value;
                 } else {
                     return "";
                 }
