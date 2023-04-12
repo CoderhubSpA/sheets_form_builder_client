@@ -41,7 +41,8 @@ export default {
         selectedOptions: [],
         options: [],
         urlrequest: '',
-        searchingNow: false
+        searchingNow: false,
+        applyDefaultValue: false
     }),
     computed: {
         multiple() {
@@ -154,6 +155,11 @@ export default {
                 }
             }
 
+            if(options.length > 0 && this.input.assign_default_value == 1 && !this.applyDefaultValue) {
+                this.applyDefaultValue = true;
+                this.setDefaultValue(options);
+            }
+
             return options;
         }
     },
@@ -229,10 +235,6 @@ export default {
     },
     mounted() {
         this.cleanReadOnly();
-
-        if(this.optionsByColFilter.length > 0 && this.input.assign_default_value == 1) {
-            this.setDefaultValue(this.optionsByColFilter);
-        }
     },
     methods: {
         setSelectedFromOptions(options) {
@@ -519,10 +521,6 @@ export default {
                 });
 
                 if(optionByDefault) {
-                    document.getElementById(this.input.id).value = {
-                        [this.input.id]: optionByDefault.id
-                    }
-
                     this.selected = optionByDefault;
                 }
             }
