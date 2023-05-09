@@ -395,12 +395,10 @@ export default {
                             // Se convierte el array de opciones en un objeto para
                             // que el editor de "select" de Handsontable pueda leerlo
                             if(Array.isArray(selectOptions)) {
-                                console.log(selectOptions)
                                 selectOptions = selectOptions.reduce((acc, option) => {
                                     acc[option.value] = option.label;
                                     return acc;
                                 }, {});
-                                console.log(selectOptions)
                             }
                             columnToPush.selectOptions = selectOptions;
                             columnToPush.readOnly = column.readonly || this.input.permission === 1;
