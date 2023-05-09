@@ -1,7 +1,6 @@
 <script>
 /* eslint-disable camelcase */
 import Handsontable from 'handsontable';
-import { KeyValueSelect } from 'handsontable-key-value-select';
 import CustomMultiSelectEditor from '../handsontableCustom/customMultiSelectEditor';
 import {
     clpRenderer,
@@ -369,12 +368,10 @@ export default {
                                     }
 
                                     // Retornamos la lista de opciones
-                                    const options = entitiesFk.map((entity) => {
-                                        return {
-                                            value: entity.id,
-                                            label: entity[column.column.col_name_fk || 'name']
-                                        }
-                                    });
+                                    const options = entitiesFk.reduce((acc,entity) => {
+                                        acc[entity.id] = entity[column.column.col_name_fk || 'name'];
+                                        return acc;
+                                    }, {});
 
                                     return options;
                                 }
@@ -393,8 +390,18 @@ export default {
                             }
 
                             columnToPush.data = column.id;
-                            columnToPush.editor = KeyValueSelect;
+                            columnToPush.editor = 'select';
                             columnToPush.renderer = customSelectRenderer;
+                            // Se convierte el array de opciones en un objeto para
+                            // que el editor de "select" de Handsontable pueda leerlo
+                            if(Array.isArray(selectOptions)) {
+                                console.log(selectOptions)
+                                selectOptions = selectOptions.reduce((acc, option) => {
+                                    acc[option.value] = option.label;
+                                    return acc;
+                                }, {});
+                                console.log(selectOptions)
+                            }
                             columnToPush.selectOptions = selectOptions;
                             columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             columnToPush.isRequired = column.isRequired;
