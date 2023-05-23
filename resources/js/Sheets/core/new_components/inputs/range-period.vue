@@ -14,6 +14,7 @@
                 <vue-monthly-picker
                     :selectedBackgroundColor="errorInput ? 'red' : ''"
                     :id="`${id}-start`"
+                    :disabled="disabled"
                     placeHolder="Valor inicial"
                     v-model="dateStart"
                     @selected="selectedStart"
@@ -24,6 +25,7 @@
                 <vue-monthly-picker
                     :selectedBackgroundColor="errorInput ? 'red' : ''"
                     :id="`${id}-end`"
+                     :disabled="disabled"
                     placeHolder="Valor final"
                     v-model="dateEnd"
                     @selected="selectedEnd"

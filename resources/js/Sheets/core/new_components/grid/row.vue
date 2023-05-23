@@ -70,11 +70,9 @@ export default {
 
 <style lang="scss">
 .sheets-row {
-    border: 1px solid blue;
-    padding: 2px;
-
     .sheets-row-title {
-        color: rgb(10, 10, 94);
+        color: inherit;
+        font-size: 26px;
     }
 }
 </style>

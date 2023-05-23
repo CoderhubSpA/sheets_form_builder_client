@@ -1,5 +1,6 @@
 <template>
     <input-group
+        :character="'№'"
         :label="label"
         :required="required"
         :linkTarget="link_target"

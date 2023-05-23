@@ -12,16 +12,17 @@
     >
 
     <div class="input-group-prepend" v-if="previewLink">
-        <span class="input-group-text bg-white text-info" @click="onShowFile()">
-            <i class="fa fa-eye"></i>
-        </span>
+        <button class="btn btn-outline-info bg-info text-light rounded-left" type="button" id="inputGroupFileAddon04" @click="onShowFile()" :disabled="disabled">
+            <i class="fa fa-eye fa-lg"></i>
+        </button>
     </div>
     <div class="custom-file">
-        <input type="file" class="custom-file-input"
+        <input type="file"
             :id="id"
             :aria-describedby="id"
             :disabled="disabled"
             :accept="accept"
+            :class="[{'form-control': disabled }, 'custom-file-input']"
             @input="onInput"
             @change="onChange"
             lang="es"
@@ -31,9 +32,9 @@
             v-text="document_name || input.default_value || ''" />
     </div>
     <div class="input-group-append" v-if="showDeleteBtn">
-        <span class="input-group-text bg-danger text-light"  @click="onDeleteFile()" :disabled="disabled">
-            <i class="fa fa-trash"></i>
-        </span>
+        <button class="btn btn-outline-danger bg-danger text-light rounded-right" type="button" id="inputGroupFileAddon04" @click="onDeleteFile()" :disabled="disabled">
+            <i class="fa fa-trash fa-lg"></i>
+        </button>
     </div>
     <div ref="preview"></div>
     </file-template>

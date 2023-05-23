@@ -110,7 +110,7 @@ export default {
                         options.push({ id: objKey, name: opt[objKey] });
                     });
                 }
-                if (this.input.default_value) {
+                if (this.input.default_value || this.input.default_value === 0) {
                     options.forEach((opt) => {
                         if (this.input.default_value == opt.id) {
                             this.defaultOption = opt.name;

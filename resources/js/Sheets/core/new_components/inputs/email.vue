@@ -16,6 +16,7 @@
             :id="id"
             :value="inputValue"
             :placeholder="defaultValue"
+            :disabled="disabled"
             @input="onInput"
         />
     </form-group>

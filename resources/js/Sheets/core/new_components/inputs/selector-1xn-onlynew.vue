@@ -22,6 +22,7 @@
                 :no-drop="true"
                 :multiple="multiple"
                 :ref="'ref-' + id"
+                :disabled="disabled"
                 v-model="selected"
                 @option:deselected="deselected"
             >
