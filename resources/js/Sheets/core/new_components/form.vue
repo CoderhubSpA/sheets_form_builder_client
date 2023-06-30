@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="form-border">
         <loading-message :status="loadingForm"></loading-message>
         <h3 class="sheets-form-title">
             {{ form_title }}
@@ -193,13 +193,16 @@ export default {
         form_loaded() {
             return this.$store.getters[`${this.namespace}/form_loaded`];
         },
+        customMessages() {
+            return this.$store.getters[`${this.namespace}/customMessages`];
+        }
     },
     watch: {
         name(val) {
             this.$emit('name', val);
         },
         formAnswer() {
-
+            
         },
         form_loaded(val) {
             if (val) {
@@ -530,10 +533,11 @@ export default {
                         .dispatch(action, form)
                         .then((response) => {
                             this.uploadingForm = false;
+
                             this.snackbar = {
                                 success: response.success,
                                 show: true,
-                                message: response.content.message,
+                                message: this.customMessages.success ? this.customMessages.success : response.content.message
                             };
 
                             if (response.success) {
@@ -766,7 +770,6 @@ export default {
 }
 
 .sheets-form-title {
-    border: 1px solid gray;
     margin-bottom: 5px;
 }
 </style>

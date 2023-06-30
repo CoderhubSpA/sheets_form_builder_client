@@ -1,5 +1,5 @@
 <template>
-    <div :class="{hide}">
+    <div>
         <selector-remote
             :input="input"
             :value="value"

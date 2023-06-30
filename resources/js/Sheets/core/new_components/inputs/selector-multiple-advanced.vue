@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid" :id="`sma-${id}`" :class="{ 'sma-not-visible': !show_field, 'hide': hide}">
+    <div class="container-fluid" :id="`sma-${id}`" :class="!show_field ? 'sma-not-visible' : ''">
         <div class="row p-1 mb-2">
             <div class="col-12">
                 <div class="row">

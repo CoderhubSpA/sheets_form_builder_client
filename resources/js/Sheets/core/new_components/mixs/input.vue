@@ -45,9 +45,6 @@ export default {
         disabled() {
             return this.input.permission === 1;
         },
-        hide() {
-            return this.input.permission == 0;
-        },
         readonly() {
             return this.input.readonly;
         },
@@ -81,6 +78,8 @@ export default {
                     this.onInput(e);
 
                     return result[this.id];
+                } else if(this.input.assign_default_value == 1) {
+                    return this.input.default_value;
                 } else {
                     return "";
                 }
@@ -166,8 +165,6 @@ export default {
             let valueParsed;
             if (formatWithMaxLength.indexOf(this.input.format) > -1) {
                 valueParsed = e.target.value.toString().substring(0, this.maxlengths[this.input.format]);
-            } else if (this.input.format === 'TEXT[AREA]') {
-                valueParsed = e.target.value.substring(0, 1000);
             } else {
                 valueParsed = e.target.value;
             }

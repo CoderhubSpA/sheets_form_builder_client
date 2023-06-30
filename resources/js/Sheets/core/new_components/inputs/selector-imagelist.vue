@@ -6,7 +6,6 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
-        :class="{hide}"
     >
         <div class="container-fluid sheets-select-image">
             <div class="row">

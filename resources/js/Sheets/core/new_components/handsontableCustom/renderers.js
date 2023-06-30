@@ -30,10 +30,10 @@ export function customSelectRenderer(instance, td, row, col, prop, value, cellPr
     if (value !== null && value !== undefined && value !== '') {
         let options = (typeof cellProperties.selectOptions == "function") ? cellProperties.selectOptions() : cellProperties.selectOptions;
 
-        const selected = options.find((opt) => opt.value == value);
+        const selected = options[value];
 
         span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>${
-            selected ? selected.label : ""
+            selected ? selected : ""
         }`;
     } else {
         span.innerHTML = `<div class="htAutocompleteArrow">&#9660;</div>`;

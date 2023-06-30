@@ -6,7 +6,6 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
-        :class="{'hide': hide}"
         v-if="show_field"
     >
         <input
@@ -17,6 +16,7 @@
             :id="id"
             :value="inputValue"
             :placeholder="defaultValue"
+            :disabled="disabled"
             @input="onInput"
         />
     </form-group>

@@ -4,6 +4,7 @@
 /* eslint-disable no-param-reassign */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import axios from 'axios';
+import { isObject } from 'lodash';
 import Vue from 'vue';
 
 const DEFAULT_ACTION = {
@@ -58,7 +59,8 @@ export default {
         url_selector_remote: {},
         uuid: null,
         fields_as_object: [],
-        entityPermissions: null
+        entityPermissions: null,
+        customMessages: {},
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -118,6 +120,7 @@ export default {
         uuid: (state) => state.uuid,
         fields_as_object: (state) => state.fields_as_object,
         entity_permissions: (state) => state.entityPermissions,
+        customMessages: (state) => state.customMessages,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -302,7 +305,7 @@ export default {
                 };
                 // Codifica el objeto de filtros activos en formato JSON
                 const url = `${encodeURIComponent(JSON.stringify(mainfilter))}`;
-
+                
                 // Comienza a construir el objeto de filtros activos a enviar al servidor
                 Vue.set(state.url_selector_remote, val.column.id, url);
                 Object.keys(state.url_selector_remote).forEach((key) => {
@@ -381,6 +384,9 @@ export default {
         ENTITY_PERMISSIONS(state, val) {
             state.entityPermissions = val;
         },
+        CUSTOM_MESSAGES(state, val) {
+            state.customMessages = val;
+        }
     },
     actions: {
         async get({ commit, dispatch }, payload) {
@@ -463,6 +469,10 @@ export default {
                             return row;
                         });
                         rows.sort((a, b) => (a.order > b.order ? 1 : -1));
+
+                        if(response.data.content.custom_messages && isObject(JSON.parse(response.data.content.custom_messages)) && Object.keys(JSON.parse(response.data.content.custom_messages)).length > 0) {
+                            commit('CUSTOM_MESSAGES', JSON.parse(response.data.content.custom_messages));
+                        }
 
                         const form = {
                             rows,

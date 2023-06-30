@@ -1,12 +1,12 @@
 <template>
-    <form-group :id="id" :label="label" :required="required" :class="{'hide': hide}">
+    <form-group :id="id" :label="label" :required="required">
         <v-select
             label="name"
+            v-model="selected"
             :id="id"
             :options="options"
-            v-model="selected"
-            :searchable="searchable"
-            :disabled="disabled">
+            :searchable="searchable">
+            :disabled="disabled"
         </v-select>
         <div v-if="options.length === 0">
             <b>Esta lista está vacía</b>

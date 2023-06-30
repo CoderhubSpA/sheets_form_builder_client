@@ -9,30 +9,29 @@
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
         :placeholder="document_name"
-        :class="{'hide': hide}"
     >
-    <div class="input-group-prepend" v-if="previewLink">
-        <span class="input-group-text bg-white text-info" @click="onShowFile()">
-            <i class="fa fa-eye"></i>
-        </span>
-    </div>
-    <div class="custom-file">
-        <input type="file" class="custom-file-input"
-            :id="id"
-            :aria-describedby="id"
-            :disabled="disabled"
-            :accept="accept"
-            @input="onInput"
-            @change="onChange"
-            :ref="dynamicRef">
-        <label class="custom-file-label" :for="id" v-text="document_name" />
-    </div>
-    <div class="input-group-append" v-if="showDeleteBtn">
-        <span class="input-group-text bg-danger text-light"  @click="onDeleteFile()">
-            <i class="fa fa-trash"></i>
-        </span>
-    </div>
-    <div ref="preview"></div>
+        <div class="input-group-prepend" v-if="previewLink">
+            <button class="btn btn-outline-info bg-info text-light rounded-left" type="button" id="inputGroupFileAddon04" @click="onShowFile()" :disabled="disabled">
+                <i class="fa fa-eye fa-lg"></i>
+            </button>
+        </div>
+        <div class="custom-file">
+            <input type="file" class="custom-file-input"
+                :id="id"
+                :aria-describedby="id"
+                :disabled="disabled"
+                :accept="accept"
+                :ref="dynamicRef"
+                @input="onInput"
+                @change="onChange">
+            <label class="custom-file-label" :for="id" v-text="document_name" />
+        </div>
+        <div class="input-group-append" v-if="showDeleteBtn">
+            <button class="btn btn-outline-danger bg-danger text-light rounded-right" type="button" id="inputGroupFileAddon04" @click="onDeleteFile()" :disabled="disabled">
+                <i class="fa fa-trash fa-lg"></i>
+            </button>
+        </div>
+        <div ref="preview"></div>
     </file-template>
 </template>
 

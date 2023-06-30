@@ -1,7 +1,6 @@
 <script>
 /* eslint-disable camelcase */
 import Handsontable from 'handsontable';
-import { KeyValueSelect } from 'handsontable-key-value-select';
 import CustomMultiSelectEditor from '../handsontableCustom/customMultiSelectEditor';
 import {
     clpRenderer,
@@ -369,12 +368,10 @@ export default {
                                     }
 
                                     // Retornamos la lista de opciones
-                                    const options = entitiesFk.map((entity) => {
-                                        return {
-                                            value: entity.id,
-                                            label: entity[column.column.col_name_fk || 'name']
-                                        }
-                                    });
+                                    const options = entitiesFk.reduce((acc,entity) => {
+                                        acc[entity.id] = entity[column.column.col_name_fk || 'name'];
+                                        return acc;
+                                    }, {});
 
                                     return options;
                                 }
@@ -393,8 +390,16 @@ export default {
                             }
 
                             columnToPush.data = column.id;
-                            columnToPush.editor = KeyValueSelect;
+                            columnToPush.editor = 'select';
                             columnToPush.renderer = customSelectRenderer;
+                            // Se convierte el array de opciones en un objeto para
+                            // que el editor de "select" de Handsontable pueda leerlo
+                            if(Array.isArray(selectOptions)) {
+                                selectOptions = selectOptions.reduce((acc, option) => {
+                                    acc[option.value] = option.label;
+                                    return acc;
+                                }, {});
+                            }
                             columnToPush.selectOptions = selectOptions;
                             columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             columnToPush.isRequired = column.isRequired;
@@ -533,6 +538,7 @@ export default {
                                     td.appendChild(span)
                                     td.classList.add('htCenter');
                                     td.classList.add('htMiddle');
+                                    td.classList.add('form-trigger')
                                     td.classList.add('custom-hot-oneclick-trigger');
                                     // td.classList.add('custom-hot-select');
 
@@ -814,6 +820,11 @@ export default {
 };
 </script>
 <style>
+.form-trigger {
+    cursor: pointer;
+    border: 2px solid #ccc !important;
+    font-weight: 600;
+}
 .min-height-150 {
     min-height: 350px;
 }

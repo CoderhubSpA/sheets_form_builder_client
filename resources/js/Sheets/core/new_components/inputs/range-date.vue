@@ -7,23 +7,20 @@
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
         v-if="show_field"
-        :class="{'field-error': errorInput, 'hide': hide}"
+        :classes="errorInput ? ['field-error'] : []"
     >
-        <div class="row">
-            <div class="col-4">
-                <date-picker
-                    range
-                    type="date"
-                    v-model="dateStart"
-                    format="DD/MM/YYYY"
-                    placeholder="Desde DD/MM/YYY ~ Hasta DD/MM/YYY"
-                    :disabled="disabled"
-                    :default-value="showDateAfterMonth()"
-                    :disabled-date="datesAvailableUntil"
-                    @input="selectedDateRange"
-                ></date-picker>
-            </div>
-        </div>
+        <date-picker
+            range
+            type="date"
+            v-model="dateStart"
+            format="DD/MM/YYYY"
+            placeholder="Desde DD/MM/YYY ~ Hasta DD/MM/YYY"
+            :disabled="disabled"
+            :default-value="showDateAfterMonth()"
+            :disabled-date="datesAvailableUntil"
+            @input="selectedDateRange"
+        ></date-picker>
+  
         <div v-if="errorInput" class="row mt-3">
             <div class="col text-center">
                 <p class="text-danger">El valor final debe ser superior al valor inicial</p>
