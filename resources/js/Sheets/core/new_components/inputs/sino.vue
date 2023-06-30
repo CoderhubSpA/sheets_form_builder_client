@@ -6,6 +6,8 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
+        :disabled="disabled"
+        :class="{hide}"
     >
         <input
             :class="getInputClasses()"
@@ -33,12 +35,6 @@ export default {
         indeterminate: true,
         checked: null,
     }),
-    mounted() {
-        if(this.input.assign_default_value == 1 && this.input.default_value == "1") {
-            this.indeterminate = false;
-            this.checked = true;
-        }
-    },
     computed: {
         inputValue() {
             const fields = this.$store.getters[`${this.state}/fields`];
@@ -56,6 +52,7 @@ export default {
         inputValue(val) {
             this.indeterminate = false;
             this.checked = val;
+
         },
         checked(val, old) {
             // !Emulando el objeto event del input
@@ -67,6 +64,32 @@ export default {
             this.onInput(e)
         }
     },
+    // mounted() {
+    //     if (this.inputValue === null) {
+    //         if (this.input.default_value != null || this.input.default_value != undefined) {
+    //             switch (this.input.default_value) {
+    //                 case 1:
+    //                 case '1':
+    //                     this.indeterminate = false;
+    //                     this.checked = true;
+    //                     break;
+    //                 case 0:
+    //                 case '0':
+    //                     this.indeterminate = false;
+    //                     this.checked = false;
+    //                     break;
+    //                 default:
+    //                     break;
+    //             }
+    //         }
+    //     } else if (this.inputValue === 0) {
+    //         this.indeterminate = false;
+    //         this.checked = false;
+    //     } else if (this.inputValue === 1) {
+    //         this.indeterminate = false;
+    //         this.checked = true;
+    //     }
+    // },
     methods: {
         getInputClasses() {
             if (this.input.link_url !== null && this.input.link_url !== undefined) {

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{hide}">
         <form-group
             :id="id"
             :label="label"

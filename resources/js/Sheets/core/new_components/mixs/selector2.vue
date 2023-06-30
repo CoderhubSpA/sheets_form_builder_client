@@ -68,10 +68,6 @@ export default {
                 }
             }
 
-            if(!result && this.input.assign_default_value == 1) {
-                this.selected = this.options.find((o) => o.id == this.input.default_value);
-            }
-
             return result;
         },
         selectorFilters() {
@@ -110,7 +106,7 @@ export default {
                         options.push({ id: objKey, name: opt[objKey] });
                     });
                 }
-                if (this.input.default_value || this.input.default_value === 0) {
+                if (this.input.default_value) {
                     options.forEach((opt) => {
                         if (this.input.default_value == opt.id) {
                             this.defaultOption = opt.name;

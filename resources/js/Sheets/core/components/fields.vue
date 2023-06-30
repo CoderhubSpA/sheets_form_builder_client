@@ -222,6 +222,9 @@ export default {
 .vs__dropdown-toggle {
     background-color: white;
 }
+.mx-datepicker {
+    width: 100%;
+}
 .SheetsFormRenderFields__smallDefault {
     position: relative;
     top: -10px;

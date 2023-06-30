@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{hide}">
         <form-group
             :id="id"
             :label="label"
@@ -21,7 +21,7 @@
                 :multiple="multiple"
                 :searchable="false"
                 :readonly="false"
-                :clearable="!multiple"
+                :clearable="false"
                 @input="deselectedSingleOption"
                 @search="(search, loading) => { filterByFuncDebounce(search) }"
             >
@@ -56,7 +56,7 @@
                 :multiple="multiple"
                 :searchable="false"
                 :readonly="false"
-                :clearable="!multiple"
+                :clearable="false"
                 v-on:open="getOptions()"
                 @input="deselectedSingleOption"
                 @search="(search, loading) => { filterByFuncDebounce(search) }"
@@ -92,7 +92,7 @@
                 :multiple="multiple"
                 :searchable="true"
                 :readonly="false"
-                :clearable="!multiple"
+                :clearable="false"
                 v-on:open="getOptions()"
                 @input="deselectedSingleOption"
             >

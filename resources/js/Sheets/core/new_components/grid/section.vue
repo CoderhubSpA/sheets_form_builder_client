@@ -165,7 +165,7 @@ export default {
 
 <style lang="scss">
 .sheets-section-title {
-    color: inherit;
+    color: black;
     display: inline-block;
 }
 .sheets-img-section {

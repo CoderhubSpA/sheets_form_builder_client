@@ -44,22 +44,3 @@ export default {
     }
 };
 </script>
-<style lang="scss">
-// Container that the modal scrolls within
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 160;
-  display: none;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  // Prevent Chrome on Windows from adding a focus outline. For details, see
-  // https://github.com/twbs/bootstrap/pull/10951.
-  outline: 0;
-  // We deliberately don't use `-webkit-overflow-scrolling: touch;` due to a
-  // gnarly iOS Safari bug: https://bugs.webkit.org/show_bug.cgi?id=158342
-  // See also https://github.com/twbs/bootstrap/issues/17695
-}
-</style>

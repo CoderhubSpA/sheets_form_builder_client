@@ -7,17 +7,17 @@
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
         v-if="show_field"
-        :classes="errorInput ? ['field-error'] : []"
+        :class="{'field-error': errorInput, 'hide': hide}"
     >
         <div class="row">
             <div class="col-6">
                 <vue-monthly-picker
                     :selectedBackgroundColor="errorInput ? 'red' : ''"
                     :id="`${id}-start`"
-                    :disabled="disabled"
                     placeHolder="Valor inicial"
                     v-model="dateStart"
                     @selected="selectedStart"
+                    :disabled="disabled"
                 >
                 </vue-monthly-picker>
             </div>
@@ -25,10 +25,10 @@
                 <vue-monthly-picker
                     :selectedBackgroundColor="errorInput ? 'red' : ''"
                     :id="`${id}-end`"
-                     :disabled="disabled"
                     placeHolder="Valor final"
                     v-model="dateEnd"
                     @selected="selectedEnd"
+                    :disabled="disabled"
                 >
                 </vue-monthly-picker>
             </div>

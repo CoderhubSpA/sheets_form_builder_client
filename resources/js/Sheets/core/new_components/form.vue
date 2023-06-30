@@ -1,5 +1,5 @@
 <template>
-    <div class="form-border">
+    <div>
         <loading-message :status="loadingForm"></loading-message>
         <h3 class="sheets-form-title">
             {{ form_title }}
@@ -199,7 +199,7 @@ export default {
             this.$emit('name', val);
         },
         formAnswer() {
-            
+
         },
         form_loaded(val) {
             if (val) {
@@ -766,6 +766,7 @@ export default {
 }
 
 .sheets-form-title {
+    border: 1px solid gray;
     margin-bottom: 5px;
 }
 </style>

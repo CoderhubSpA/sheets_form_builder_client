@@ -6,10 +6,12 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
+        :class="{hide}"
         v-if="show_field"
     >
         <textarea
             rows="3"
+            maxlength="1000"
             class="form-control"
             :id="id"
             :placeholder="defaultValue"

@@ -41,8 +41,7 @@ export default {
         selectedOptions: [],
         options: [],
         urlrequest: '',
-        searchingNow: false,
-        applyDefaultValue: false
+        searchingNow: false
     }),
     computed: {
         multiple() {
@@ -154,29 +153,23 @@ export default {
                     });
                 }
             }
-
-            if(options.length > 0 && this.input.assign_default_value == 1 && !this.applyDefaultValue) {
-                this.applyDefaultValue = true;
-                this.setDefaultValue(options);
-            }
-
             return options;
         }
     },
     watch: {
-        optionsByColFilter(options) {
-            if(options.length > 0){
-                this.setSelectedFromOptions(options)
+        optionsByColFilter() {
+            if(this.optionsByColFilter.length > 0){
+                this.setSelectedFromOptions(this.optionsByColFilter)
             }
         },
-        options(options) {
-            if(options.length > 0) {
-                this.setSelectedFromOptions(options)
+        options(optionsValue) {
+            if(optionsValue.length > 0) {
+                this.setSelectedFromOptions(this.options)
             }
         },
-        optionsRemote(options) {
-            if (options.length > 0) {
-                this.setSelectedFromOptions(options)
+         optionsRemote (val) {
+            if (val.length > 0) {
+                this.setSelectedFromOptions(this.optionsRemote)
             }
         },
 
@@ -187,7 +180,101 @@ export default {
          * para ser enviado al server
          */
         selected(val) {
-            this.setSelectedValue(val)
+            if (val) {
+                const data = {};
+
+                if (this.multiple) {
+                    data[this.id] = val.map((v) => v.id);
+                } else {
+                    data[this.id] = val.id;
+                }
+
+                // eslint-disable-next-line prefer-object-spread
+                this.selectorvmodelsample = Object.assign({}, data);
+
+                const contentInfo = this.$store.getters[`${this.state}/content_info`];
+
+                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
+
+                let selectedValue = '';
+
+                if (val !== null) {
+                    if (!this.multiple) {
+                        selectedValue = val.id;
+                    } else {
+                        selectedValue = val.length > 0 ? val.map((v) => v.id) : '';
+                    }
+                }
+
+                let type = null;
+                switch(this.input.format) {
+                    case 'SELECTOR[REMOTE][MULTIPLE]':
+                    case 'SELECTOR[REMOTE][MULTIPLE][ALL]':
+                    case 'DIMENSION[MULTIPLE]':
+                        type = "IN";
+                        break;
+                    case 'SELECTOR[METRIC]':
+                        type = "METRIC";
+                        break;
+                    default:
+                        type = "EQUAL";
+                        break;
+                }
+
+                const filter = {
+                    column,
+                    id: `external-filter-${column.id}`,
+                    order: 1,
+                    search: selectedValue,
+                    type,
+                    remote: true
+                };
+
+                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
+                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
+
+                this.$emit('input', data);
+                /**
+                 * mostrar/ocultar section
+                 */
+                // eslint-disable-next-line camelcase
+                const field_section_show_hide = {};
+
+                field_section_show_hide[this.form_field_id] = data[this.id];
+
+                this.$store.commit(
+                    `${this.state}/FIELD_SECTION_SHOW_HIDE`,
+                    field_section_show_hide
+                );
+
+                // eslint-disable-next-line camelcase
+                const field_show_hide = {};
+
+                field_show_hide[this.form_field_id] = data[this.id];
+
+                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
+
+                if (type === "METRIC") {
+                        const remote_selectors = this.$store.getters[`${this.state}/selector_remote_filter`];
+                        const active_filters = this.$store.getters[`${this.state}/active_filter`];
+
+                        if (remote_selectors.length > 0) {
+                            this.clean_filters_for_dimensions(remote_selectors, "SELECTOR_REMOTE_FILTER", data[this.id]);
+                        }
+
+                        if (active_filters.length > 0) {
+                            this.clean_filters_for_dimensions(active_filters, "ACTIVE_FILTERS", data[this.id]);
+                    }
+                }
+            }
+
+            if (!val) {
+                const field_show_hide = {};
+
+                field_show_hide[this.form_field_id] = null;
+
+                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
+            }
         },
         /**
          * Observador para selectedValue
@@ -198,6 +285,7 @@ export default {
              */
             // eslint-disable-next-line func-names, object-shorthand
             handler: function (val) {
+                // console.log(this.input.format, this.input.name, val);
                 if (val) this.selected = val;
             },
             /**
@@ -237,10 +325,9 @@ export default {
         this.cleanReadOnly();
     },
     methods: {
-        setSelectedFromOptions(options) {
+        setSelectedFromOptions(options){
             const fields = this.$store.getters[`${this.state}/fields`];
             const optionId = fields.find(field => field[this.id] !== undefined)?.[this.id];
-            
             if (!this.selected && optionId) {
                 this.selected = options.find(option => option.id === optionId);
             }
@@ -514,114 +601,6 @@ export default {
                 });
             });
         },
-        setDefaultValue(options) {
-            if(options.length > 0 && this.input.assign_default_value == 1) {
-                const optionByDefault = options.find((opt) => {
-                    return opt.id === this.input.default_value;
-                });
-
-                if(optionByDefault) {
-                    this.selected = optionByDefault;
-                }
-            }
-        },
-        setSelectedValue(val) {
-            if (val) {
-                const data = {};
-
-                if (this.multiple) {
-                    data[this.id] = val.map((v) => v.id);
-                } else {
-                    data[this.id] = val.id;
-                }
-
-                // eslint-disable-next-line prefer-object-spread
-                this.selectorvmodelsample = Object.assign({}, data);
-
-                const contentInfo = this.$store.getters[`${this.state}/content_info`];
-
-                const column = contentInfo.content.columns.find((col) => col.id === this.input.id);
-
-                let selectedValue = '';
-
-                if (val !== null) {
-                    if (!this.multiple) {
-                        selectedValue = val.id;
-                    } else {
-                        selectedValue = val.length > 0 ? val.map((v) => v.id) : '';
-                    }
-                }
-
-                let type = null;
-                switch(this.input.format) {
-                    case 'SELECTOR[REMOTE][MULTIPLE]':
-                    case 'SELECTOR[REMOTE][MULTIPLE][ALL]':
-                    case 'DIMENSION[MULTIPLE]':
-                        type = "IN";
-                        break;
-                    case 'SELECTOR[METRIC]':
-                        type = "METRIC";
-                        break;
-                    default:
-                        type = "EQUAL";
-                        break;
-                }
-
-                const filter = {
-                    column,
-                    id: `external-filter-${column.id}`,
-                    order: 1,
-                    search: selectedValue,
-                    type,
-                    remote: true
-                };
-
-                this.$store.commit(`${this.state}/ACTIVE_FILTERS`, filter);
-                this.$store.commit(`${this.state}/SELECTOR_REMOTE_FILTER`, filter);
-
-                this.$emit('input', data);
-                /**
-                 * mostrar/ocultar section
-                 */
-                // eslint-disable-next-line camelcase
-                const field_section_show_hide = {};
-
-                field_section_show_hide[this.form_field_id] = data[this.id];
-
-                this.$store.commit(
-                    `${this.state}/FIELD_SECTION_SHOW_HIDE`,
-                    field_section_show_hide
-                );
-
-                // eslint-disable-next-line camelcase
-                const field_show_hide = {};
-
-                field_show_hide[this.form_field_id] = data[this.id];
-
-                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
-
-                if (type === "METRIC") {
-                        const remote_selectors = this.$store.getters[`${this.state}/selector_remote_filter`];
-                        const active_filters = this.$store.getters[`${this.state}/active_filter`];
-
-                        if (remote_selectors.length > 0) {
-                            this.clean_filters_for_dimensions(remote_selectors, "SELECTOR_REMOTE_FILTER", data[this.id]);
-                        }
-
-                        if (active_filters.length > 0) {
-                            this.clean_filters_for_dimensions(active_filters, "ACTIVE_FILTERS", data[this.id]);
-                    }
-                }
-            }
-
-            if (!val) {
-                const field_show_hide = {};
-
-                field_show_hide[this.form_field_id] = null;
-
-                this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
-            }
-        }
     },
 };
 </script>

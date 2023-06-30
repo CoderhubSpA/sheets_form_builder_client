@@ -1,5 +1,5 @@
 <template>
-    <form-group :id="id" :label="label" :required="required" :classes="['response-field']">
+    <form-group :id="id" :label="label" :required="required" :classes="['response-field']" :class="{hide}">
         <v-select
             label="name"
             :id="id"
@@ -30,7 +30,7 @@ export default {
             })
             questionsId.push(this.input.id)
 
-            
+
             const formProducts = this.$store.getters['formBuilder/content_info'].content.entities_fk.form_products
 
             let options  = []

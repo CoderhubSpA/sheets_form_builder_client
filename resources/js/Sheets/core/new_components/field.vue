@@ -106,6 +106,11 @@ export default {
 </script>
 
 <style lang="scss">
+.sheets-field {
+    border: 1px solid green;
+    margin-bottom: 2px;
+    padding: 2px;
+}
 .sheets-required-answer {
     font-weight: 700;
 }

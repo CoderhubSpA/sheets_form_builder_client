@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{hide}">
         <form-group
             :id="id"
             :label="label"
@@ -22,8 +22,8 @@
                 :no-drop="true"
                 :multiple="multiple"
                 :ref="'ref-' + id"
-                :disabled="disabled"
                 v-model="selected"
+                :disabled="disabled"
                 @option:deselected="deselected"
             >
                 <template #selected-option="{ name, id }">
