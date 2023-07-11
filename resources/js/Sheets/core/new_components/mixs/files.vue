@@ -1,4 +1,6 @@
 <script>
+import DocumentViewer from '../utils/DocumentViewer.vue';
+import Vue from 'vue';
 export default {
     props: {
         input: {
@@ -10,7 +12,8 @@ export default {
     },
     data: () => ({
         showDeleteBtn: false,
-        document_name: ''
+        document_name: '',
+        viewer_open: false,
     }),
     computed: {
         /**
@@ -101,6 +104,45 @@ export default {
             const validation = {};
             validation[this.id] = null;
             this.$emit('input', validation);
+        },
+        onShowFile() {
+            this.viewer_open = true;
+            if (process.env.MIX_SHOW_DOCUMENT_OUTSIDE_IFRAME === 'true') {
+                window.postMessage({
+                    type: 'show_document_visualizer',
+                    params: [
+                        {
+                            filename: this.document_name,
+                            src: this.previewLink
+                        }
+                    ],
+                })
+
+            } else {
+                window.postMessage({
+                    type: 'expand_modal_container',
+                    params: [
+                        {
+                            filename: this.document_name,
+                            src: this.previewLink
+                        }
+                    ],
+                })
+                const documentViewerClass = Vue.extend(DocumentViewer);
+                const instance = new documentViewerClass({
+                    propsData: {
+                        filename: this.document_name,
+                        src: this.previewLink,
+                        value: true
+                    }
+                });
+                instance.$on('input', (value) => {
+                    this.viewer_open = false;
+                })
+                instance.$mount();
+                this.$refs.preview.appendChild(instance.$el);
+            }
+
         }
     },
 };

@@ -45,7 +45,6 @@
 import FileTemplate from '../templates/file.vue';
 import mix from '../mixs/input.vue';
 import mixFile from '../mixs/files.vue';
-import DocumentViewer from '../utils/DocumentViewer.vue';
 
 export default {
     mixins: [mix, mixFile],
@@ -97,42 +96,6 @@ export default {
                 validation[this.id] = 'file-pending';
                 this.$emit('input', validation);
             }
-        },
-        onShowFile() {
-
-            if (process.env.MIX_SHOW_DOCUMENT_OUTSIDE_IFRAME === 'true') {
-                window.postMessage({
-                    type: 'show_document_visualizer',
-                    params: [
-                        {
-                            filename: this.document_name,
-                            src: this.previewLink
-                        }
-                    ],
-                })
-
-            } else {
-                window.postMessage({
-                    type: 'expand_modal_container',
-                    params: [
-                        {
-                            filename: this.document_name,
-                            src: this.previewLink
-                        }
-                    ],
-                })
-                const documentViewerClass = Vue.extend(DocumentViewer);
-                const instance = new documentViewerClass({
-                    propsData: {
-                        filename: this.document_name,
-                        src: this.previewLink,
-                        value: true
-                    }
-                });
-                instance.$mount();
-                this.$refs.preview.appendChild(instance.$el);
-            }
-
         }
     },
 };
