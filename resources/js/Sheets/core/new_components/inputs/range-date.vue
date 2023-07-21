@@ -7,7 +7,7 @@
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
         v-if="show_field"
-        :classes="errorInput ? ['field-error'] : []"
+        :class="{'field-error': errorInput }"
     >
         <date-picker
             range

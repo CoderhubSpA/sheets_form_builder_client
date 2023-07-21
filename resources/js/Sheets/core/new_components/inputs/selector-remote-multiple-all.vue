@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div >
         <form-group
             :id="id"
             :label="label"

@@ -1,4 +1,6 @@
 <template>
+    <div>
+        
     <file-template
         :label="label"
         :id="id"
@@ -31,6 +33,18 @@
         </div>
         <div ref="preview"></div>
     </file-template>
+        <div class="form-group" v-if="can_select_sheets">
+            <label :for="id"> Página del Excel </label>
+            <v-select
+                label="name"
+                :id="id"
+                :options="options"
+                :disabled="disabled"
+                v-model="selected"
+                :multiple="multiple"
+            />
+        </div>
+    </div>
 </template>
 
 <script>
@@ -172,6 +186,7 @@ export default {
             const wb = new ExcelJs.Workbook();
             const reader = new FileReader();
             reader.readAsArrayBuffer(this.file);
+            
             switch (this.extension) {
                 case 'xlsx':
                     reader.onload = () => {

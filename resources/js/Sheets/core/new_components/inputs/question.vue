@@ -1,5 +1,5 @@
 <template>
-    <form-group :id="id" :label="label" :required="required">
+    <form-group :id="id" :label="label" :required="required" >
         <v-select
             label="name"
             v-model="selected"

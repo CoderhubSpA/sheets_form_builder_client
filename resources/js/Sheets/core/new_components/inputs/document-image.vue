@@ -9,6 +9,7 @@
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
         :placeholder="document_name"
+        
     >
         <div class="input-group-prepend" v-if="previewLink">
             <button class="btn btn-outline-info bg-info text-light rounded-left" type="button" id="inputGroupFileAddon04" @click="onShowFile()" :disabled="disabled">

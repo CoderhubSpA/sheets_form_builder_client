@@ -9,6 +9,7 @@
         :tooltipInfo="tooltip"
         v-if="show_field"
         :showDeleteButton="showDeleteBtn"
+        
     >
 
     <div class="input-group-prepend" v-if="previewLink">

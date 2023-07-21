@@ -6,6 +6,8 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
+        :disabled="disabled"
+        
     >
         <input
             :class="getInputClasses()"

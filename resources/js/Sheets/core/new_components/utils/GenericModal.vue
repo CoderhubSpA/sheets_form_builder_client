@@ -11,7 +11,7 @@
                 </button>
             </div>
             <div class="modal-body" ref="content">
-                <!--  -->
+                <slot />
             </div>
             <slot name="footer">
                 <!-- <div class="modal-footer">
@@ -30,9 +30,22 @@ export default {
             require: true
         }
     },
+    computed: {
+        dialog() {
+            return this.show
+        }
+    },
+    watch: {
+        dialog(value) {
+            const modal = this.$refs.modal;
+            if (value)
+                modal.style.display = 'block'
+            else 
+                modal.style.display = 'none'
+        }
+    },
     mounted() {
-        const modal = this.$refs.modal;
-        modal.style.display = 'block'
+        
         // this.$nextTick(() => {
         //     modal.style.display = 'block';
         // });

@@ -1,5 +1,5 @@
 <template>
-    <div class="container" v-if="show_field">
+    <div class="container" v-if="show_field" >
         <div class="row">
             <div class="col-12" v-if="link_target">
                 <a

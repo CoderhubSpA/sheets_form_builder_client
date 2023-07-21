@@ -305,7 +305,7 @@ export default {
                 };
                 // Codifica el objeto de filtros activos en formato JSON
                 const url = `${encodeURIComponent(JSON.stringify(mainfilter))}`;
-                
+
                 // Comienza a construir el objeto de filtros activos a enviar al servidor
                 Vue.set(state.url_selector_remote, val.column.id, url);
                 Object.keys(state.url_selector_remote).forEach((key) => {
