@@ -100,10 +100,10 @@ export default {
                 videoElement.srcObject = stream 
                 videoElement.play()
                 const settings = stream.getVideoTracks()[0].getSettings()
-                
-                this.width = canvas.width;
+                console.log(settings)
+                this.width = settings.width;
                 this.height = settings.height;
-                canvas.height = settings.height;
+                // canvas.height = settings.height;
                 this.drawImage(videoElement);
             }).catch((error) => {
                 console.error(error)
@@ -115,8 +115,8 @@ export default {
          */
         drawImage(video) {
             const canvas = document.querySelector(`#${this.canvasId}`);
-            // canvas.width = 800;
-            // canvas.height = this.height;
+            canvas.width = this.width;
+            canvas.height = this.height;
             const ctx = canvas.getContext('2d', { alpha: false })
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
             
@@ -125,7 +125,7 @@ export default {
             const w_3 = parseInt(this.width /3);
             // tercio del alto de la imagen
             const y_3 = parseInt(this.height /3);
-            const PX = parseInt(w_3 - (w_3 / 2));
+            const PX = parseInt((this.width /3) /2); //this.width - parseInt(w_3 - (w_3 / 2));
             const PY = parseInt(y_3 - (y_3 / 2));
             const WIDTH = parseInt(this.width - w_3);
             const HEIGHT = parseInt(this.height - y_3);
@@ -145,8 +145,8 @@ export default {
             this.has_preview = true;
             const imgThumb = document.querySelector(`#${this.resultId}`);
             imgThumb.src = imageBase64
-            imgThumb.width = 100
-            imgThumb.height = 100
+            imgThumb.width = 200
+            imgThumb.height = 150
 
             // tercio del ancho de la imagen
             const w_3 = parseInt(this.width /3);
@@ -206,7 +206,7 @@ export default {
                     interest: data.interest
                 }
             }
-            const store = { id: this.id, file: file, metadata: storeData[this.id].metada };
+            const store = { id: this.id, file: file, metadata: storeData[this.id].metadata };
             this.$store.commit(`${this.state}/FILES`, store);
             this.$emit('input', storeData)
         },
@@ -252,7 +252,7 @@ export default {
 canvas {
     border: 1px solid black;
     width: 100%;
-    max-height: 90vh;
+    height: auto;
 }
 .thumbnail-cam {
     position: relative;

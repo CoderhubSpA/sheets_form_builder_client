@@ -1,5 +1,6 @@
 <template>
     <file-template
+        v-if="show_field"
         :label="label"
         :id="id"
         :required="required"
@@ -7,13 +8,11 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
-        v-if="show_field"
         :showDeleteButton="showDeleteBtn"
-        
     >
 
     <div class="input-group-prepend" v-if="previewLink">
-        <button class="btn btn-outline-info bg-info text-light rounded-left" type="button" id="inputGroupFileAddon04" @click="onShowFile()" :disabled="disabled">
+        <button class="btn btn-outline-info bg-info text-light rounded-left" type="button" id="inputGroupFileAddon04" @click="onShowFile()">
             <i class="fa fa-eye fa-lg"></i>
         </button>
     </div>
