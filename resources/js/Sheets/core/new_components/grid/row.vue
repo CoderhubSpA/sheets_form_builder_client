@@ -1,26 +1,41 @@
 <template>
     <div class="sheets-row">
         <h3 class="sheets-row-title">{{ name }}</h3>
-        <div class="sheets-row-wrapper row" :style="{ height: row_height }">
-            <sheets-section
-                v-for="(sect, key) in sections"
-                :key="key"
-                :section="sect"
-                :state="state"
-                :base_url="base_url"
-                v-model="rowModel[key]"
-            >
-            </sheets-section>
+        <div class="sheets-row-wrapper" :style="{ height: row_height }">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12" v-if="grouped_sections">
+                        <step-as-step
+                            :groupedSections="grouped_sections"
+                            :row="row"
+                            :state="state"
+                            :base_url="base_url"
+                        ></step-as-step>
+                    </div>
+                    <div class="col-12" v-if="!grouped_sections">
+                        <sheets-section
+                            v-for="(sect, key) in sections"
+                            :key="key"
+                            :section="sect"
+                            :state="state"
+                            :base_url="base_url"
+                            v-model="rowModel[key]"
+                        ></sheets-section>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import section from './section.vue';
+import StepAsStep from './step-as-step.vue';
 
 export default {
     components: {
         'sheets-section': section,
+        "step-as-step": StepAsStep,
     },
     props: {
         row: {
@@ -39,15 +54,6 @@ export default {
     data: () => ({
         rowModel: [],
     }),
-    watch: {
-        rowModel() {
-            let model = [];
-            this.rowModel.forEach((s) => {
-                model = model.concat(s);
-            });
-            this.$emit('input', model);
-        },
-    },
     computed: {
         id() {
             return this.row.id;
@@ -63,6 +69,59 @@ export default {
                 return `${this.row.height}px`;
             }
             return 'unset';
+        },
+        // filter sections without fields
+        filtered_sections() {
+            // if there are no sections, return an empty array
+            if(!this.row.sections) return [];
+
+            // filter out sections without fields
+            return this.sections.filter((s) => s.fields.length > 0);
+        },
+        // The grouped_sections() function filters the sections array to remove those sections that are not visible in the current view, and returns a new object with the sections grouped by group_name
+        grouped_sections() {
+            if(this.filtered_sections.length > 0) {
+                let number = 0;
+                // Create a new object with the sections grouped by group_name
+                const groupedSections = this.filtered_sections.reduce((acc, obj) => {
+                    let groupName = "";
+
+                    // If the section has a group_name, use it. Otherwise, use "Sin grupo"
+                    if(obj.group_name) {
+                        groupName = obj.group_name;
+                    } else {
+                        groupName = "Sin grupo";
+                        obj.group_name = "Sin grupo";
+                    }
+
+                    // If the group does not exist in the accumulator, add it
+                    acc[groupName] = acc[groupName] || [];
+                    // Add a "complete" property to the group
+                    acc[groupName].complete = false;
+                    // Add a "number" property to the group
+                    acc[groupName].number = number;
+                    // Increase the number
+                    number++;
+
+                    // Add the section to the group
+                    acc[groupName].push(obj);
+                    
+                    return acc;
+                }, {});
+
+                return groupedSections;
+            }
+
+            return;
+        },
+    },
+    watch: {
+        rowModel() {
+            let model = [];
+            this.rowModel.forEach((s) => {
+                model = model.concat(s);
+            });
+            this.$emit('input', model);
         },
     },
 };
