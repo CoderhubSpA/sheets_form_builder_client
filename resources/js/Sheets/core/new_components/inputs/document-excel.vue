@@ -1,20 +1,15 @@
 <template>
     <div>
+        
     <file-template
-            :label="label"
-            :id="id"
+        :label="label"
+        :id="id"
         :required="required"
         :placeholder="document_name"
         :showDeleteButton="showDeleteBtn"
     >
-            <div class="input-group-prepend" v-if="previewLink">
-                <button
-                    class="btn btn-outline-info bg-info text-light rounded-left"
-                    type="button"
-                    id="inputGroupFileAddon04"
-                    @click="onShowFile()"
-                    :disabled="disabled"
-                >
+        <div class="input-group-prepend" v-if="previewLink">
+            <button class="btn btn-outline-info bg-info text-light rounded-left" type="button" id="inputGroupFileAddon04" @click="onShowFile()">
                 <i class="fa fa-eye fa-lg"></i>
             </button>
         </div>
@@ -191,7 +186,7 @@ export default {
             const wb = new ExcelJs.Workbook();
             const reader = new FileReader();
             reader.readAsArrayBuffer(this.file);
-
+            
             switch (this.extension) {
                 case 'xlsx':
                     reader.onload = () => {
@@ -226,6 +221,7 @@ export default {
             this.selected = [];
             if (this.extension !== 'xlsx') {
                 this.can_select_sheets = false;
+
             } else this.can_select_sheets = true;
             this.file = f;
             if (event.target.files.lenght > 1) {

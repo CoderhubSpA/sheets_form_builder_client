@@ -62,7 +62,7 @@
             <sheets-row
                 v-for="(row, key) in formRows"
                 v-show="key === currentStep"
-                :state="state"
+                state="myStore0"
                 :key="key"
                 :row="row"
                 :base_url="baseUrl"
@@ -237,7 +237,6 @@ export default {
     border-radius: 50%;
     margin: 0 auto 10px auto;
     padding: 2px;
-    border: 2px solid #00938f;
 }
 
 #progress li:after {
@@ -253,12 +252,12 @@ export default {
 
 #progress li.active:before,
 #progress li.active:after {
-    background: #00938f;
+    background: skyblue;
 }
 
 #progress li.active:before,
 #progress li.active:after {
-    background: #00938f;
+    background: skyblue;
 }
 
 #progress li.errors-fields:before,
@@ -285,7 +284,7 @@ export default {
     width: 50px;
     height: 50px;
     margin-top: 0;
-    background-color: #00938f;
+    background-color: skyblue;
     border-radius: 50%;
     color: #ffffff;
     font-size: 18px;
@@ -316,7 +315,7 @@ export default {
 
 .progress-mobile button {
     color: #fff;
-    background: #00938f;
+    background: skyblue;
 }
 
 .progress-mobile small.errors-field-text-mobile {
