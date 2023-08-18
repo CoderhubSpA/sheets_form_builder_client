@@ -22,6 +22,9 @@ export default {
         accept() {
             return '*';
         },
+        disabled() {
+            return this.input.permission === 1 || this.viewer_open;
+        },
         existing_file() {
             let file = {};
 

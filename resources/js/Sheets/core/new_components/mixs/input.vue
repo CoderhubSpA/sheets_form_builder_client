@@ -169,12 +169,6 @@ export default {
                 valueParsed = e.target.value;
             }
 
-            if (this.input.format === 'EMAIL') {
-                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(valueParsed)) {
-                    this.$emit('input', '');
-                    valueParsed = '';
-                }
-            }
             const dataToSelectorFilters = {
                 key: this.input.col_name,
                 value: valueParsed,

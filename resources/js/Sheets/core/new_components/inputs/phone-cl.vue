@@ -9,12 +9,10 @@
         :tooltipInfo="tooltip"
     >
         <input
-            type="email"
-            maxlength="250"
+            type="text"
             class="form-control"
-            autocomplete="new-password"
             :id="id"
-            :value="emailValue"
+            :value="phoneValue"
             :placeholder="defaultValue"
             :disabled="disabled"
             @input="onInput"
@@ -35,9 +33,9 @@ export default {
         test: '',
     }),
     computed: {
-        emailValue() {
+        phoneValue() {
             if(this.inputValue) {
-                if(!this.validateEmail(this.inputValue)) {
+                if(!this.validatePhone(this.inputValue)) {
                     this.$store.commit(
                         `${this.state}/ERRORS_FIELD`,
                         {
@@ -62,10 +60,10 @@ export default {
         },
     },
     methods: {
-        validateEmail(email) {
-            const regex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+        validatePhone(phone) {
+            const regex = /^[0-9]{9,}$/;
 
-            return regex.test(email);
+            return regex.test(phone);
         }
     }
 };

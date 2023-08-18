@@ -1,0 +1,230 @@
+<template>
+    <div class="container-fluid" v-if="groupedSections">
+        <div class="row">
+            <div class="col-md-2 col-lg-2">
+                <div class='wrapper'>
+                    <div class='steps' id='steps'>
+                        <div class='step' v-for="(section, key) in groupedSections" :key="key" @click="setSections(key)">
+                            <div :class="[{ 'active': section.complete }, 'number']" v-if="section.complete">
+                                <i class="fa fa-solid fa-check"></i>
+                            </div>
+                            <div :class="[{'active': section.complete }, 'number']" v-else>{{ section.number }}</div>
+                            <div class='info'>
+                                <p class='title'>{{ key }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <sheets-section
+                    v-for="(sect, key) in sections"
+                    v-show="sect.group_name === groupName"
+                    v-model="rowModel[key]"
+                    :key="key"
+                    :section="sect"
+                    :state="state"
+                    :base_url="baseUrl"
+                >
+                </sheets-section>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import section from './section.vue';
+export default {
+    name: 'step-as-step',
+    components: {
+        'sheets-section': section,
+    },
+    props: {
+        groupedSections: {
+            type: Object,
+            require: true,
+        },
+        row: {
+            type: Object,
+            require: true,
+        },
+        state: {
+            type: String,
+            require: true,
+        },
+        baseUrl: {
+            type: String,
+            default: '',
+        },
+    },
+    data: () => ({
+        rowModel: [],
+        groupName: ""
+    }),
+    mounted() {
+        this.groupName = this.groupedSections[Object.keys(this.groupedSections)[0]][0].group_name;
+    },
+    computed: {
+        sections() {
+            return this.row.sections || [];
+        },
+    },
+    watch: {
+        rowModel() {
+            let model = [];
+            this.rowModel.forEach((s) => {
+                model = model.concat(s);
+            });
+            this.$emit('input', model);
+        },
+    },
+    methods: {
+        // This function sets the sections of the groupedSections object to complete if all fields in the section have values. It sets the current group name to the new group if the new group is complete. If the new group is not complete, it sets the current group name to incomplete.
+        setSections(groupKey) {
+            // if the current section is complete, set that section to complete
+            if(this.verifyFieldsWithValue(this.groupedSections[this.groupName])) {
+                this.groupedSections[this.groupName].complete = true;
+                // set the group name to the new group
+                this.groupName = groupKey;
+            } else {
+                // otherwise, set the current section to incomplete
+                this.groupedSections[this.groupName].complete = false;
+            }
+
+            // if the new section is complete, set the group name to the new group
+            if(this.groupedSections[groupKey].complete === true) {
+                this.groupName = groupKey;
+            }
+        },
+        // This code is used to verify that all required fields in a section have a value. It is used in the create and edit views of a module.
+       verifyFieldsWithValue(sections) {
+            // Get fields with value
+            const fieldsInStore = this.$store.getters[`${this.state}/field_section_show_hide`];
+            // Count required fields in section
+            let requiredFields = [];
+            // Count fields with value
+            let requiredFieldsWithValue = 0;
+
+            // Loop through each section
+            sections.forEach((section) => {
+                // Loop through each field
+                section.fields.forEach((field) => {
+                    // Check if field is required
+                    if(field.required == '1') {
+                        const findField = requiredFields.find((field) => {
+                            return field === field.form_field_id;
+                        });
+
+                        if(!findField) {
+                            requiredFields.push(field.form_field_id);
+                        }
+                    }
+                });
+            });
+
+            // Loop through each required field
+            requiredFields.forEach((field) => {
+                // Check if field has value
+                const findField = Object.keys(fieldsInStore).find((fieldKey) => {
+                    return (fieldKey === field && fieldsInStore[fieldKey] !== null && fieldsInStore[fieldKey] !== '' && fieldsInStore[fieldKey] !== undefined);
+                });
+
+                if(findField) {
+                    requiredFieldsWithValue++;
+                }
+            });
+
+            // Check if all required fields have value
+            if(requiredFields.length > 0 && requiredFieldsWithValue !== requiredFields.length) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+}
+</script>
+
+<style lang="scss">
+$primary: #00938f;
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+.wrapper {
+    .steps {
+    max-width: 300px;
+    margin: 0 auto;
+    }
+
+    .step {
+        display: flex;
+        position: relative;
+        height: 45px;
+        cursor: pointer;
+
+        &:after {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: 32px;
+            height: 0;
+            width: 2px;
+            background-color: $primary;
+        }
+
+        .info {
+            margin: 4px 0 20px;
+        }
+        .title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 8px;
+            color: $primary;
+        }
+
+        &:not(:last-child) {
+                &:after {
+                height: 30%;
+                }
+            }
+    }
+
+    .number {
+        width: 32px;
+        height: 32px;
+        background-color: lightgray;
+        border-radius: 50%;
+        border: 2px solid #00938f;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        margin-right: 14px;
+
+        &.completed {
+            background-color: $primary;
+        }
+
+        svg {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+
+            path {
+            fill: white;
+            }
+        }
+    }
+
+    .active {
+        background-color: $primary;
+    }
+}
+
+</style>
+

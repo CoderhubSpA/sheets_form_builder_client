@@ -54,7 +54,7 @@ export default {
     }
 };
 </script>
-<style>
+<style lang="scss">
 
 .sidebar {
     height: 100%;
@@ -69,6 +69,15 @@ export default {
     box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
     -webkit-box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
     -moz-box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
+
+    .sidebar-header {
+        display: flex;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: space-between;
+    }
 }
 
 @keyframes showSidebar {
