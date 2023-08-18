@@ -10,6 +10,7 @@
                             :row="row"
                             :state="state"
                             :base_url="base_url"
+                            v-on:input="emitData"
                         ></step-as-step>
                     </div>
                     <div class="col-12" v-if="!grouped_sections">
@@ -109,6 +110,12 @@ export default {
                     return acc;
                 }, {});
 
+                let countGroups = Object.keys(groupedSections).length;
+
+                if(countGroups === 1 && groupedSections["Sin grupo"]) {
+                    return false;
+                }
+
                 return groupedSections;
             }
 
@@ -124,6 +131,11 @@ export default {
             this.$emit('input', model);
         },
     },
+    methods: {
+        emitData(model) {
+            this.$emit('input', model);
+        },
+    }
 };
 </script>
 
