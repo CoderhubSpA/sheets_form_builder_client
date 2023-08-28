@@ -4,14 +4,13 @@
         :class="`sheets-field col-sm-${sm} col-md-${md} col-xl-${xl} ${hidden_class} ${visible_class}`"
     >
         <component
+            v-model="data"
             :is="fieldInput"
             :input="field"
-            v-model="data"
-            @poll-entry="handlePollEntry($event, field.id, field.col_name)"
-            @tooglefield="handleToogleField"
-            disabled
             :state="state"
             :base_url="base_url"
+            @tooglefield="handleToogleField"
+            @poll-entry="handlePollEntry($event, field.id, field.col_name)"
         >
         </component>
         <div class="row" v-if="error_messages">
@@ -85,8 +84,8 @@ export default {
             this.$emit('input', this.data);
         },
         clear(val) {
-            if (val) {
-                this.data = {};
+            if(val) {
+                this.data[this.field.id] = null;
             }
         },
     },

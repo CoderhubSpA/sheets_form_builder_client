@@ -18,12 +18,16 @@ export default {
         picker: null,
         // VERIFICACIÓN DEL MODEL PARA LOS TEST
         vmodelcurrentvalue: {},
+        disabledDate: () => false,
     }),
     mounted(){
         if(this.input.assign_default_value === 1 && this.input.default_value) {
             this.picker = moment(this.input.default_value).toDate();
             this.onInput(this.picker);
+        }
 
+        if(this.input.metadata) {
+            this.setFunctionFromMetadata(this.input.metadata);
         }
     },
     computed: {
@@ -65,12 +69,20 @@ export default {
             }
             return result;
         },
+        clear() {
+            return this.$store.getters[`${this.state}/clearfields`];
+        },
     },
     watch: {
         fieldValue(val) {
             if (val) {
                 this.picker = moment(this.fieldValue).toDate()
                 this.onInput(val);
+            }
+        },
+        clear(val) {
+            if(val) {
+               this.picker = null;
             }
         },
     },
@@ -88,6 +100,20 @@ export default {
             field_section_show_hide[this.form_field_id] = val;
             this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
         },
+        setFunctionFromMetadata(data){
+            let parseMetadata = JSON.parse(data);
+
+            Object.keys(parseMetadata).forEach((key) => {
+                if(key === "onlyDatesFromNow") {
+                    if(parseMetadata[key] === true) {
+                        this.disabledDate = (date) => {
+                            return date < new Date(new Date().toLocaleDateString('en-US'));
+                        };
+                    }
+                }
+            })
+
+        }
     },
 };
 </script>

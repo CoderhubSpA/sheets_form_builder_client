@@ -84,7 +84,6 @@ export default {
     mounted() {
         const date = new Date();
 
-        this.picker = date;
         this.setSundayDays(date);
     },
     computed: {

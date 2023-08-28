@@ -501,6 +501,22 @@ export default {
                         body[key] = obj[key];
                     }
                 });
+                /**
+                 * Para no complicar el envio de los NUMBER[ES]
+                 * el cast a numero se hara previo al envio
+                 * del formulario
+                 */
+                const fieldsNumberES = this.$store.getters[
+                    `${this.namespace}/fields_as_object`
+                ].filter((f) => f.format === 'NUMBER[ES]');
+
+                Object.keys(body).forEach((key) => {
+                    if (fieldsNumberES.find((f) => f.id === key)) {
+                        const num = Number(body[key].replaceAll('.', '').replace(',', '.'));
+                        body[key] = num;
+                    }
+                });
+                //-------------------------------------
 
                 if (this.record_id) {
                     body.id = this.record_id;

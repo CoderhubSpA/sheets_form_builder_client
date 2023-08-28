@@ -14,6 +14,7 @@
             v-model="picker"
             :format="dateFormat"
             :placeholder="defaultValue"
+            :disabled-date="disabledDate"
             :disabled="disabled"
             @input="onInput"
         ></date-picker>
