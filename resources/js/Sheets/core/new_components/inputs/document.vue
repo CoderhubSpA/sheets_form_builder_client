@@ -10,38 +10,51 @@
         :tooltipInfo="tooltip"
         :showDeleteButton="showDeleteBtn"
     >
-
-    <div class="input-group-prepend" v-if="previewLink">
-        <button class="btn btn-outline-info bg-info text-light rounded-left" type="button" id="inputGroupFileAddon04" @click="onShowFile()">
-            <i class="fa fa-eye fa-lg"></i>
-        </button>
-    </div>
-    <div class="custom-file">
-        <input type="file"
-            :id="id"
-            :aria-describedby="id"
-            :disabled="disabled"
-            :accept="accept"
-            :class="[{'form-control': disabled }, 'custom-file-input']"
-            @input="onInput"
-            @change="onChange"
-            lang="es"
-            :ref="dynamicRef">
-        <label class="custom-file-label"
-            :for="id"
-            v-text="document_name || input.default_value || ''" />
-    </div>
-    <div class="input-group-append" v-if="showDeleteBtn">
-        <button class="btn btn-outline-danger bg-danger text-light rounded-right" type="button" id="inputGroupFileAddon04" @click="onDeleteFile()" :disabled="disabled">
-            <i class="fa fa-trash fa-lg"></i>
-        </button>
-    </div>
-    <div ref="preview"></div>
+        <div class="input-group-prepend" v-if="previewLink">
+            <button
+                class="btn btn-outline-info bg-info text-light rounded-left"
+                type="button"
+                id="inputGroupFileAddon04"
+                @click="onShowFile()"
+                :disabled="disabled"
+            >
+                <i class="fa fa-eye fa-lg"></i>
+            </button>
+        </div>
+        <div class="custom-file">
+            <input
+                type="file"
+                :id="id"
+                :aria-describedby="id"
+                :disabled="disabled"
+                :accept="accept"
+                :class="[{ 'form-control': disabled }, 'custom-file-input']"
+                @input="onInput"
+                @change="onChange"
+                lang="es"
+                :ref="dynamicRef"
+            />
+            <label
+                class="custom-file-label"
+                :for="id"
+                v-text="document_name || input.default_value || ''" />
+        </div>
+        <div class="input-group-append" v-if="showDeleteBtn">
+            <button
+                class="btn btn-outline-danger bg-danger text-light rounded-right"
+                type="button"
+                id="inputGroupFileAddon04"
+                @click="onDeleteFile()"
+                :disabled="disabled"
+            >
+                <i class="fa fa-trash fa-lg"></i>
+            </button>
+        </div>
+        <div ref="preview"></div>
     </file-template>
 </template>
 
 <script>
-/* eslint-disable object-shorthand */
 import FileTemplate from '../templates/file.vue';
 import mix from '../mixs/input.vue';
 import mixFile from '../mixs/files.vue';
@@ -65,9 +78,10 @@ export default {
                         const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
                         const imgPre = entities.find((ent) => ent.id === val[this.id]);
 
-                        (imgPre && imgPre.src) ? this.showDeleteBtn = true : '';
+                        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+                        this.showDeleteBtn = imgPre && imgPre.src;
 
-                        return (imgPre && imgPre.src) ? `${this.base_url}${imgPre.src}` : '';
+                        return imgPre && imgPre.src ? `${this.base_url}${imgPre.src}` : '';
                     }
                 }
             }

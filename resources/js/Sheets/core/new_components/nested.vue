@@ -3,11 +3,13 @@
         <button class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="open">+</button>
         <div class="nested-form" v-show="show">
             <div class="content">
-                <div class="header">
+                <div class="header p-2">
                     <div class="header-title">
-                        {{ form_name }}
+                        <i class="fa fa-list-alt text-black-25 ml-2"></i>
                     </div>
-                    <button @click="close">&times;</button>
+                    <div @click="close">
+                        <i class="fa fa-times float-right text-black-50 close"></i>
+                    </div>
                 </div>
                 <div class="body">
                     <div ref="nested" />
@@ -40,7 +42,12 @@ export default {
             type: String,
             require: false,
             default: ''
-        }
+        },
+        parent_input_id: {
+            type: String,
+            require: true,
+            default: ''
+        },
     },
     data: () => ({
         show: false,
@@ -67,12 +74,21 @@ export default {
         build() {
             const store = this.$store;
             const FormBuilderClass = Vue.extend(formbuilder);
+            // Get the parent form data from the store
+            const parent_form_data = this.$store.getters[`${this.state}/form_data`];
+
+            if (parent_form_data){
+                parent_form_data.parent_input_id = this.parent_input_id;
+            }
+
             const instance = new FormBuilderClass({
                 propsData: {
                     entityId: this.entity_type_permission_fk,
                     record_id: this.recordId,
                     store: this.entity_type_permission_fk,
                     is_nested: true,
+                    // Set the parent form data
+                    parent_form_data: parent_form_data ? parent_form_data : {},
                 },
                 store,
             });
@@ -124,17 +140,35 @@ export default {
 
     .content {
         background-color: #fefefe;
-        margin: 15% auto; /* 15% from the top and centered */
-        padding: 20px;
         width: 80%; /* Could be more or less, depending on screen size */
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 0px !important;
+        border-radius: 5px;
 
         .header {
-            background-color: #fefefe;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
             margin-bottom: 1rem;
+            background-color: #fefefe;
+            border-bottom: solid 1px #dee2e6;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
 
-            button {
-                float: right;
+            .header-title {
+                color: #dee2e6;
             }
+
+            .close {
+                font-size: 1.35rem;
+                font-weight: 700;
+                line-height: 1;
+                opacity: .5;
+                text-shadow: 0 1px 0 #fff;
+            }
+        }
+        .body {
+            padding: 0px 15px 15px 15px;
         }
     }
 }

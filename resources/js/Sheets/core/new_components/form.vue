@@ -128,7 +128,13 @@ export default {
         is_step_row: {
             type: String,
             default: 'false',
-        }
+        },
+        // Retrieve the parent form data from the parent component
+        parent_form_data: {
+            type: Object,
+            default: () => ({}),
+            required: false,
+        },
     },
     components: {
         // "sheets-loading": Loading,
@@ -226,6 +232,12 @@ export default {
         window.name = this.windowName;
         this.window = window;
         this.initForm();
+
+        // If the parent form data is set, commit it to the store
+        if (this.parent_form_data) {
+            // Set data to the store
+            this.$store.commit(`${this.namespace}/PARENT_FORM_DATA`, this.parent_form_data);
+        }
     },
     methods: {
         postMessage(data) {

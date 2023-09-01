@@ -20,7 +20,7 @@
                     ? options
                     : optionsFiltered
             "
-            :disabled="disabled"
+            :disabled="disabled || disabledForRule"
             v-model="selected"
             :clearable="false"
         >

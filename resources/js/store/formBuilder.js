@@ -61,6 +61,9 @@ export default {
         fields_as_object: [],
         entityPermissions: null,
         customMessages: {},
+        current_user: {},
+        form_data: {},
+        parent_form_data: {},
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -121,6 +124,9 @@ export default {
         fields_as_object: (state) => state.fields_as_object,
         entity_permissions: (state) => state.entityPermissions,
         customMessages: (state) => state.customMessages,
+        current_user: (state) => state.current_user,
+        form_data: (state) => state.form_data,
+        parent_form_data: (state) => state.parent_form_data,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -386,10 +392,19 @@ export default {
         },
         CUSTOM_MESSAGES(state, val) {
             state.customMessages = val;
-        }
+        },
+        CURRENT_USER(state, val) {
+            state.current_user = val;
+        },
+        FORM_DATA(state, val) {
+            state.form_data = val;
+        },
+        PARENT_FORM_DATA(state, val) {
+            state.parent_form_data = val;
+        },
     },
     actions: {
-        async get({ commit, dispatch }, payload) {
+        async get({ commit, dispatch, state }, payload) {
             commit('LOADING', true);
 
             const { id } = payload;
@@ -406,6 +421,13 @@ export default {
                     .get(URL)
                     .then((response) => {
                         const data = response.data.content;
+
+                        // Set record_id to data properties
+                        if(recordid) {
+                            data.record_id = recordid;
+                        }
+                        // Set all form data to state
+                        commit('FORM_DATA', data);
 
                         // asignacion del titulo de formulario
                         commit('FORM_NAME', data.name);
@@ -794,5 +816,18 @@ export default {
                     });
             }
         },
+        async get_current_user({ commit }) {
+            await axios
+                .get(`/api/sheets/user`)
+                .then((response) => {
+                    commit('CURRENT_USER', response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+                .finally(() => {
+                    //
+                });
+        }
     },
 };

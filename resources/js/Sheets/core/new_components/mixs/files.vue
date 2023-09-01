@@ -57,12 +57,12 @@ export default {
         },
         dynamicRef() {
             return `file-${this.id}`;
-        }
+        },
     },
     watch: {
         value(val) {
             if (Object.keys(val).length === 0) {
-                this.onDeleteFile()
+                this.onDeleteFile();
             }
         },
         existing_file(val) {
@@ -82,8 +82,8 @@ export default {
     methods: {
         onChange(event) {
             const file = event.target.files[0];
-            this.document_name = file.name
-            const data = { id: this.id, file: file };
+            this.document_name = file.name;
+            const data = { id: this.id, file };
             if (this.input.permission === 2) {
                 this.$store.commit(`${this.state}/FILES`, data);
             }
@@ -116,11 +116,10 @@ export default {
                     params: [
                         {
                             filename: this.document_name,
-                            src: this.previewLink
-                        }
+                            src: this.previewLink,
+                        },
                     ],
-                })
-
+                });
             } else {
                 window.postMessage({
                     type: 'expand_modal_container',
@@ -131,22 +130,21 @@ export default {
                         }
                     ],
                 })
-                const documentViewerClass = Vue.extend(DocumentViewer);
-                const instance = new documentViewerClass({
+                const DocumentViewerClass = Vue.extend(DocumentViewer);
+                const instance = new DocumentViewerClass({
                     propsData: {
                         filename: this.document_name,
                         src: this.previewLink,
-                        value: true
-                    }
+                        value: true,
+                    },
                 });
-                instance.$on('input', (value) => {
+                instance.$on('input', () => {
                     this.viewer_open = false;
-                })
+                });
                 instance.$mount();
                 this.$refs.preview.appendChild(instance.$el);
             }
-
-        }
+        },
     },
 };
 </script>

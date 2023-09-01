@@ -3,10 +3,10 @@
     <file-template
             :label="label"
             :id="id"
-        :required="required"
-        :placeholder="document_name"
-        :showDeleteButton="showDeleteBtn"
-    >
+            :required="required"
+            :placeholder="document_name"
+            :showDeleteButton="showDeleteBtn"
+        >
             <div class="input-group-prepend" v-if="previewLink">
                 <button
                     class="btn btn-outline-info bg-info text-light rounded-left"
@@ -15,29 +15,34 @@
                     @click="onShowFile()"
                     :disabled="disabled"
                 >
-                <i class="fa fa-eye fa-lg"></i>
-            </button>
-        </div>
-        <div class="custom-file">
-            <input
-                type="file"
-                :class="[{'form-control': disabled }, 'custom-file-input']"
-                :id="id"
-                :accept="accept"
-                :disabled="disabled"
-                :ref="dynamicRef"
-                lang="es"
-                @change="onChange"
-            />
-            <label class="custom-file-label" :for="id" v-text="document_name" />
-        </div>
-        <div class="input-group-append" v-if="showDeleteBtn">
-            <button class="btn btn-outline-danger bg-danger text-light rounded-right" type="button" id="inputGroupFileAddon04" @click="onDeleteFile()">
-                <i class="fa fa-trash fa-lg"></i>
-            </button>
-        </div>
-        <div ref="preview"></div>
-    </file-template>
+                    <i class="fa fa-eye fa-lg"></i>
+                </button>
+            </div>
+            <div class="custom-file">
+                <input
+                    type="file"
+                    :class="[{ 'form-control': disabled }, 'custom-file-input']"
+                    :id="id"
+                    :accept="accept"
+                    :disabled="disabled"
+                    :ref="dynamicRef"
+                    lang="es"
+                    @change="onChange"
+                />
+                <label class="custom-file-label" :for="id" v-text="document_name" />
+            </div>
+            <div class="input-group-append" v-if="showDeleteBtn">
+                <button
+                    class="btn btn-outline-danger bg-danger text-light rounded-right"
+                    type="button"
+                    id="inputGroupFileAddon04"
+                    @click="onDeleteFile()"
+                >
+                    <i class="fa fa-trash fa-lg"></i>
+                </button>
+            </div>
+            <div ref="preview"></div>
+        </file-template>
         <div class="form-group" v-if="can_select_sheets">
             <label :for="id"> Página del Excel </label>
             <v-select

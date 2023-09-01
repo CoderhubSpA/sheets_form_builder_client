@@ -43,6 +43,7 @@
                 :state="state"
                 :openForm="openNested"
                 :recordId="recordId"
+                :parent_input_id="id"
                 v-on:opened-nested="recordId = ''"
                 v-on:closed-nested="openNested = false"
                 @inserted="createdOption"

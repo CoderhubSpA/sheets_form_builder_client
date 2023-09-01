@@ -32,7 +32,8 @@ export default {
         openNested: false,
         recordId: '',
         has_permissions_for_create: false,
-        deselectedOptions: []
+        deselectedOptions: [],
+        disabledForRule: false
     }),
     computed: {
         /**
@@ -380,6 +381,8 @@ export default {
         },
         options(val) {
             if (val.length > 1) {
+                this.setOptionFromColFk1N();
+
                 if (this.inserted) {
                     const option = this.options.find((options) => options.id === this.inserted);
                     if (this.multiple) {
@@ -463,6 +466,27 @@ export default {
         },
         deselected(val) {
             this.deselectedOptions.push(val);
+        },
+        setOptionFromColFk1N() {
+            // Get the parent form data from the store
+            const parent_form_data = this.$store.getters[`${this.state}/parent_form_data`]
+            // If parent_form_data exists, then get the field that is the parent input
+            if(parent_form_data && parent_form_data.fields) {
+                const getField = parent_form_data.fields.find((field) => field.id === parent_form_data.parent_input_id);
+                // If the parent input is the same as the current input, then set the selected option
+                if(getField.col_fk_1_n === this.input.col_name) {
+                    Object.keys(parent_form_data).forEach((key) => {
+                        const keyValue = getField.col_fk_n_1 === "id" ? 'record_id' : key;
+
+                        this.options.forEach((option) => {
+                            if(option.id == parent_form_data[keyValue]) {
+                                this.selected = option;
+                                this.disabledForRule = true;
+                            }
+                        });
+                    });
+                }
+            }
         },
     },
 };
