@@ -62,14 +62,18 @@
             <sheets-row
                 v-for="(row, key) in formRows"
                 v-show="key === currentStep"
+                v-model="formAnswer[key]"
                 :state="state"
                 :key="key"
                 :row="row"
                 :base_url="baseUrl"
-                v-model="formAnswer[key]"
+                :last_row="last_row"
+                v-on:previous-row="previousStep"
+                v-on:next-row="nextStep"
+                v-on:has-groups="rowHasStepGroups"
             />
         </div>
-        <div class="mb-4 text-right">
+        <div class="mb-4 text-right" v-if="!ifRowHasStepGroups">
             <button @click="previousStep()" class="btn btn-secondary" :disabled="currentStep <= 0">
                 Anterior
             </button>
@@ -103,10 +107,6 @@ export default {
             type: Array,
             default: [],
         },
-        row: {
-            type: Object,
-            require: true,
-        },
         state: {
             type: String,
             require: true,
@@ -124,7 +124,9 @@ export default {
         return {
             currentStep: 0,
             formAnswer: [],
-            ifErrorTextForMobile: false
+            ifErrorTextForMobile: false,
+            ifRowHasStepGroups: false,
+            last_row: false,
         };
     },
     computed: {
@@ -178,16 +180,34 @@ export default {
     },
     methods: {
         clickInProgressNumber(key) {
+            //If the game is not set to strict, allow the user to click any number in the sequence
             if (this.is_strict !== '2') {
+                //Set the current step to the key being clicked
                 this.currentStep = key;
             }
         },
         previousStep() {
-            this.currentStep--;
+            //If the current step is greater than 0, go back one step
+            if(this.currentStep > 0) {
+                this.last_row = false;
+                this.currentStep--;
+            }
         },
         nextStep() {
-            this.currentStep++;
+            //If the current step is less than the total number of rows, go forward one step
+            if(this.currentStep + 1 < this.rows.length) {
+                this.currentStep++;
+            }
+
+            //If the current step is the last step, set the last_row variable to true
+            if(this.currentStep + 1 === this.rows.length) {
+                this.last_row = true;
+            }
         },
+        rowHasStepGroups(value) {
+            //If the row has step groups, set the ifRowHasStepGroups variable to true
+            this.ifRowHasStepGroups = value;
+        }
     },
 };
 </script>

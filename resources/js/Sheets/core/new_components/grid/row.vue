@@ -10,17 +10,20 @@
                             :row="row"
                             :state="state"
                             :base_url="base_url"
-                            v-on:input="emitData"
+                            :input="emitData"
+                            :lastRow="last_row"
+                            v-on:previous-row="previousRow"
+                            v-on:next-row="nextRow"
                         ></step-as-step>
                     </div>
                     <div class="col-12" v-if="!grouped_sections">
                         <sheets-section
                             v-for="(sect, key) in sections"
+                            v-model="rowModel[key]"
                             :key="key"
                             :section="sect"
                             :state="state"
                             :base_url="base_url"
-                            v-model="rowModel[key]"
                         ></sheets-section>
                     </div>
                 </div>
@@ -50,6 +53,10 @@ export default {
         base_url: {
             type: String,
             default: '',
+        },
+        last_row: {
+            type: Boolean,
+            default: false,
         },
     },
     data: () => ({
@@ -115,9 +122,13 @@ export default {
                 if(countGroups === 1 && groupedSections["Sin grupo"]) {
                     return false;
                 }
+                // Checks if there are groups in the data
+                this.$emit('has-groups', true);
 
                 return groupedSections;
             }
+            // Emit the 'has-groups' event for the 'groups' property
+            this.$emit('has-groups', false);
 
             return;
         },
@@ -132,9 +143,18 @@ export default {
         },
     },
     methods: {
+        // Emit the data model to the parent component
         emitData(model) {
             this.$emit('input', model);
         },
+        // Notify the parent component that the user has moved to the previous row
+        previousRow() {
+            this.$emit('previous-row');
+        },
+        // Notify the parent component that the user has moved to the next row
+        nextRow() {
+            this.$emit('next-row');
+        }
     }
 };
 </script>

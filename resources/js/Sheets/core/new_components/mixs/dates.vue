@@ -1,5 +1,6 @@
 <script>
 import Moment from 'moment';
+import { es } from '@sum.cumo/vue-datepicker/dist/locale/index.esm'
 
 export default {
     props: {
@@ -18,7 +19,12 @@ export default {
         picker: null,
         // VERIFICACIÓN DEL MODEL PARA LOS TEST
         vmodelcurrentvalue: {},
-        disabledDate: () => false,
+        disabledDates: {
+            to: null,
+            dates: [],
+            from: null
+        },
+        es: es,
     }),
     mounted(){
         if(this.input.assign_default_value === 1 && this.input.default_value) {
@@ -33,6 +39,9 @@ export default {
     computed: {
         dateFormat() {
             return this.input.format === 'DATE' ? 'DD/MM/YYYY' : 'DD/MM/YYYY HH:mm';
+        },
+        customDateFormat() {
+            return this.input.format === 'DATE' ? 'dd/MM/yyyy' : '';
         },
         /**
          * interval between hours in time picker
@@ -106,9 +115,7 @@ export default {
             Object.keys(parseMetadata).forEach((key) => {
                 if(key === "onlyDatesFromNow") {
                     if(parseMetadata[key] === true) {
-                        this.disabledDate = (date) => {
-                            return date < new Date(new Date().toLocaleDateString('en-US'));
-                        };
+                        this.disabledDates.to = new Date(new Date().toLocaleDateString('en-US'));
                     }
                 }
             })

@@ -10,21 +10,25 @@
         v-if="show_field"
     >
         <date-picker
-            type="date"
             v-model="picker"
-            :format="dateFormat"
+            wrapper-class="form-control"
+            input-class="date-input"
+            :id="id"
+            :format="customDateFormat"
             :placeholder="defaultValue"
-            :disabled-date="disabledDate"
+            :disabled-dates="disabledDates"
             :disabled="disabled"
+            :language="es"
             @input="onInput"
         ></date-picker>
     </form-group>
 </template>
 <script>
-import DatePicker from 'vue2-datepicker';
 import mix from '../mixs/input.vue';
 import mixDate from '../mixs/dates.vue';
 import FormGroup from '../templates/form-group.vue';
+import DatePicker from '@sum.cumo/vue-datepicker';
+import '@sum.cumo/vue-datepicker/dist/Datepicker.css'
 
 export default {
     mixins: [mix, mixDate],

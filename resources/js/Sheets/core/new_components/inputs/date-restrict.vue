@@ -30,7 +30,6 @@ import mix from '../mixs/input.vue';
 import mixDate from '../mixs/dates.vue';
 import FormGroup from '../templates/form-group.vue';
 import DatePicker from '@sum.cumo/vue-datepicker';
-import { es } from '@sum.cumo/vue-datepicker/dist/locale/index.esm'
 import '@sum.cumo/vue-datepicker/dist/Datepicker.css'
 
 export default {
@@ -78,7 +77,6 @@ export default {
                     new Date(2023, 11, 25),
                 ],
             },
-            es: es,
         };
     },
     mounted() {
@@ -143,5 +141,14 @@ export default {
         &:focus-visible {
             outline: none !important;
         }
+    }
+
+    .vdp-datepicker__calendar .cell.selected.highlighted, .vdp-datepicker__calendar .cell.selected:hover {
+        background-color: #007571 !important;
+    }
+
+    .vdp-datepicker__calendar .cell.selected {
+        background: #00938f;
+        color: #fff;
     }
 </style>
