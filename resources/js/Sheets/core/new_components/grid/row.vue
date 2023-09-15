@@ -79,7 +79,7 @@ export default {
             return 'unset';
         },
         // filter sections without fields
-        filtered_sections() {
+        filtered_sections_with_fields() {
             // if there are no sections, return an empty array
             if(!this.row.sections) return [];
 
@@ -88,10 +88,10 @@ export default {
         },
         // The grouped_sections() function filters the sections array to remove those sections that are not visible in the current view, and returns a new object with the sections grouped by group_name
         grouped_sections() {
-            if(this.filtered_sections.length > 0) {
+            if(this.filtered_sections_with_fields.length > 0) {
                 let number = 0;
                 // Create a new object with the sections grouped by group_name
-                const groupedSections = this.filtered_sections.reduce((acc, obj) => {
+                const groupedSections = this.filtered_sections_with_fields.reduce((acc, obj) => {
                     let groupName = "";
 
                     // If the section has a group_name, use it. Otherwise, use "Sin grupo"
@@ -122,13 +122,12 @@ export default {
                 if(countGroups === 1 && groupedSections["Sin grupo"]) {
                     return false;
                 }
+
                 // Checks if there are groups in the data
-                this.$emit('has-groups', true);
+                this.$emit('has-groups', {row: this.row, hasGroup: true});
 
                 return groupedSections;
             }
-            // Emit the 'has-groups' event for the 'groups' property
-            this.$emit('has-groups', false);
 
             return;
         },

@@ -125,6 +125,7 @@ export default {
             currentStep: 0,
             formAnswer: [],
             ifErrorTextForMobile: false,
+            rowStepGroups:[],
             ifRowHasStepGroups: false,
             last_row: false,
         };
@@ -176,6 +177,13 @@ export default {
                     this.$emit('show-actions', true);
                 }
             }
+        },
+        rowStepGroups(val) {
+            /* Check that the val variable has some elements. */
+            if(val.length > 0) {
+                /* Enable the buttons. */
+                this.activePreviousNextButtons();
+            }
         }
     },
     methods: {
@@ -185,6 +193,8 @@ export default {
                 //Set the current step to the key being clicked
                 this.currentStep = key;
             }
+
+            this.activePreviousNextButtons();
         },
         previousStep() {
             //If the current step is greater than 0, go back one step
@@ -192,21 +202,44 @@ export default {
                 this.last_row = false;
                 this.currentStep--;
             }
+
+            this.activePreviousNextButtons();
         },
         nextStep() {
             //If the current step is less than the total number of rows, go forward one step
             if(this.currentStep + 1 < this.rows.length) {
                 this.currentStep++;
             }
-
+            
             //If the current step is the last step, set the last_row variable to true
             if(this.currentStep + 1 === this.rows.length) {
                 this.last_row = true;
             }
+            
+            this.activePreviousNextButtons();
         },
         rowHasStepGroups(value) {
             //If the row has step groups, set the ifRowHasStepGroups variable to true
-            this.ifRowHasStepGroups = value;
+            const findRow = this.rowStepGroups.find((row) => {
+                return row === value.row.id;
+            });
+
+            if(!findRow) {
+                this.rowStepGroups.push(value.row.id)
+            }
+        },
+        activePreviousNextButtons() {
+            // Find the row in the rowStepGroups array that matches the current form row
+            const findRow = this.rowStepGroups.find((row) => {
+                return row === this.formRows[this.currentStep].id;
+            });
+
+            // If the row has a step group, then enable the buttons
+            if(findRow) {
+                this.ifRowHasStepGroups = true;
+            } else {
+                this.ifRowHasStepGroups = false;
+            }
         }
     },
 };
