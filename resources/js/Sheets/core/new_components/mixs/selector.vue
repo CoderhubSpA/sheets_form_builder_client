@@ -89,7 +89,7 @@ export default {
                                 // eslint-disable-next-line array-callback-return,  consistent-return
                                 const optionsfiltered = entities.filter(
                                     (e) =>
-                                        e[this.input.col_fk_filter] ===
+                                        e[this.input.col_fk_filter] ==
                                         this.selectorFilters[this.input.col_filter_by].toString()
                                 );
                                 options = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));

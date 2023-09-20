@@ -408,7 +408,7 @@ export default {
                     ) {
                         const optionsfiltered = entities.filter(
                             (e) =>
-                                e[this.input.col_fk_filter] ===
+                                e[this.input.col_fk_filter] ==
                                 this.selectorFilters[this.input.col_filter_by].toString()
                         );
                         optionsFil = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));

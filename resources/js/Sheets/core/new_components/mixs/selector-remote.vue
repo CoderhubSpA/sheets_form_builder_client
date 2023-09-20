@@ -139,7 +139,7 @@ export default {
                                 // eslint-disable-next-line array-callback-return,  consistent-return
                                 const optionsfiltered = entities.filter(
                                     (e) =>
-                                        e[this.input.col_fk_filter] ===
+                                        e[this.input.col_fk_filter] ==
                                         this.selectorFilters[this.input.col_filter_by].toString()
                                 );
                                 options = optionsfiltered.map((e) => ({ id: e.id, name: e[key] }));
@@ -240,7 +240,7 @@ export default {
         setSelectedFromOptions(options) {
             const fields = this.$store.getters[`${this.state}/fields`];
             const optionId = fields.find(field => field[this.id] !== undefined)?.[this.id];
-            
+
             if (!this.selected && optionId) {
                 this.selected = options.find(option => option.id === optionId);
             }
