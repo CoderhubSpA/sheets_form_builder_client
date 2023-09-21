@@ -33,6 +33,9 @@ export default {
     components: {
         'input-group': InputGroup,
     },
+    created() {
+        console.log('ok')
+    },
     computed: {
         inputValue() {
             if (!this.updatedInput) {

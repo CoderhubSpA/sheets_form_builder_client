@@ -577,6 +577,10 @@ export default {
                                 this.action = {};
                             }
                             this.disabledAction = false;
+
+                            if(response.content.scripts && response.content.scripts.length > 0) {
+                                this.executeScripts(response.content.scripts);
+                            }
                         })
                         .catch((error) => {
                             this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
@@ -787,6 +791,35 @@ export default {
             });
 
             return showFieldNow;
+        },
+        executeScripts(scripts) {
+            if(scripts.length > 0) {
+                scripts.forEach((script) => {
+                    if( script.actions.length > 0) {
+                        script.actions.forEach((action) => {
+                            if(action.type) {
+                                switch (action.type) {
+                                    case "load_url":
+                                        if(action.params.length > 1) {
+                                            action.params.forEach((param) => {
+                                                window.open(param.value, '_blank');
+                                            });
+                                        } else {
+                                            action.params.forEach((param) => {
+                                                window.location.href = param.value;
+                                            });
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            console.log("scripts", scripts);
         }
     },
 };
