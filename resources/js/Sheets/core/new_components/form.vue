@@ -522,12 +522,14 @@ export default {
                     `${this.namespace}/fields_as_object`
                 ].filter((f) => f.format === 'NUMBER[ES]');
 
-                Object.keys(body).forEach((key) => {
-                    if (fieldsNumberES.find((f) => f.id === key)) {
-                        const num = Number(body[key].replaceAll('.', '').replace(',', '.'));
-                        body[key] = num;
-                    }
-                });
+                if (fieldsNumberES.length > 0) {
+                    fieldsNumberES.forEach((item) => {
+                        const key = item.id;
+                        if (typeof body[key] === 'string') {
+                            body[key] = Number(body[key].replaceAll('.', ``).replace(`,`, `.`));
+                        }
+                    });
+                }
                 //-------------------------------------
 
                 if (this.record_id) {

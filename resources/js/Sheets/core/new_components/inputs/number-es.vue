@@ -33,9 +33,6 @@ export default {
     components: {
         'input-group': InputGroup,
     },
-    created() {
-        console.log('ok')
-    },
     computed: {
         inputValue() {
             if (!this.updatedInput) {
@@ -59,7 +56,6 @@ export default {
 
                 if (result[this.id]) {
                     this.onInput(e);
-
                     return this.formatNumberToES(result[this.id]);
                 } else if (this.input.assign_default_value == 1) {
                     return this.input.default_value;
@@ -82,21 +78,21 @@ export default {
             return regex.test(num);
         },
         formatNumberToES(data) {
-            const value = data.toString();
-            // let number = value;
-            // si ingresan por segunda vez
-            // una coma, retorna el numero sin esta
-            if (value.match(/,/g)?.length > 1) {
-                const n = value.split(',');
-                return `${n[0]},${n[1]}`;
+            let value = null;
+            if (typeof data === 'number' && data != null) {
+                value = data.toLocaleString('es-ES');
+            } else if (typeof data === 'string' && data != null) {
+                if (data.match(/,/g)?.length > 1) {
+                    const n = data.split(',');
+                    value = `${n[0]},${n[1]}`;
+                }
+                if (data[data.length - 1] === ',') {
+                    value = data;
+                }
+                const n = data.replace('.', '').replace(',', '.');
+                value = Number(n).toLocaleString('es-ES');
             }
-            // si el ultimo caracter del numero es un ,
-            // retornalo
-            if (value[value.length - 1] === ',') {
-                return `${value},`;
-            }
-            const prev = Number(value.replaceAll('.', '').replace(',', '.'));
-            return Number(prev).toLocaleString('es-ES');
+            return value;
         },
         onInput(e) {
             const { value } = e.target;

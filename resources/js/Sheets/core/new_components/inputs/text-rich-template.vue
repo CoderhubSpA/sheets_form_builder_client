@@ -1,7 +1,20 @@
 <template>
-    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target" :linkDescription="link_description"
-        :tooltipInfo="tooltip" v-if="show_field">
-        <Editor api-key="no-api-key" :init="tinymceConfig" :id="id" v-if="tinymceConfig" v-model="content" />
+    <form-group
+        :id="id"
+        :label="label"
+        :required="required"
+        :linkTarget="link_target"
+        :linkDescription="link_description"
+        :tooltipInfo="tooltip"
+        v-if="show_field"
+    >
+        <Editor
+            api-key="no-api-key"
+            :init="tinymceConfig"
+            :id="id"
+            v-if="tinymceConfig"
+            v-model="content"
+        />
     </form-group>
 </template>
 <script>
@@ -9,7 +22,6 @@ import mix from '../mixs/input.vue';
 import FormGroup from '../templates/form-group.vue';
 import Editor from '@tinymce/tinymce-vue';
 import Axios from 'axios';
-
 
 export default {
     mixins: [mix],
@@ -32,7 +44,7 @@ export default {
     },
     methods: {
         onEntitySelected(entityTypeId) {
-            var htmlContent = ""
+            var htmlContent = '';
             //Extract content from tinymce editor
             if (entityTypeId == null) {
                 return;
@@ -43,10 +55,15 @@ export default {
                 htmlContent = editor.getContent();
                 this.content = htmlContent;
             }
-            Axios.get(`http://localhost:8001/entity/info/${entityTypeId}`).then((response) => {
-                const filteredData = response.data.content.columns.filter(column => column.valid == 1).map(column => {
-                    return { name: `${response.data.content.entity_type.name}:${column.name}`, id: column.id };
-                });
+            Axios.get(`/api/sheets/entity/info/${entityTypeId}`).then((response) => {
+                const filteredData = response.data.content.content.columns
+                    .filter((column) => column.valid == 1)
+                    .map((column) => {
+                        return {
+                            name: `${response.data.content.content.entity_type.name}:${column.name}`,
+                            id: column.id,
+                        };
+                    });
                 const dropDownItemsFromData = filteredData.reduce(function (acc, item) {
                     acc[item.name] = item.id;
                     return acc;
@@ -54,7 +71,9 @@ export default {
                 this.tinymceConfig = {
                     branding: false,
                     plugins: 'pagebreak table',
-                    toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat | mybutton pagebreak',
+                    promotion: false,
+                    toolbar:
+                        'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat | mybutton pagebreak',
                     setup: function (editor) {
                         // Add a custom button to the toolbar
                         editor.ui.registry.addMenuButton('mybutton', {
@@ -64,13 +83,18 @@ export default {
                                 editor.insertContent('Custom button clicked!');
                             },
                             fetch: (callback) => {
-                                const items = Object.entries(dropDownItemsFromData).map(([name, value]) => ({
-                                    type: 'menuitem',
-                                    text: name,
-                                    onAction: () => editor.insertContent(`&nbsp;<strong data-id="${value}"><span contenteditable="false">{{${name}}}</span></strong>&nbsp;`),
-                                }));
+                                const items = Object.entries(dropDownItemsFromData).map(
+                                    ([name, value]) => ({
+                                        type: 'menuitem',
+                                        text: name,
+                                        onAction: () =>
+                                            editor.insertContent(
+                                                `&nbsp;<strong data-id="${value}"><span contenteditable="false">{{${name}}}</span></strong>&nbsp;`
+                                            ),
+                                    })
+                                );
                                 callback(items);
-                            }
+                            },
                         });
                     },
                     pagebreak_separator: '<div class="pagebreak"></div>',
@@ -104,11 +128,11 @@ export default {
                             padding:4rem 6rem 6rem 6rem
                         }
                     }
-                `
+                `,
                 };
                 this.editorInstance = true;
-            })
-        }
+            });
+        },
     },
     watch: {
         selectorFilters: {
@@ -124,7 +148,6 @@ export default {
         if (this.selectorFilters[this.input.col_filter_by]) {
             this.onEntitySelected(this.selectorFilters[this.input.col_filter_by]);
         }
-
     },
 };
 </script>
