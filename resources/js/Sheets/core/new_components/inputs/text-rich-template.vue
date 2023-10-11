@@ -44,16 +44,12 @@ export default {
     },
     methods: {
         onEntitySelected(entityTypeId) {
-            var htmlContent = '';
             //Extract content from tinymce editor
             if (entityTypeId == null) {
                 return;
             }
             if (this.editorInstance) {
                 this.tinymceConfig = null;
-                const editor = tinymce.get(this.id);
-                htmlContent = editor.getContent();
-                this.content = htmlContent;
             }
             Axios.get(`/api/sheets/entity/info/${entityTypeId}`).then((response) => {
                 const filteredData = response.data.content.content.columns
@@ -72,6 +68,7 @@ export default {
                     branding: false,
                     plugins: 'pagebreak table',
                     promotion: false,
+                    height: 600,
                     toolbar:
                         'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat | mybutton pagebreak',
                     setup: function (editor) {
@@ -98,13 +95,11 @@ export default {
                         });
                     },
                     pagebreak_separator: '<div class="pagebreak"></div>',
-                    init: function (editor) {
-                        editor.setContent(htmlContent);
-                    },
                     init_instance_callback: function (_) {
                         var freeTiny = document.querySelector('.tox .tox-notification--in');
                         freeTiny.style.display = 'none';
                     },
+
                     // Estilo para semejanza a word
                     content_style: `
                     body {
@@ -143,11 +138,23 @@ export default {
             },
             deep: true,
         },
+        content: {
+            handler: function (val) {
+                if (val) {
+                    const data = {};
+                    data[this.id] = val;
+
+                    this.$emit('input', data);
+                }
+            },
+            deep: true,
+        },
     },
     mounted() {
         if (this.selectorFilters[this.input.col_filter_by]) {
             this.onEntitySelected(this.selectorFilters[this.input.col_filter_by]);
         }
+        this.content = this.inputValue;
     },
 };
 </script>
