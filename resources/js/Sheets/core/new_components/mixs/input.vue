@@ -55,7 +55,7 @@ export default {
             return this.input.placeholder;
         },
         inputValue() {
-            if(!this.updatedInput) {
+            if (!this.updatedInput) {
                 let result = {};
 
                 const e = {
@@ -150,7 +150,7 @@ export default {
         },
         tooltip() {
             return this.input.description || '';
-        }
+        },
     },
     methods: {
         readInputValue() {
@@ -214,6 +214,28 @@ export default {
             }
             const changed = new Event('input');
             event.target.dispatchEvent(changed);
+        },
+        /**
+         * Aplicar solo para campos numericos
+         * devuelve un string de un number
+         * bajo un formato numerico
+         */
+        formatNumberToES(data) {
+            let value = null;
+            if (typeof data === 'number' && data != null) {
+                value = data.toLocaleString('es-ES');
+            } else if (typeof data === 'string' && data != null) {
+                if (data.match(/,/g)?.length > 1) {
+                    const n = data.split(',');
+                    value = `${n[0]},${n[1]}`;
+                }
+                if (data[data.length - 1] === ',') {
+                    value = data;
+                }
+                const n = data.replace('.', '').replace(',', '.');
+                value = Number(n).toLocaleString('es-ES');
+            }
+            return value;
         },
     },
 };

@@ -77,23 +77,6 @@ export default {
             const regex = /^[1-9][0-9]*(\.[0-9]{1,5})?$/;
             return regex.test(num);
         },
-        formatNumberToES(data) {
-            let value = null;
-            if (typeof data === 'number' && data != null) {
-                value = data.toLocaleString('es-ES');
-            } else if (typeof data === 'string' && data != null) {
-                if (data.match(/,/g)?.length > 1) {
-                    const n = data.split(',');
-                    value = `${n[0]},${n[1]}`;
-                }
-                if (data[data.length - 1] === ',') {
-                    value = data;
-                }
-                const n = data.replace('.', '').replace(',', '.');
-                value = Number(n).toLocaleString('es-ES');
-            }
-            return value;
-        },
         onInput(e) {
             const { value } = e.target;
             const selectorFilters = {

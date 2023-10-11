@@ -520,7 +520,9 @@ export default {
                  */
                 const fieldsNumberES = this.$store.getters[
                     `${this.namespace}/fields_as_object`
-                ].filter((f) => f.format === 'NUMBER[ES]');
+                ].filter((f) =>
+                    ['NUMBER[ES]', 'PERCENTAGE', 'PERCENTAGE[X100]'].inlcudes(f.format)
+                );
 
                 if (fieldsNumberES.length > 0) {
                     fieldsNumberES.forEach((item) => {

@@ -13,7 +13,7 @@
             type="number"
             aria-label="Username"
             aria-describedby="basic-addon1"
-            class="form-control"
+            class="form-control number-to-right"
             :id="id"
             :placeholder="defaultValue"
             :value="inputValue"
@@ -51,10 +51,12 @@ export default {
                         `${this.state}/FIELD_SECTION_SHOW_HIDE`,
                         field_section_show_hide
                     );
-                    return val[this.id] * 100;
+                    const value = val[this.id] * 100;
+                    return this.formatNumberToES(value);
                 }
             }
-            return this.value ? parseFloat(this.value[this.id]) * 100 : '';
+            const value = this.value ? parseFloat(this.value[this.id]) * 100 : '';
+            return this.formatNumberToES(value);
         },
     },
     methods: {
