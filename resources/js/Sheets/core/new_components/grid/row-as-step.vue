@@ -7,7 +7,8 @@
                     :key="key"
                     :id="row.id"
                     :class="[
-                        { active: key === currentStep },
+                        { active: key === currentStep},
+                        { checked: row.checked},
                         { 'cursor-disabled': is_strict === '2' },
                         { 'errors-fields': row.errorsFields },
                         'progress-number',
@@ -15,6 +16,8 @@
                     @click="clickInProgressNumber(key)"
                 >
                     <strong>{{ row.name }}</strong>
+                    <br>
+                    <strong>{{ row.checked }}</strong>
                     <br />
                     <small v-show="row.errorsFields" class="errors-field-text"
                         >Existen errores de validación</small
@@ -137,8 +140,11 @@ export default {
             let setErrorMessageForMobile = 0;
 
             const rows = this.formRows.map((formRow) => {
+                formRow.checked = false;
+
                 const section = Object.assign({}, formRow);
                 let sectionWithErrorsFields = 0;
+
 
                 formRow.sections.forEach((section) => {
                     section.fields.forEach((field) => {
@@ -206,6 +212,12 @@ export default {
             this.activePreviousNextButtons();
         },
         nextStep() {
+            if(this.rows[this.currentStep].errorsFields === false) {
+                this.rows[this.currentStep].checked = true;
+            } else {
+                this.rows[this.currentStep].checked = false;
+            }
+
             //If the current step is less than the total number of rows, go forward one step
             if(this.currentStep + 1 < this.rows.length) {
                 this.currentStep++;
@@ -215,7 +227,7 @@ export default {
             if(this.currentStep + 1 === this.rows.length) {
                 this.last_row = true;
             }
-            
+
             this.activePreviousNextButtons();
         },
         rowHasStepGroups(value) {
@@ -307,16 +319,19 @@ export default {
 #progress li.active:before,
 #progress li.active:after {
     background: #00938f;
+    border: solid 1px #00938f;
 }
 
-#progress li.active:before,
-#progress li.active:after {
+#progress li.checked:before,
+#progress li.checked:after {
     background: #00938f;
+    border: solid 1px #00938f;
 }
 
 #progress li.errors-fields:before,
 #progress li.errors-fields:after {
     background: red;
+    border: solid 1px #00938f;
 }
 
 #progress li small.errors-field-text {
