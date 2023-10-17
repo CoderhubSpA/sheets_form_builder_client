@@ -35,41 +35,28 @@ export default {
     },
     computed: {
         inputValue() {
-            if (!this.updatedInput) {
-                const result = {};
+            const fields = this.$store.getters[`${this.state}/fields`];
 
-                const e = {
-                    target: {
-                        value: null,
-                    },
-                };
-
-                const fields = this.$store.getters[`${this.state}/fields`];
-
-                if (fields && fields.length > 0) {
-                    const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
-                    if (val) {
-                        result[this.id] = val[this.id];
-                        e.target.value = val[this.id];
-                    }
+            if (fields && fields.length > 0) {
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (val) {
+                    this.$emit('input', val);
+                    /**
+                     * mostrar/ocultar section
+                     */
+                    // eslint-disable-next-line camelcase
+                    const field_section_show_hide = {};
+                    field_section_show_hide[this.form_field_id] = val;
+                    this.$store.commit(
+                        `${this.state}/FIELD_SECTION_SHOW_HIDE`,
+                        field_section_show_hide
+                    );
+                    const value = val[this.id] * 100;
+                    return this.formatNumberToES(value);
                 }
-
-                if (result[this.id]) {
-                    this.onInput(e);
-                    return this.formatNumberToES(result[this.id]);
-                } else if (this.input.assign_default_value == 1) {
-                    return this.input.default_value;
-                } else {
-                    return "";
-                }
-
-            } else if(this.updatedInput[this.id] === "" && this.input.default_value) {
-                this.updatedInput[this.id] = this.input.default_value;
-
-                return "";
-            } else {
-                return this.formatNumberToES(this.updatedInput[this.id]);
             }
+            const value = !Number.isNaN(this.value) ? parseFloat(this.value[this.id]) * 100 : '';
+            return this.formatNumberToES(value);
         },
     },
     methods: {

@@ -6,13 +6,10 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
-
         v-if="show_field"
     >
         <input
-            type="number"
-            aria-label="Username"
-            aria-describedby="basic-addon1"
+            type="text"
             class="form-control number-to-right"
             :id="id"
             :placeholder="defaultValue"
@@ -20,6 +17,7 @@
             :disabled="disabled"
             @input="onInput"
             @paste="onPaste"
+            lang="es"
         />
     </input-group>
 </template>
@@ -35,41 +33,56 @@ export default {
     },
     computed: {
         inputValue() {
-            if (!this.updatedInput) {
-                const result = {};
+            const fields = this.$store.getters[`${this.state}/fields`];
 
-                const e = {
-                    target: {
-                        value: null,
-                    },
-                };
-
-                const fields = this.$store.getters[`${this.state}/fields`];
-
-                if (fields && fields.length > 0) {
-                    const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
-                    if (val) {
-                        result[this.id] = val[this.id];
-                        e.target.value = val[this.id];
-                    }
+            if (fields && fields.length > 0) {
+                const val = fields.filter((f) => Object.keys(f)[0] === this.id)[0];
+                if (val) {
+                    this.$emit('input', val);
+                    /**
+                     * mostrar/ocultar section
+                     */
+                    // eslint-disable-next-line camelcase
+                    const field_section_show_hide = {};
+                    field_section_show_hide[this.form_field_id] = val;
+                    this.$store.commit(
+                        `${this.state}/FIELD_SECTION_SHOW_HIDE`,
+                        field_section_show_hide
+                    );
+                    const value = val[this.id];
+                    return !Number.isNaN(value) ? this.formatNumberToES(value) : '';
                 }
-
-                if (result[this.id]) {
-                    this.onInput(e);
-                    return this.formatNumberToES(result[this.id]);
-                } else if (this.input.assign_default_value == 1) {
-                    return this.input.default_value;
-                } else {
-                    return "";
-                }
-
-            } else if(this.updatedInput[this.id] === "" && this.input.default_value) {
-                this.updatedInput[this.id] = this.input.default_value;
-
-                return "";
-            } else {
-                return this.formatNumberToES(this.updatedInput[this.id]);
             }
+            const value = !Number.isNaN(this.value) ? parseFloat(this.value[this.id]) : '';
+            return value ? this.formatNumberToES(value) : '';
+        },
+    },
+    methods: {
+        onInput(e) {
+            const { value } = e.target;
+
+            if (this.formatNumberToES(value) === 'NaN') {
+                this.value[this.id] = '';
+                this.$emit('input', this.value);
+                return;
+            }
+
+            this.value[this.id] = this.formatNumberToES(value);
+            this.$emit('input', this.value);
+            /**
+             * mostrar/ocultar section
+             */
+            // eslint-disable-next-line camelcase
+            const field_section_show_hide = {};
+            field_section_show_hide[this.form_field_id] = value;
+            this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, field_section_show_hide);
+            /**
+             * mostrar/ocultar field
+             */
+            // eslint-disable-next-line camelcase
+            const field_show_hide = {};
+            field_show_hide[this.form_field_id] = value;
+            this.$store.commit(`${this.state}/FIELD_SHOW_HIDE`, field_show_hide);
         },
     },
 };

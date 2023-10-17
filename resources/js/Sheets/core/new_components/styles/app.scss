@@ -32,3 +32,11 @@
 .hide {
     display: none;
 }
+
+input[type=text].number-to-right {
+    text-align: right;
+}
+
+input[type=number].number-to-right {
+    text-align: right;
+}

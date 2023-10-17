@@ -6,13 +6,10 @@
         :linkTarget="link_target"
         :linkDescription="link_description"
         :tooltipInfo="tooltip"
-
         v-if="show_field"
     >
         <input
             type="number"
-            aria-label="Username"
-            aria-describedby="basic-addon1"
             class="form-control number-to-right"
             :id="id"
             :placeholder="defaultValue"
@@ -52,11 +49,11 @@ export default {
                         field_section_show_hide
                     );
                     const value = val[this.id] * 100;
-                    return this.formatNumberToES(value);
+                    return value;
                 }
             }
-            const value = this.value ? parseFloat(this.value[this.id]) * 100 : '';
-            return this.formatNumberToES(value);
+            const value = !Number.isNaN(this.value) ? parseFloat(this.value[this.id]) * 100 : '';
+            return value;
         },
     },
     methods: {
