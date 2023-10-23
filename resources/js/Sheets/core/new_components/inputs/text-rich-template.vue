@@ -81,11 +81,14 @@ export default {
 
             return filteredData.reduce((acc, item) => {
                 acc[item.id] = item.subdata
-                    ? item.subdata.reduce((subAcc, subitem) => {
-                          subAcc[subitem.id] = subitem.name;
-                          return subAcc;
-                      }, {})
-                    : item.name;
+                    ? {
+                          name: item.name,
+                          values: item.subdata.reduce((subAcc, subitem) => {
+                              subAcc[subitem.id] = { name: subitem.name, id: subitem.id };
+                              return subAcc;
+                          }, {}),
+                      }
+                    : { name: item.name };
                 return acc;
             }, {});
         },
@@ -116,24 +119,24 @@ export default {
                             },
                             fetch: (callback) => {
                                 const items = Object.entries(dropDownItemsFromData).map(
-                                    ([value, name]) => {
+                                    ([id, values]) => {
                                         const type =
-                                            typeof value === 'object'
+                                            typeof values.values === 'object'
                                                 ? 'nestedmenuitem'
                                                 : 'menuitem';
                                         if (type == 'nestedmenuitem') {
                                             return {
                                                 type: 'nestedmenuitem',
-                                                text: name,
+                                                text: values.name,
                                                 getSubmenuItems: () => {
-                                                    return Object.entries(value).map(
-                                                        ([subvalue, subname]) => {
+                                                    return Object.entries(values.values).map(
+                                                        ([subid, subvalues]) => {
                                                             return {
                                                                 type: 'menuitem',
-                                                                text: subname,
+                                                                text: subvalues.name,
                                                                 onAction: () => {
                                                                     editor.insertContent(
-                                                                        `&nbsp;<strong data-id="${subvalue}"><span contenteditable="false">{{${name} : ${subname}}}</span></strong>&nbsp;`
+                                                                        `&nbsp;<strong data-id="${subid}"><span contenteditable="false">{{${values.name} : ${subvalues.name}}}</span></strong>&nbsp;`
                                                                     );
                                                                 },
                                                             };
@@ -144,10 +147,10 @@ export default {
                                         } else if (type == 'menuitem') {
                                             return {
                                                 type: 'menuitem',
-                                                text: name,
+                                                text: values.name,
                                                 onAction: () => {
                                                     editor.insertContent(
-                                                        `&nbsp;<strong data-id="${value}"><span contenteditable="false">{{${name}}}</span></strong>&nbsp;`
+                                                        `&nbsp;<strong data-id="${id}"><span contenteditable="false">{{${values.name}}}</span></strong>&nbsp;`
                                                     );
                                                 },
                                             };
