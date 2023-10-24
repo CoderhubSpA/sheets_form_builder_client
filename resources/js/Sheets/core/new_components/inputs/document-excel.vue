@@ -13,7 +13,6 @@
                     type="button"
                     id="inputGroupFileAddon04"
                     @click="onShowFile()"
-                    :disabled="disabled"
                 >
                     <i class="fa fa-eye fa-lg"></i>
                 </button>
