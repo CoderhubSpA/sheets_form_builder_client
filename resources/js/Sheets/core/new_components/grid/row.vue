@@ -10,10 +10,10 @@
                             :row="row"
                             :state="state"
                             :base_url="base_url"
-                            :input="emitData"
                             :lastRow="last_row"
                             v-on:previous-row="previousRow"
                             v-on:next-row="nextRow"
+                            v-on:input="emitData"
                         ></step-as-step>
                     </div>
                     <div class="col-12" v-if="!grouped_sections">
@@ -143,8 +143,8 @@ export default {
     },
     methods: {
         // Emit the data model to the parent component
-        emitData(model) {
-            this.$emit('input', model);
+        emitData(data) {
+            this.$emit('input', data);
         },
         // Notify the parent component that the user has moved to the previous row
         previousRow() {

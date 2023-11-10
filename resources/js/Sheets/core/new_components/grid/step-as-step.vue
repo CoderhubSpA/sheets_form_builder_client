@@ -25,6 +25,7 @@
                     :section="sect"
                     :state="state"
                     :base_url="baseUrl"
+                    v-on:input="emitData"
                 >
                 </sheets-section>
             </div>
@@ -209,7 +210,10 @@ export default {
                     this.$emit('next-row');
                 }
             }
-        }
+        },
+        emitData(data) {
+            this.$emit('input', data);
+        },
     }
 }
 </script>

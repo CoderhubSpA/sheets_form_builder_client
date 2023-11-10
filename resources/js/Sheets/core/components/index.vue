@@ -38,7 +38,7 @@ export default {
             default: '',
         },
         record_id: {
-            type: String,
+            type: [String, Number],
             default: '',
         },
         params: {

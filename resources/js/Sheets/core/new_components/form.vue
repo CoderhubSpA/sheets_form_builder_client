@@ -39,7 +39,7 @@
                     v-on:sections-with-errors="sectionsWithErrors"
                 />
             </div>
-            <div class="row text-center sheets-actions-container" v-if="is_step_row === '2' && show_actions_from_step">
+            <div class="row text-center sheets-actions-container" v-if="is_step_row == '2' && show_actions_from_step">
                 <div class="col" v-for="(action, key) in formActions" :key="key">
                     <sheets-action
                         :disabledaction="disabledAction"
@@ -97,7 +97,7 @@ export default {
         },
         // ID del registro
         record_id: {
-            type: String,
+            type: [String, Number],
             require: false,
             default: '',
         },
@@ -126,7 +126,7 @@ export default {
             default: '',
         },
         is_step_row: {
-            type: String,
+            type: [String, Number],
             default: 'false',
         },
         // Retrieve the parent form data from the parent component
@@ -770,6 +770,7 @@ export default {
             return allowedFields;
         },
         showActionsFromStep (value) {
+            console.log("showActionsFromStep", value)
             this.show_actions_from_step = value;
         },
         sectionsWithErrors(sections) {
@@ -822,8 +823,6 @@ export default {
                     }
                 });
             }
-
-            console.log("scripts", scripts);
         }
     },
 };

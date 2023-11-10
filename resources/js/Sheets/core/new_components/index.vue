@@ -10,7 +10,7 @@ export default {
             require: true,
         },
         record_id: {
-            type: String,
+            type: [String, Number],
             default: '',
         },
     },

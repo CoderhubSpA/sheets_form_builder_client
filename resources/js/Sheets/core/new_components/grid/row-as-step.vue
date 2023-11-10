@@ -16,8 +16,6 @@
                     @click="clickInProgressNumber(key)"
                 >
                     <strong>{{ row.name }}</strong>
-                    <br>
-                    <strong>{{ row.checked }}</strong>
                     <br />
                     <small v-show="row.errorsFields" class="errors-field-text"
                         >Existen errores de validación</small
@@ -119,7 +117,7 @@ export default {
             default: '',
         },
         is_strict: {
-            type: String,
+            type: [String, Number],
             default: 'false',
         },
     },
@@ -175,11 +173,11 @@ export default {
         },
         currentStep (val) {
             if (val ) {
-                if (val + 1 !== this.formRows.length && this.is_strict === '2') {
+                if (val + 1 !== this.formRows.length && this.is_strict == '2') {
                     this.$emit('show-actions', false);
                 }
 
-                if (val + 1 === this.formRows.length && this.is_strict === '2') {
+                if (val + 1 === this.formRows.length && this.is_strict == '2') {
                     this.$emit('show-actions', true);
                 }
             }
