@@ -48,7 +48,7 @@ export default {
     mounted() {
         this.$nextTick(() => {
             const { modal } = this.$refs;
-            modal.style.display = 'block';
+            modal.style.display = this.dialog ? 'block' : 'none';
         });
     },
     methods: {
