@@ -72,6 +72,7 @@
                 v-on:previous-row="previousStep"
                 v-on:next-row="nextStep"
                 v-on:has-groups="rowHasStepGroups"
+                v-on:validate-require-fields="validateRequireFields"
             />
         </div>
         <div class="mb-4 text-right" v-if="!ifRowHasStepGroups">
@@ -250,6 +251,9 @@ export default {
             } else {
                 this.ifRowHasStepGroups = false;
             }
+        },
+        validateRequireFields() {
+            this.$emit('validate-require-fields');
         }
     },
 };

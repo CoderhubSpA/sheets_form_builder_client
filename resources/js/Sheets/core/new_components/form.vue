@@ -37,6 +37,7 @@
                     v-model="formAnswer"
                     v-on:show-actions="showActionsFromStep"
                     v-on:sections-with-errors="sectionsWithErrors"
+                    v-on:validate-require-fields="validateRequireFields"
                 />
             </div>
             <div class="row text-center sheets-actions-container" v-if="is_step_row == '2' && show_actions_from_step">
@@ -770,7 +771,6 @@ export default {
             return allowedFields;
         },
         showActionsFromStep (value) {
-            console.log("showActionsFromStep", value)
             this.show_actions_from_step = value;
         },
         sectionsWithErrors(sections) {
@@ -823,6 +823,10 @@ export default {
                     }
                 });
             }
+        },
+        validateRequireFields() {
+            this.validateAllFields();
+            this.getSMAValidation();
         }
     },
 };

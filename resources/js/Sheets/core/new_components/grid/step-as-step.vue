@@ -100,6 +100,7 @@ export default {
         countSteps() {
             return Object.keys(this.groupedSections).length;
         },
+
     },
     watch: {
         rowModel() {
@@ -196,6 +197,7 @@ export default {
         },
         nextStep() {
             // Check if the sections were set
+            this.validateRequireFields();
             if(this.setSections(Object.keys(this.groupedSections)[this.currentStep])) {
                 // If they were set, move to the next step
                 this.currentStep++;
@@ -214,6 +216,9 @@ export default {
         emitData(data) {
             this.$emit('input', data);
         },
+        validateRequireFields() {
+            this.$emit('validate-require-fields');
+        }
     }
 }
 </script>

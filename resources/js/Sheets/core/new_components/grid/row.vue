@@ -14,6 +14,7 @@
                             v-on:previous-row="previousRow"
                             v-on:next-row="nextRow"
                             v-on:input="emitData"
+                            v-on:validate-require-fields="validateRequireFields"
                         ></step-as-step>
                     </div>
                     <div class="col-12" v-if="!grouped_sections">
@@ -153,6 +154,9 @@ export default {
         // Notify the parent component that the user has moved to the next row
         nextRow() {
             this.$emit('next-row');
+        },
+        validateRequireFields() {
+            this.$emit('validate-require-fields');
         }
     }
 };
