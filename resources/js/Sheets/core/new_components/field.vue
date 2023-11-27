@@ -53,7 +53,9 @@ export default {
         fieldInput() {
             const chars = { '[': '-', ']': '' };
             const format = this.field.format.toLowerCase().replace(/\[|\]/g, (m) => chars[m]);
-            return () => import(`./inputs/${format}`);
+            return () => import(`./inputs/${format}`).then((module) => module.default).catch(() => {
+                return import(`./inputs/text`)
+            });
         },
         xl() {
             return this.field.col_xl || 12;
