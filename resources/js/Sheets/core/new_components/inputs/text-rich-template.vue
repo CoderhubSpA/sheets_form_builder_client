@@ -48,7 +48,12 @@ export default {
             const response = await Axios.get(`/api/sheets/entity/info/${entityTypeId}`);
             return response.data.content.content.columns
                 .filter((column) => {
-                    return column.valid == 1 && column.visible == 1 && column.format != 'DOCUMENT';
+                    return (
+                        column.valid == 1 &&
+                        column.visible == 1 &&
+                        column.format != 'DOCUMENT' &&
+                        column.format != 'FORM'
+                    );
                 })
                 .map((column) => {
                     return {
@@ -56,6 +61,7 @@ export default {
                         entity_name: response.data.content.content.entity_type.name,
                         id: column.id,
                         entity_type_permission_fk: column.entity_type_permission_fk,
+                        entity_type_pivot_fk: column.entity_type_pivot_fk,
                         subdata: null,
                         format: column.format,
                     };
@@ -140,9 +146,12 @@ export default {
         // Si una columna tiene entity_type_permission_fk se realiza nuevamente la request de sus columnas
         async fetchSubdata(column) {
             if (column.entity_type_permission_fk) {
-                const columnfilteredData = await this.fetchValidColumns(
+                let columnfilteredData = await this.fetchValidColumns(
                     column.entity_type_permission_fk
                 );
+                if (columnfilteredData.length == 0) {
+                    columnfilteredData = await this.fetchValidColumns(column.entity_type_pivot_fk);
+                }
                 column.name = column.name;
                 column.subdata = columnfilteredData;
             }
@@ -181,7 +190,23 @@ export default {
                                                 : 'menuitem';
                                         if (
                                             type == 'nestedmenuitem' &&
-                                            values.format != 'SELECTOR[MULTIPLE]'
+                                            (values.format == 'SELECTOR[MULTIPLE]' ||
+                                                values.format == 'SELECTOR[MULTIPLE][ADVANCED]')
+                                        ) {
+                                            return {
+                                                type: 'menuitem',
+                                                text: values.name + '*',
+                                                onAction: () => {
+                                                    editor.execCommand('openCustomDialog', {
+                                                        id: id,
+                                                        values: values,
+                                                    });
+                                                },
+                                            };
+                                        } else if (
+                                            type == 'nestedmenuitem' &&
+                                            (values.format != 'SELECTOR[MULTIPLE]' ||
+                                                values.format != 'SELECTOR[MULTIPLE][ADVANCED]')
                                         ) {
                                             return {
                                                 type: 'nestedmenuitem',
@@ -202,7 +227,7 @@ export default {
                                                     );
                                                 },
                                             };
-                                        } else if (type == 'menuitem') {
+                                        } else {
                                             return {
                                                 type: 'menuitem',
                                                 text: values.name,
@@ -210,20 +235,6 @@ export default {
                                                     editor.insertContent(
                                                         `&nbsp;<strong data-id="${id}"><span contenteditable="false">{{${values.name}}}</span></strong>&nbsp;`
                                                     );
-                                                },
-                                            };
-                                        } else if (
-                                            type == 'nestedmenuitem' &&
-                                            values.format == 'SELECTOR[MULTIPLE]'
-                                        ) {
-                                            return {
-                                                type: 'menuitem',
-                                                text: values.name + '*',
-                                                onAction: () => {
-                                                    editor.execCommand('openCustomDialog', {
-                                                        id: id,
-                                                        values: values,
-                                                    });
                                                 },
                                             };
                                         }
@@ -234,19 +245,6 @@ export default {
                         });
                         // Funcion custom para agregar el dialogo correspondiente a un selector multiple
                         editor.addCommand('openCustomDialog', function (multiselectorItem) {
-                            // console.log(multiselectorItem);
-                            // console.log(
-                            //     Object.entries(
-                            //         multiselectorItem.values.values
-                            //     ).map(([id, values]) => {
-                            //         return {
-                            //             type: "checkbox",
-                            //             name: id,
-                            //             label: values.name,
-                            //             enabled: false,
-                            //         };
-                            //     })
-                            // );
                             editor.windowManager.open({
                                 title: 'Insertar selector multiple',
                                 body: {
