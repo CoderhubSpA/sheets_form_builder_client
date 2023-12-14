@@ -128,7 +128,7 @@ export default {
         },
         is_step_row: {
             type: [String, Number],
-            default: 'false',
+            default: '0',
         },
         // Retrieve the parent form data from the parent component
         parent_form_data: {
@@ -154,7 +154,6 @@ export default {
         snackbar: { message: '', success: false, show: false },
         action: {},
         disabledAction: false,
-        errorsOnSMA: false,
         errorRequiredFields: false,
         errorOnLoadFiles: false,
         uploadingForm: false,
@@ -447,7 +446,7 @@ export default {
         },
         async getSMAValidation() {
             this.$store.commit(`${this.namespace}/ERRORSSMA`, null);
-            this.errorsOnSMA = false;
+
             await this.result.forEach((data) => {
                 const fieldId = Object.keys(data)[0];
                 this.formRows.forEach((row) => {
@@ -461,7 +460,6 @@ export default {
                                     );
                                     if (!valid) {
                                         this.$store.commit(`${this.namespace}/ERRORSSMA`, field.id);
-                                        this.errorsOnSMA = true;
                                     }
                                 }
                             }
@@ -469,13 +467,14 @@ export default {
                     });
                 });
             });
-            return true;
         },
         async save() {
             this.uploadingForm = true;
+
             await this.validateAllFields();
             await this.getSMAValidation();
-            if (this.errorRequiredFields === false && this.errorsOnSMA === false) {
+
+            if (this.errorRequiredFields === false) {
                 this.disabledAction = true;
                 this.uploadingForm = true;
                 const entityId = this.$store.getters[`${this.namespace}/entity_id`];
@@ -689,7 +688,7 @@ export default {
                 return;
             }
 
-            if (this.errorRequiredFields === false && this.errorsOnSMA === false) {
+            if (this.errorRequiredFields === false) {
                 this.$store.commit(`${this.namespace}/CLEARFIELDS`, false);
 
                 this.$store.commit(`${this.namespace}/CLEAR_ERRORS_FIELDS`);
@@ -801,7 +800,7 @@ export default {
         executeScripts(scripts) {
             if(scripts.length > 0) {
                 scripts.forEach((script) => {
-                    if( script.actions.length > 0) {
+                    if(Array.isArray(script.actions) && script.actions.length > 0) {
                         script.actions.forEach((action) => {
                             if(action.type) {
                                 switch (action.type) {
@@ -825,9 +824,9 @@ export default {
                 });
             }
         },
-        validateRequireFields() {
-            this.validateAllFields();
-            this.getSMAValidation();
+        async validateRequireFields() {
+            await this.validateAllFields();
+            await this.getSMAValidation();
         }
     },
 };

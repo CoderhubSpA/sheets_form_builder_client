@@ -138,7 +138,7 @@ export default {
                     .then((response) => {
                         const rows = [];
                         const apiResponse = response.data.content;
-                        if (params.length > 0) {
+                        if (params && params.length > 0) {
                             const parametrosJson = JSON.parse(params);
                             apiResponse.fields.map((item) => {
                                 Object.keys(parametrosJson).forEach((paramkey) => {
