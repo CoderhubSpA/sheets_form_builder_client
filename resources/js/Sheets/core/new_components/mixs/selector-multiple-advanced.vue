@@ -181,7 +181,8 @@ export default {
         hotTableLoaded: false,
         optionsFiltered: [],
         mainLabel: "",
-        disableAddRow: false
+        disableAddRow: false,
+        canCreateOverPivotTable: true,
     }),
     mounted() {
         this.getEntityInfo();
@@ -207,6 +208,14 @@ export default {
                     // ARMO EL CONTENIDO DE CADA ROW
                     this.buildHotTableData();
                     this.loadingSelector = false;
+
+                    // determinar si se tiene permisos sobre tabla pivot para crear rows
+                    // content.content.entity_type_permission
+                    const { entity_type_permission } = response.data.content.content;
+                    const canCreateOverPivotTable = entity_type_permission.filter(
+                        (ettp) => parseInt(ettp.create, 10) === 1
+                    );
+                    this.canCreateOverPivotTable = canCreateOverPivotTable.length > 0;
                 })
                 .catch((error) => {
                     // eslint-disable-next-line no-console

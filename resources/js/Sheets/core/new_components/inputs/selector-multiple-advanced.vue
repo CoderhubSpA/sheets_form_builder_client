@@ -23,7 +23,13 @@
                         </span>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-sm" @click="addRow" v-if="!disableAddRow">&plus;</button>
+                <button
+                    class="btn btn-primary btn-sm"
+                    @click="addRow"
+                    v-if="!disableAddRow && canCreateOverPivotTable"
+                >
+                    &plus;
+                </button>
             </div>
         </div>
         <div class="row" v-if="hotTableLoaded">
@@ -59,7 +65,6 @@ export default {
     components: {
         HotTable,
     },
-    data: () => ({}),
     methods: {
         getClass() {
             if (this.input.link_url !== null && this.input.link_url !== undefined) {
