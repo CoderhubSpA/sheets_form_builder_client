@@ -45,6 +45,10 @@ export default {
     methods: {
         //Se realiza la request de las columnas de la entidad y se filtra las que son posibles ocupar en plantilla
         async fetchValidColumns(entityTypeId) {
+            if (!entityTypeId) {
+                return {};
+            }
+
             const response = await Axios.get(`/api/sheets/entity/info/${entityTypeId}`);
             return response.data.content.content.columns
                 .filter((column) => {
@@ -67,86 +71,81 @@ export default {
                     };
                 });
         },
-        async generateDropDownItems(filteredData) {
-            const hasEntityTypePermissionFk = filteredData.some(
-                (column) => column.entity_type_permission_fk
-            );
-
-            if (hasEntityTypePermissionFk) {
-                const groupedColumns = {};
-                const usedEntities = {};
-                // Se agrupan los elementos con la misma entity_type_permission_fk, de esa forma no aparecen duplicados en el dropdown
-                filteredData.forEach((column) => {
-                    if (column.entity_type_permission_fk) {
-                        if (!groupedColumns[column.entity_type_permission_fk]) {
-                            groupedColumns[column.entity_type_permission_fk] = {
-                                name: '',
-                                entity_name: column.entity_name,
-                                column: column,
-                                subdata: null,
-                            };
-                        }
-                        groupedColumns[column.entity_type_permission_fk].name += column.name + ', ';
-                    }
-                });
-                // Se realiza el fetch de la data de las columnas agrupadas
-                await Promise.all(
-                    Object.values(groupedColumns).map((group) => this.fetchSubdata(group.column))
-                );
-
-                //Tomando la data original, la transformamos a los elementos finales para el dropdown
-                return filteredData.reduce((acc, item) => {
-                    // Si el elemento tiene un entity_type_permission_fk y no ha sido usado, se agrega al dropdown
-                    if (
-                        item.entity_type_permission_fk &&
-                        !usedEntities[item.entity_type_permission_fk]
-                    ) {
-                        acc[item.id] = {
-                            name: `${
-                                groupedColumns[item.entity_type_permission_fk].entity_name
-                            } : ${groupedColumns[item.entity_type_permission_fk].name.slice(
-                                0,
-                                -2
-                            )}`,
-                            format: item.format,
-                            values: groupedColumns[
-                                item.entity_type_permission_fk
-                            ].column.subdata.reduce((subAcc, subitem) => {
-                                subAcc[subitem.id] = {
-                                    name: subitem.name,
-                                    id: subitem.id,
-                                };
-                                return subAcc;
-                            }, {}),
-                        };
-                        usedEntities[item.entity_type_permission_fk] = true;
-                    }
-                    // Si el elemento tiene un entity_type_permission_fk y ya ha sido usado, no se agrega al dropdown
-                    else if (
-                        item.entity_type_permission_fk &&
-                        usedEntities[item.entity_type_permission_fk]
-                    ) {
-                        return acc;
-                    }
-                    // Si el elemento no tiene un entity_type_permission_fk, se agrega al dropdown
-                    else {
-                        acc[item.id] = {
-                            name: `${item.entity_name} : ${item.name}`,
-                        };
+        async groupAndFetchSubdata(filteredData, i = 0) {
+            if (i == 2) {
+                return filteredData;
+            }
+            let result = Object.values(
+                filteredData.reduce((acc, item) => {
+                    let key =
+                        item.entity_type_permission_fk !== null
+                            ? item.entity_type_permission_fk
+                            : item.id;
+                    if (acc[key]) {
+                        acc[key].name += `, ${item.name}`;
+                    } else {
+                        acc[key] = { ...item };
                     }
                     return acc;
-                }, {});
+                }, {})
+            );
+            // make a group with all elements that have a entity_type_permission_fk different from null
+            let groupedColumns = {};
+            result.forEach((column) => {
+                if (column.entity_type_permission_fk) {
+                    groupedColumns[column.entity_type_permission_fk] = column;
+                }
+            });
+            // fetch the data of the grouped columns
+            await Promise.all(
+                Object.values(groupedColumns).map((group) => this.fetchSubdata(group))
+            );
+            //replace in result the grouped columns with the subdata
+            result = result.map((column) => {
+                if (column.entity_type_permission_fk) {
+                    column = groupedColumns[column.entity_type_permission_fk];
+                }
+                return column;
+            });
+            for (let item of result) {
+                if (item.subdata) {
+                    item.subdata = await this.groupAndFetchSubdata(item.subdata, i + 1);
+                }
             }
-
+            console.log(result);
+            return result;
+        },
+        async generateDropDownItems(filteredData) {
+            // Funcion recursiva que solamente se ocupa en el scope de la funcion generateDropDownItems
+            function formatData(item) {
+                return {
+                    name: `${item.entity_name} : ${item.name}`,
+                    id: item.id,
+                    format: item.format,
+                    values: item.subdata
+                        ? item.subdata.reduce((subAcc, subitem) => {
+                              subAcc[subitem.id] = formatData(subitem);
+                              return subAcc;
+                          }, {})
+                        : null,
+                };
+            }
+            filteredData = await this.groupAndFetchSubdata(filteredData);
             return filteredData.reduce((acc, item) => {
-                acc[item.id] = { name: item.name };
+                if (item.entity_type_permission_fk) {
+                    acc[item.id] = formatData(item);
+                } else {
+                    acc[item.id] = {
+                        name: `${item.entity_name} : ${item.name}`,
+                    };
+                }
                 return acc;
             }, {});
         },
         // Si una columna tiene entity_type_permission_fk se realiza nuevamente la request de sus columnas
         async fetchSubdata(column) {
             if (column.entity_type_permission_fk) {
-                let columnfilteredData = await this.fetchValidColumns(
+                var columnfilteredData = await this.fetchValidColumns(
                     column.entity_type_permission_fk
                 );
                 if (columnfilteredData.length == 0) {
@@ -155,6 +154,251 @@ export default {
                 column.name = column.name;
                 column.subdata = columnfilteredData;
             }
+        },
+        createDropDown(data, editor, prevName = '') {
+            return Object.entries(data).map(([id, values]) => {
+                var type;
+                if (values.values == null) {
+                    type = 'menuitem';
+                } else {
+                    type = typeof values.values === 'object' ? 'nestedmenuitem' : 'menuitem';
+                }
+
+                if (
+                    type == 'nestedmenuitem' &&
+                    (values.format == 'SELECTOR[MULTIPLE]' ||
+                        values.format == 'SELECTOR[MULTIPLE][ADVANCED]')
+                ) {
+                    return {
+                        type: 'menuitem',
+                        text: values.name,
+                        icon: 'plus',
+                        onAction: () => {
+                            editor.execCommand('openCustomDialog', {
+                                id: id,
+                                values: values,
+                            });
+                        },
+                    };
+                } else if (
+                    type == 'nestedmenuitem' &&
+                    (values.format != 'SELECTOR[MULTIPLE]' ||
+                        values.format != 'SELECTOR[MULTIPLE][ADVANCED]' ||
+                        values.values != null)
+                ) {
+                    return {
+                        type: 'nestedmenuitem',
+                        text: values.name,
+                        getSubmenuItems: () => {
+                            return this.createDropDown(
+                                values.values,
+                                editor,
+                                prevName + (prevName != '' ? ' : ' : '') + values.name + ' : '
+                            );
+                        },
+                    };
+                } else {
+                    return {
+                        type: 'menuitem',
+                        text: values.name,
+                        onAction: () => {
+                            editor.insertContent(
+                                `&nbsp;<strong data-id="${id}"><span contenteditable="false">{{${prevName}${values.name}}}</span></strong>&nbsp;`
+                            );
+                        },
+                    };
+                }
+            });
+        },
+        tablepageconfig(multiselectorItem) {
+            return {
+                title: 'Insertar selector multiple',
+                size: 'large',
+                body: {
+                    type: 'panel',
+                    items: [
+                        {
+                            type: 'label',
+                            label: 'Seleccionar las columnas que aparecerán en el documento como tabla',
+                            items: Object.entries(multiselectorItem.values.values).map(
+                                ([id, values]) => {
+                                    return {
+                                        type: 'grid',
+                                        columns: 2,
+                                        items: [
+                                            {
+                                                type: 'checkbox',
+                                                name: id,
+                                                label: values.name,
+                                                enabled: false,
+                                            },
+                                            {
+                                                type: 'input',
+                                                name: id + 'orden',
+                                                placeholder: 'Orden',
+                                                inputMode: 'numeric',
+                                            },
+                                        ],
+                                    };
+                                }
+                            ),
+                        },
+                    ],
+                },
+                buttons: [
+                    {
+                        type: 'cancel',
+                        text: 'Cancelar',
+                    },
+                    {
+                        type: 'submit',
+                        text: 'Insertar',
+                        buttonType: 'primary',
+                    },
+                ],
+                onSubmit: (api) => {
+                    const data = api.getData();
+                    const selectedColumns = Object.entries(multiselectorItem.values.values)
+                        .map(([id, column]) => {
+                            if (data[id] === false) {
+                                return null;
+                            }
+                            return {
+                                id,
+                                name: column.name,
+                                orden: data[id + 'orden'],
+                            };
+                        })
+                        .filter((column) => column !== null)
+                        .sort((a, b) => a.orden - b.orden);
+                    const textToInsert = `&nbsp;<strong data-table-id="${
+                        multiselectorItem.id
+                    }" data-columns-ids="${selectedColumns
+                        .map((column) => column.id)
+                        .join(',')}"><span contenteditable="false">{{<br/>Tabla de ${
+                        multiselectorItem.values.name
+                    } <br/> con columnas: <br/> ${selectedColumns
+                        .map((column) => column.name)
+                        .join('<br/>')}<br/>}}</span></strong>&nbsp;`;
+                    tinymce.activeEditor.execCommand('mceInsertContent', false, textToInsert);
+                    api.close();
+                },
+            };
+        },
+        selectorpageconfig(multiselectorItem) {
+            return {
+                title: 'Selector multiple',
+                size: 'large',
+                body: {
+                    type: 'panel',
+                    items: [
+                        {
+                            type: 'htmlpanel',
+                            html: `<p>Quiere insertar una tabla o una lista a partir de la columna seleccionada?</p>`,
+                        },
+                    ],
+                },
+                buttons: [
+                    {
+                        type: 'custom',
+                        name: 'lista',
+                        text: 'Lista',
+                        align: 'start',
+                        buttonType: 'primary',
+                    },
+                    {
+                        type: 'custom',
+                        text: 'Tabla',
+                        name: 'tabla',
+                        align: 'end',
+                        buttonType: 'primary',
+                    },
+                ],
+                onAction: (api, details) => {
+                    if (details.name == 'lista') {
+                        api.redial(this.listpageconfig(multiselectorItem));
+                    } else if (details.name == 'tabla') {
+                        api.redial(this.tablepageconfig(multiselectorItem));
+                    }
+                },
+            };
+        },
+        listpageconfig(multiselectorItem) {
+            return {
+                title: 'Insertar selector multiple',
+                size: 'large',
+                body: {
+                    type: 'panel',
+                    items: [
+                        {
+                            type: 'label',
+                            label: 'Insertar texto a mostrar en la lista',
+                            items: [
+                                {
+                                    type: 'htmlpanel', // component type
+                                    html: "<div contenteditable='true' style='margin: 10px; border: 1px solid black; padding: 10px; height: 100%;' id='textareaA'></div>",
+                                },
+                                {
+                                    type: 'selectbox', // component type
+                                    name: 'SelectA', // identifier
+                                    label: 'Select Label',
+                                    enabled: true, // enabled state
+                                    size: 1, // number of visible values (optional)
+                                    items: [
+                                        { text: 'None', value: 'None' },
+                                        ...Object.entries(multiselectorItem.values.values).map(
+                                            ([id, values]) => {
+                                                return {
+                                                    text: values.name,
+                                                    value: `&nbsp;<strong data-id="${id}"><span contenteditable="false">{{${values.name}}}</span></strong>&nbsp;`,
+                                                };
+                                            }
+                                        ),
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                buttons: [
+                    {
+                        type: 'cancel',
+                        text: 'Cancelar',
+                    },
+                    {
+                        type: 'submit',
+                        text: 'Insertar',
+                        buttonType: 'primary',
+                    },
+                ],
+                onChange: (api) => {
+                    const data = api.getData();
+                    if (data.SelectA == 'None') {
+                        return;
+                    }
+                    const textareaA = document.getElementById('textareaA');
+                    if (textareaA) {
+                        textareaA.innerHTML += data.SelectA;
+                    }
+                    api.setData({
+                        textareaA: data.textareaA,
+                        SelectA: 'None',
+                    });
+                },
+                onSubmit: (api) => {
+                    const textareaA = document.getElementById('textareaA');
+                    const textAreaHtml = textareaA.innerHTML;
+                    const textToInsert = `&nbsp;<strong data-list-id="${
+                        multiselectorItem.id
+                    }" data-inner-html="${btoa(
+                        textAreaHtml
+                    )}"><span contenteditable="false">{{Lista de ${
+                        multiselectorItem.values.name
+                    } con forma  </br> : {{${textAreaHtml}}}</span></strong>&nbsp;`;
+                    tinymce.activeEditor.execCommand('mceInsertContent', false, textToInsert);
+                    api.close();
+                },
+            };
         },
         async onEntitySelected(entityTypeId) {
             //Extract content from tinymce editor
@@ -167,168 +411,30 @@ export default {
             try {
                 const filteredData = await this.fetchValidColumns(entityTypeId);
                 // Extract all items in filteredData that have a format of "SELECTOR[MULTIPLE]" in another variable and the rest pass to generateDropDownItems
+
                 const dropDownItemsFromData = await this.generateDropDownItems(filteredData);
                 this.tinymceConfig = {
+                    toolbar_mode: 'wrap',
                     plugins: 'pagebreak table link image lists',
                     table_sizing_mode: 'relative',
                     height: 600,
                     toolbar:
                         'undo redo | mybutton | blocks | bold italic underline forecolor | link image | alignleft aligncenter alignright alignjustify lineheight | bullist numlist indent outdent | removeformat |  pagebreak',
-                    setup: function (editor) {
+                    setup: (editor) => {
                         // Add a custom button to the toolbar
                         editor.ui.registry.addMenuButton('mybutton', {
                             text: 'Entidad',
-                            onAction: function (_) {
-                                // Your custom button action code here
-                            },
                             fetch: (callback) => {
-                                const items = Object.entries(dropDownItemsFromData).map(
-                                    ([id, values]) => {
-                                        const type =
-                                            typeof values.values === 'object'
-                                                ? 'nestedmenuitem'
-                                                : 'menuitem';
-                                        if (
-                                            type == 'nestedmenuitem' &&
-                                            (values.format == 'SELECTOR[MULTIPLE]' ||
-                                                values.format == 'SELECTOR[MULTIPLE][ADVANCED]')
-                                        ) {
-                                            return {
-                                                type: 'menuitem',
-                                                text: values.name + '*',
-                                                onAction: () => {
-                                                    editor.execCommand('openCustomDialog', {
-                                                        id: id,
-                                                        values: values,
-                                                    });
-                                                },
-                                            };
-                                        } else if (
-                                            type == 'nestedmenuitem' &&
-                                            (values.format != 'SELECTOR[MULTIPLE]' ||
-                                                values.format != 'SELECTOR[MULTIPLE][ADVANCED]')
-                                        ) {
-                                            return {
-                                                type: 'nestedmenuitem',
-                                                text: values.name,
-                                                getSubmenuItems: () => {
-                                                    return Object.entries(values.values).map(
-                                                        ([subid, subvalues]) => {
-                                                            return {
-                                                                type: 'menuitem',
-                                                                text: subvalues.name,
-                                                                onAction: () => {
-                                                                    editor.insertContent(
-                                                                        `&nbsp;<strong data-id="${subid}"><span contenteditable="false">{{${values.name} : ${subvalues.name}}}</span></strong>&nbsp;`
-                                                                    );
-                                                                },
-                                                            };
-                                                        }
-                                                    );
-                                                },
-                                            };
-                                        } else {
-                                            return {
-                                                type: 'menuitem',
-                                                text: values.name,
-                                                onAction: () => {
-                                                    editor.insertContent(
-                                                        `&nbsp;<strong data-id="${id}"><span contenteditable="false">{{${values.name}}}</span></strong>&nbsp;`
-                                                    );
-                                                },
-                                            };
-                                        }
-                                    }
-                                );
+                                const items = this.createDropDown(dropDownItemsFromData, editor);
                                 callback(items);
                             },
                         });
                         // Funcion custom para agregar el dialogo correspondiente a un selector multiple
-                        editor.addCommand('openCustomDialog', function (multiselectorItem) {
-                            editor.windowManager.open({
-                                title: 'Insertar selector multiple',
-                                body: {
-                                    type: 'panel',
-                                    items: [
-                                        {
-                                            type: 'label',
-                                            label: 'Seleccionar las columnas que aparecerán en el documento como tabla',
-                                            items: Object.entries(
-                                                multiselectorItem.values.values
-                                            ).map(([id, values]) => {
-                                                return {
-                                                    type: 'grid',
-                                                    columns: 2,
-                                                    items: [
-                                                        {
-                                                            type: 'checkbox',
-                                                            name: id,
-                                                            label: values.name,
-                                                            enabled: false,
-                                                        },
-                                                        {
-                                                            type: 'input',
-                                                            name: id + 'orden',
-                                                            placeholder: 'Orden',
-                                                            inputMode: 'numeric',
-                                                        },
-                                                    ],
-                                                };
-                                            }),
-                                        },
-                                    ],
-                                },
-                                buttons: [
-                                    {
-                                        type: 'cancel',
-                                        text: 'Cancelar',
-                                    },
-                                    {
-                                        type: 'submit',
-                                        text: 'Insertar',
-                                        buttonType: 'primary',
-                                    },
-                                ],
-                                onSubmit: (api) => {
-                                    const data = api.getData();
-                                    const selectedColumns = Object.entries(
-                                        multiselectorItem.values.values
-                                    )
-                                        .map(([id, column]) => {
-                                            if (data[id] === false) {
-                                                return null;
-                                            }
-                                            return {
-                                                id,
-                                                name: column.name,
-                                                orden: data[id + 'orden'],
-                                            };
-                                        })
-                                        .filter((column) => column !== null)
-                                        .sort((a, b) => a.orden - b.orden);
-                                    const textToInsert = `&nbsp;<strong data-table-id="${
-                                        multiselectorItem.id
-                                    }" data-columns-ids="${selectedColumns
-                                        .map((column) => column.id)
-                                        .join(
-                                            ','
-                                        )}"><span contenteditable="false">{{<br/>Tabla de ${
-                                        multiselectorItem.values.name
-                                    } <br/> con columnas: <br/> ${selectedColumns
-                                        .map((column) => column.name)
-                                        .join('<br/>')}<br/>}}</span></strong>&nbsp;`;
-                                    tinymce.activeEditor.execCommand(
-                                        'mceInsertContent',
-                                        false,
-                                        textToInsert
-                                    );
-                                    api.close();
-                                },
-                            });
+                        editor.addCommand('openCustomDialog', (multiselectorItem) => {
+                            editor.windowManager.open(this.selectorpageconfig(multiselectorItem));
                         });
                     },
                     pagebreak_separator: '<div class="pagebreak"></div>',
-
                     // Estilo para semejanza a word
                     content_style: `
                     body {

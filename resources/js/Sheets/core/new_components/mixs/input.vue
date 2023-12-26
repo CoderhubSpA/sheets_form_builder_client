@@ -169,6 +169,12 @@ export default {
                 valueParsed = e.target.value;
             }
 
+            const isClp = this.input.format == 'CLP';
+            if(isClp) {
+                // Cada caracter que no sea un numero, se elimina
+                valueParsed = valueParsed.replace(/[^0-9]/g, '');
+            }
+
             const dataToSelectorFilters = {
                 key: this.input.col_name,
                 value: valueParsed,
