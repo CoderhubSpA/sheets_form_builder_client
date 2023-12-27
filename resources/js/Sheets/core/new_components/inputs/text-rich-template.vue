@@ -1,20 +1,14 @@
 <template>
-    <form-group
-        :id="id"
-        :label="label"
-        :required="required"
-        :linkTarget="link_target"
-        :linkDescription="link_description"
-        :tooltipInfo="tooltip"
-        v-if="show_field"
-    >
-        <Editor
-            api-key="vdjygk7n8vw4laxwpwsmh1sb36zu318ltnp3u9f9wcrqx83g"
-            :init="tinymceConfig"
-            :id="id"
-            v-if="tinymceConfig"
-            v-model="content"
-        />
+    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target" :linkDescription="link_description"
+        :tooltipInfo="tooltip" v-if="show_field">
+        <div v-if="loading" class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Cargando...</span>
+            </div>
+        </div>
+        <Editor api-key="vdjygk7n8vw4laxwpwsmh1sb36zu318ltnp3u9f9wcrqx83g" :init="tinymceConfig" :id="id"
+            v-else-if="tinymceConfig" v-model="content" />
+        <h3 v-else>Seleccione una entidad para poder usar este campo</h3>
     </form-group>
 </template>
 <script>
@@ -34,6 +28,7 @@ export default {
             content: '',
             tinymceConfig: null,
             editorInstance: null,
+            loading: false,
         };
     },
     computed: {
@@ -124,9 +119,9 @@ export default {
                     format: item.format,
                     values: item.subdata
                         ? item.subdata.reduce((subAcc, subitem) => {
-                              subAcc[subitem.id] = formatData(subitem);
-                              return subAcc;
-                          }, {})
+                            subAcc[subitem.id] = formatData(subitem);
+                            return subAcc;
+                        }, {})
                         : null,
                 };
             }
@@ -213,7 +208,7 @@ export default {
         tablepageconfig(multiselectorItem) {
             return {
                 title: 'Insertar selector multiple',
-                size: 'large',
+                size: 'medium',
                 body: {
                     type: 'panel',
                     items: [
@@ -271,15 +266,13 @@ export default {
                         })
                         .filter((column) => column !== null)
                         .sort((a, b) => a.orden - b.orden);
-                    const textToInsert = `&nbsp;<strong data-table-id="${
-                        multiselectorItem.id
-                    }" data-columns-ids="${selectedColumns
-                        .map((column) => column.id)
-                        .join(',')}"><span contenteditable="false">{{<br/>Tabla de ${
-                        multiselectorItem.values.name
-                    } <br/> con columnas: <br/> ${selectedColumns
-                        .map((column) => column.name)
-                        .join('<br/>')}<br/>}}</span></strong>&nbsp;`;
+                    const textToInsert = `&nbsp;<strong data-table-id="${multiselectorItem.id
+                        }" data-columns-ids="${selectedColumns
+                            .map((column) => column.id)
+                            .join(',')}"><span contenteditable="false">{{<br/>Tabla de ${multiselectorItem.values.name
+                        } <br/> con columnas: <br/> ${selectedColumns
+                            .map((column) => column.name)
+                            .join('<br/>')}<br/>}}</span></strong>&nbsp;`;
                     tinymce.activeEditor.execCommand('mceInsertContent', false, textToInsert);
                     api.close();
                 },
@@ -288,7 +281,7 @@ export default {
         selectorpageconfig(multiselectorItem) {
             return {
                 title: 'Selector multiple',
-                size: 'large',
+                size: 'medium',
                 body: {
                     type: 'panel',
                     items: [
@@ -326,7 +319,7 @@ export default {
         listpageconfig(multiselectorItem) {
             return {
                 title: 'Insertar selector multiple',
-                size: 'large',
+                size: 'medium',
                 body: {
                     type: 'panel',
                     items: [
@@ -388,19 +381,18 @@ export default {
                 onSubmit: (api) => {
                     const textareaA = document.getElementById('textareaA');
                     const textAreaHtml = textareaA.innerHTML;
-                    const textToInsert = `&nbsp;<strong data-list-id="${
-                        multiselectorItem.id
-                    }" data-inner-html="${btoa(
-                        textAreaHtml
-                    )}"><span contenteditable="false">{{Lista de ${
-                        multiselectorItem.values.name
-                    } con forma  </br> : {{${textAreaHtml}}}</span></strong>&nbsp;`;
+                    const textToInsert = `&nbsp;<strong data-list-id="${multiselectorItem.id
+                        }" data-inner-html="${btoa(
+                            textAreaHtml
+                        )}"><span contenteditable="false">{{Lista de ${multiselectorItem.values.name
+                        } con forma  </br> : {{${textAreaHtml}}}</span></strong>&nbsp;`;
                     tinymce.activeEditor.execCommand('mceInsertContent', false, textToInsert);
                     api.close();
                 },
             };
         },
         async onEntitySelected(entityTypeId) {
+            this.loading = true;
             //Extract content from tinymce editor
             if (entityTypeId == null) {
                 return;
@@ -461,6 +453,7 @@ export default {
                 `,
                 };
                 this.editorInstance = true;
+                this.loading = false;
             } catch (error) {
                 console.log(error);
             }
