@@ -9,7 +9,8 @@
         <GenericModal :show="modal" @show="closeModal" ref="genericModal">
             <template>
                 <video autoplay="true" :id="webcamVideoId" style="display: none;"/>
-                <canvas :id="canvasId"></canvas>
+                <canvas :id="displayCanvasId"></canvas>
+                <canvas :id="canvasId" style="display: none;"></canvas>
             </template>
             <template #footer>
                 <button class="btn btn-success btn-fab" @click="takePhoto">
@@ -65,6 +66,9 @@ export default {
         canvasId() {
             return `canvas-${this.id}`
         },
+        displayCanvasId() {
+            return `display-canvas-${this.id}`
+        },
         resultId() {
             return `result-${this.id}`
         },
@@ -92,6 +96,7 @@ export default {
         startCam() {
             this.modal = true;
             this.open_cam = true;
+            const displayCanvas = document.querySelector(`#${this.displayCanvasId}`);
             const canvas = document.querySelector(`#${this.canvasId}`);
             
             navigator.mediaDevices.getUserMedia(this.constraints)
@@ -103,6 +108,10 @@ export default {
                 console.log(settings)
                 this.width = settings.width;
                 this.height = settings.height;
+                displayCanvas.width = this.width;
+                displayCanvas.height = this.height;
+                canvas.width = this.width;
+                canvas.height = this.height;
                 // canvas.height = settings.height;
                 this.drawImage(videoElement);
             }).catch((error) => {
@@ -119,6 +128,11 @@ export default {
             canvas.height = this.height;
             const ctx = canvas.getContext('2d', { alpha: false })
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+            const displayCanvas = document.querySelector(`#${this.displayCanvasId}`);
+            const ctxDisplay = displayCanvas.getContext('2d', { alpha: false });
+            ctxDisplay.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
+            ctxDisplay.drawImage(video, 0, 0, displayCanvas.width, displayCanvas.height);
             
             
             // tercio del ancho de la imagen
@@ -130,11 +144,10 @@ export default {
             const WIDTH = parseInt(this.width - w_3);
             const HEIGHT = parseInt(this.height - y_3);
 
-            ctx.rect(PX, PY, WIDTH, HEIGHT);
-            
-            ctx.lineWidth = "3";
-            ctx.strokeStyle = "red";    
-            ctx.stroke();
+            ctxDisplay.rect(PX, PY, WIDTH, HEIGHT);
+            ctxDisplay.lineWidth = '3';
+            ctxDisplay.strokeStyle = 'red';
+            ctxDisplay.stroke();
         },
         /**
          * Captura de la image
