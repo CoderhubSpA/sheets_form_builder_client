@@ -51,7 +51,7 @@
                     ></sheets-action>
                 </div>
             </div>
-            <div class="row text-center sheets-actions-container" v-if="is_step_row === '1'">
+            <div class="row text-center sheets-actions-container" v-if="is_step_row == '1'">
                 <div class="col" v-for="(action, key) in formActions" :key="key">
                     <sheets-action
                         :disabledaction="disabledAction"

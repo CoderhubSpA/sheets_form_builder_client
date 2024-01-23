@@ -48,7 +48,7 @@ export default {
             }
 
             const response = await Axios.get(
-                `/api/sheets/entity/info/${entityTypeId}`
+                `/api/sheets/entity/info/${entityTypeId}?ignore=["entity_type","column_privileges","entities_fk","table_options"]`
             );
             return response.data.content.content.columns
                 .filter((column) => {
@@ -77,26 +77,12 @@ export default {
             if (i == 2) {
                 return filteredData;
             }
-            // let result = Object.values(
-            //     filteredData.reduce((acc, item) => {
-            //         let key =
-            //             item.entity_type_permission_fk !== null
-            //                 ? item.entity_type_permission_fk
-            //                 : item.id;
-            //         if (acc[key]) {
-            //             acc[key].name += `, ${item.name}`;
-            //         } else {
-            //             acc[key] = { ...item };
-            //         }
-            //         return acc;
-            //     }, {})
-            // );
             let result = filteredData;
             // make a group with all elements that have a entity_type_permission_fk different from null
             let groupedColumns = {};
             result.forEach((column) => {
                 if (column.entity_type_permission_fk) {
-                    groupedColumns[column.entity_type_permission_fk] = column;
+                    groupedColumns[column.id] = column;
                 }
             });
             // fetch the data of the grouped columns
@@ -108,7 +94,7 @@ export default {
             //replace in result the grouped columns with the subdata
             result = result.map((column) => {
                 if (column.entity_type_permission_fk) {
-                    column = groupedColumns[column.entity_type_permission_fk];
+                    column = groupedColumns[column.id];
                 }
                 return column;
             });
@@ -179,14 +165,14 @@ export default {
                 if (
                     type == "nestedmenuitem" &&
                     (values.format == "SELECTOR[MULTIPLE]" ||
-                        values.format == "SELECTOR[MULTIPLE][ADVANCED]")
+                        values.format == "SELECTOR[MULTIPLE][ADVANCED]" ||
+                        values.format == "SELECTOR[1XN][ONLYNEW]")
                 ) {
                     return {
                         type: "menuitem",
                         text: values.name,
                         icon: "plus",
                         onAction: () => {
-                            console.log(values)
                             editor.execCommand("openCustomDialog", {
                                 id: id,
                                 values: values,
@@ -197,6 +183,7 @@ export default {
                     type == "nestedmenuitem" &&
                     (values.format != "SELECTOR[MULTIPLE]" ||
                         values.format != "SELECTOR[MULTIPLE][ADVANCED]" ||
+                        values.format != "SELECTOR[1XN][ONLYNEW]" ||
                         values.values != null)
                 ) {
                     return {
@@ -238,11 +225,9 @@ export default {
             try {
                 const filteredData = await this.fetchValidColumns(entityTypeId);
                 // Extract all items in filteredData that have a format of "SELECTOR[MULTIPLE]" in another variable and the rest pass to generateDropDownItems
-
                 const dropDownItemsFromData = await this.generateDropDownItems(
                     filteredData
                 );
-                console.log(dropDownItemsFromData);
                 this.tinymceConfig = {
                     toolbar_mode: "wrap",
                     plugins: "pagebreak table link image lists",
