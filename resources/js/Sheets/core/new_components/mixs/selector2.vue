@@ -128,7 +128,9 @@ export default {
                 }
                 return 0;
             });
-
+            if (this.required && options.length ===1 && !this.multiple) {
+                this.selected = options[0];
+            }
             return options;
         },
         /**
