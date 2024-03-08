@@ -303,8 +303,8 @@ export default {
             deep: true,
         },
         content: {
-            handler: function (val) {
-                if (val) {
+            handler: function (val, old_val) {
+                if (val != old_val) {
                     const data = {};
                     data[this.id] = val;
 

@@ -55,7 +55,6 @@ export default {
 </script>
 <style>
 span.vs__selected {
-    min-width: 80%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

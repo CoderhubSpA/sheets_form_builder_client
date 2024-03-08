@@ -33,7 +33,8 @@ export default {
         recordId: '',
         has_permissions_for_create: false,
         deselectedOptions: [],
-        disabledForRule: false
+        disabledForRule: false,
+        newOptionsFromNested: [],
     }),
     computed: {
         /**
@@ -392,6 +393,12 @@ export default {
                         else this.selected = [option];
                     } else this.selected = option;
                 }
+
+                if(this.multiple && this.newOptionsFromNested.length > 0) {
+                    this.newOptionsFromNested.forEach((option) => {
+                        this.selected.push(option);
+                    });
+                }
             }
         },
         selectorFilters(val) {
@@ -417,6 +424,9 @@ export default {
                     }
                 }
                 this.optionsFiltered = optionsFil;
+                if (this.required && this.optionsFiltered.length === 1 && !this.multiple) {
+                    this.selected = this.options.find((o) => o.id == this.optionsFiltered[0].id);
+                }
             }
         },
         entity_permissions(val) {
@@ -436,6 +446,10 @@ export default {
         createdOption(id) {
             const optionToSelect = this.options.find((option) => option.id === id);
 
+            if(optionToSelect) {
+                this.newOptionsFromNested.push(optionToSelect);
+            }
+
             if (this.multiple) {
                 if (!this.selected) {
                     this.selected = [];
@@ -443,12 +457,18 @@ export default {
 
                 const ifExistOption = this.selected.find((option) => option.id === id);
 
-                if (ifExistOption)
+                if (ifExistOption) {
                     this.selected = this.selected.filter((option) => option.id !== id);
+                }
 
-                if (this.selected) this.selected.push(optionToSelect);
-                else this.selected = [optionToSelect];
-            } else this.selected = optionToSelect;
+                if (this.selected) {
+                    this.selected.push(optionToSelect);
+                } else {
+                    this.selected = [optionToSelect];
+                }
+            } else {
+                this.selected = optionToSelect;
+            }
 
             this.recordId = '';
         },

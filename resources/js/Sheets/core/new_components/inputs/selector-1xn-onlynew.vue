@@ -31,14 +31,14 @@
                         <span>{{ name }}</span>
                         <span
                             @click="openNestedForEdit(id)"
-                            style="margin-left: 6px; cursor: pointer; color: #969696"
+                            class="actions"
                             ><i class="bi bi-pencil-fill"></i
                         ></span>
                     </div>
                 </template>
             </v-select>
             <nested-form
-                v-if="has_permissions_for_create"
+                :createPermission="has_permissions_for_create"
                 :entity_type_permission_fk="entity_type_permission_fk"
                 :state="state"
                 :openForm="openNested"
@@ -76,3 +76,15 @@ export default {
     },
 };
 </script>
+
+<style lang="scss">
+.actions {
+    cursor: pointer;
+    color: rgb(150, 150, 150);
+    margin: 2px 2px 2px 8px;
+    padding: 1px 4px;
+    border: solid 1px rgb(150, 150, 150);
+    border-radius: 4px;
+    font-size: 12px;
+}
+</style>

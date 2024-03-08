@@ -74,7 +74,7 @@ export default {
                     };
                 });
         },
-        async groupAndFetchSubdata(filteredData, i = 0) {
+        async groupAndFetchSubdata(filteredData, i = 2) {
             if (i == 2) {
                 return filteredData;
             }
@@ -307,8 +307,8 @@ export default {
             deep: true,
         },
         content: {
-            handler: function (val) {
-                if (val) {
+            handler: function (val, old_val) {
+                if (val != old_val) {
                     const data = {};
                     data[this.id] = val;
 

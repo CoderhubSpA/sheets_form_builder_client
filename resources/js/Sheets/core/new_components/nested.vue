@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="open">+</button>
+        <button v-if="createPermission" class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="open">+</button>
         <div class="nested-form" v-show="show">
             <div class="content">
                 <div class="header p-2">
@@ -25,6 +25,10 @@ import formbuilder from './form.vue';
 
 export default {
     props: {
+        createPermission: {
+            type: Boolean,
+            require: true,
+        },
         entity_type_permission_fk: {
             type: String,
             require: true,
