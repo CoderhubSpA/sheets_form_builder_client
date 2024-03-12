@@ -1,6 +1,6 @@
 <template>
-    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target" :linkDescription="link_description"
-        :tooltipInfo="tooltip" v-if="show_field">
+    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target"
+        :linkDescription="link_description" :tooltipInfo="tooltip" v-if="show_field">
         <div v-if="loading" class="d-flex justify-content-center">
             <div class="spinner-border" role="status">
                 <span class="sr-only">Cargando...</span>
@@ -237,12 +237,13 @@ export default {
                     table_sizing_mode: "relative",
                     height: 600,
                     menubar: false,
+                    contextmenu: "false",
                     toolbar:
                         "undo redo | mybutton",
                     setup: (editor) => {
                         // Add a custom button to the toolbar
                         editor.ui.registry.addMenuButton("mybutton", {
-                            text: "Entidad",
+                            text: "Columnas",
                             fetch: (callback) => {
                                 const items = this.createDropDown(
                                     dropDownItemsFromData,
