@@ -361,6 +361,10 @@ export default {
                                 selectOptions = (row) => {
                                     // Guardamos la columna por la cual se debe filtrar
                                     const colFkFilter = column.column.col_fk_filter;
+
+                                    // col_filter_by
+                                    const colFkLocalFilter = column.column.col_filter_by;
+
                                     // Guardamos tipo de entidad foránea de donde tomar las opciones
                                     const entityTypeFk = column.column.entity_type_fk
                                     // Obtenemos la lista de entidades foráneas
@@ -369,15 +373,12 @@ export default {
                                     // Solo podemos filtrar si tenemos la fila actual
                                     if(row > -1) {
                                         // Buscamos el id de la columna por la cual se debe filtrar
-                                        const colFkFilterId = this.entityInfo.columns.find((col) => col.col_name === colFkFilter)?.id;
+                                        const colFkLocalFilterId = this.entityInfo.columns.find((col) => col.col_name === colFkLocalFilter)?.id;
                                         // Obtenemos el valor de la columna por el cual filtrar
-                                        const hotDataAtRowProp = this.$refs.hotTableComponent.hotInstance.getDataAtRowProp(row, colFkFilterId);
+                                        const hotDataAtRowProp = this.$refs.hotTableComponent.hotInstance.getDataAtRowProp(row, colFkLocalFilterId);
+
                                         // Filtramos las entidades foráneas por solo las que tengan el valor de la columna por la cual filtrar
-                                        entitiesFk = entitiesFk.filter((entity) => { return entity[colFkFilter] === hotDataAtRowProp});
-                                    }
-                                    // Si tenemos la fila actual y no tenemos entidades foráneas, buscamos las entidades foráneas
-                                    if(row > -1 && entitiesFk.length === 0) {
-                                        entitiesFk = this.entityInfo.entities_fk[entityTypeFk];
+                                        entitiesFk = entitiesFk.filter((entity) => entity[colFkFilter] === hotDataAtRowProp );
                                     }
 
                                     // Retornamos la lista de opciones
