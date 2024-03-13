@@ -748,9 +748,7 @@ export default {
         addRow() {
             const newRow = {};
             const recordid = this.$store.getters[`${this.state}/record_id`];
-            if (recordid) {
-                newRow[this.mainPivot.id] = recordid;
-            }
+
             // eslint-disable-next-line array-callback-return
             this.columnsIds.map((column) => {
                 if (column.column.default_value !== null && column.id !== 'id') {
@@ -768,6 +766,11 @@ export default {
                     newRow[column.id] = '';
                 }
             });
+
+            if (recordid) {
+                newRow[this.mainPivot.id] = recordid;
+            }
+
             this.handsontableData.push(newRow);
         },
         logData() {
