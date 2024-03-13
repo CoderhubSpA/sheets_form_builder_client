@@ -375,6 +375,10 @@ export default {
                                         // Filtramos las entidades foráneas por solo las que tengan el valor de la columna por la cual filtrar
                                         entitiesFk = entitiesFk.filter((entity) => { return entity[colFkFilter] === hotDataAtRowProp});
                                     }
+                                    // Si tenemos la fila actual y no tenemos entidades foráneas, buscamos las entidades foráneas
+                                    if(row > -1 && entitiesFk.length === 0) {
+                                        entitiesFk = this.entityInfo.entities_fk[entityTypeFk];
+                                    }
 
                                     // Retornamos la lista de opciones
                                     const options = entitiesFk.reduce((acc,entity) => {
@@ -398,9 +402,6 @@ export default {
                                 });
                             }
 
-                            columnToPush.data = column.id;
-                            columnToPush.editor = 'select';
-                            columnToPush.renderer = customSelectRenderer;
                             // Se convierte el array de opciones en un objeto para
                             // que el editor de "select" de Handsontable pueda leerlo
                             if(Array.isArray(selectOptions)) {
@@ -409,7 +410,11 @@ export default {
                                     return acc;
                                 }, {});
                             }
+
+                            columnToPush.data = column.id;
+                            columnToPush.editor = 'select';
                             columnToPush.selectOptions = selectOptions;
+                            columnToPush.renderer = customSelectRenderer;
                             columnToPush.readOnly = column.readonly || this.input.permission === 1;
                             columnToPush.isRequired = column.isRequired;
 
