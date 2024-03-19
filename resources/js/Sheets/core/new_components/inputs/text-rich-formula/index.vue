@@ -1,12 +1,12 @@
 <template>
-    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target"
-        :linkDescription="link_description" :tooltipInfo="tooltip" v-if="show_field">
+    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target" :linkDescription="link_description"
+        :tooltipInfo="tooltip" v-if="show_field">
         <div v-if="loading" class="d-flex justify-content-center">
             <div class="spinner-border" role="status">
                 <span class="sr-only">Cargando...</span>
             </div>
         </div>
-        <Editor api-key="vdjygk7n8vw4laxwpwsmh1sb36zu318ltnp3u9f9wcrqx83g" :init="tinymceConfig" :id="id"
+        <Editor api-key="no-api-key" :init="tinymceConfig" :id="'Editor' + id"
             v-else-if="tinymceConfig" v-model="content" />
         <h3 v-else>
             Seleccione una entidad para poder usar este campo
@@ -16,9 +16,36 @@
 <script>
 import mix from "../../mixs/input.vue";
 import FormGroup from "../../templates/form-group.vue";
-import Editor from "@tinymce/tinymce-vue";
+// import Editor from "@tinymce/tinymce-vue";
 import Axios from "axios";
 import Dialogs from "./dialogs";
+import 'tinymce'
+import Editor from "@tinymce/tinymce-vue"
+
+/* Required TinyMCE components */
+import 'tinymce/icons/default/icons.min.js';
+import 'tinymce/themes/silver/theme.min.js';
+import 'tinymce/models/dom/model.min.js';
+
+/* Import a skin (can be a custom skin instead of the default) */
+import 'tinymce/skins/ui/oxide/skin.js';
+
+/* Import plugins */
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/emoticons';
+import 'tinymce/plugins/emoticons/js/emojis';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/table';
+
+/* content UI CSS is required */
+import 'tinymce/skins/ui/oxide/content.js';
+
+/* The default content CSS can be changed or replaced with appropriate CSS for the editor content. */
+import 'tinymce/skins/content/default/content.js';
+
+import tinymce from "tinymce";
 export default {
     mixins: [mix],
     components: {
@@ -74,41 +101,6 @@ export default {
                     };
                 });
         },
-        async groupAndFetchSubdata(filteredData, i = 2) {
-            if (i == 2) {
-                return filteredData;
-            }
-            let result = filteredData;
-            // make a group with all elements that have a entity_type_permission_fk different from null
-            let groupedColumns = {};
-            result.forEach((column) => {
-                if (column.entity_type_permission_fk) {
-                    groupedColumns[column.id] = column;
-                }
-            });
-            // fetch the data of the grouped columns
-            await Promise.all(
-                Object.values(groupedColumns).map((group) =>
-                    this.fetchSubdata(group)
-                )
-            );
-            //replace in result the grouped columns with the subdata
-            result = result.map((column) => {
-                if (column.entity_type_permission_fk) {
-                    column = groupedColumns[column.id];
-                }
-                return column;
-            });
-            for (let item of result) {
-                if (item.subdata) {
-                    item.subdata = await this.groupAndFetchSubdata(
-                        item.subdata,
-                        i + 1
-                    );
-                }
-            }
-            return result;
-        },
         async generateDropDownItems(filteredData) {
             function formatData(item) {
                 return {
@@ -125,7 +117,6 @@ export default {
                         : null,
                 };
             }
-            filteredData = await this.groupAndFetchSubdata(filteredData);
             return filteredData.reduce((acc, item) => {
                 if (item.entity_type_permission_fk) {
                     acc[item.id] = formatData(item);
@@ -137,21 +128,6 @@ export default {
                 }
                 return acc;
             }, {});
-        },
-        // Si una columna tiene entity_type_permission_fk se realiza nuevamente la request de sus columnas
-        async fetchSubdata(column) {
-            if (column.entity_type_permission_fk) {
-                var columnfilteredData = await this.fetchValidColumns(
-                    column.entity_type_permission_fk
-                );
-                if (columnfilteredData.length == 0) {
-                    columnfilteredData = await this.fetchValidColumns(
-                        column.entity_type_pivot_fk
-                    );
-                }
-                column.name = column.name;
-                column.subdata = columnfilteredData;
-            }
         },
         createDropDown(data, editor, prevName = "") {
             return Object.entries(data).map(([id, values]) => {
@@ -233,11 +209,9 @@ export default {
                 );
                 this.tinymceConfig = {
                     toolbar_mode: "wrap",
-                    plugins: "pagebreak table link image lists",
-                    table_sizing_mode: "relative",
                     height: 600,
                     menubar: false,
-                    contextmenu: "false",
+                    contextmenu: false,
                     toolbar:
                         "undo redo | mybutton",
                     setup: (editor) => {
@@ -327,6 +301,7 @@ export default {
         },
     },
     mounted() {
+        tinymce.execCommand('mceRemoveEditor', false, 'Editor' + this.id);
         if (this.selectorFilters[this.input.col_filter_by]) {
             this.onEntitySelected(
                 this.selectorFilters[this.input.col_filter_by]
