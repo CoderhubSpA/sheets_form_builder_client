@@ -172,7 +172,7 @@ export default {
             const isClp = this.input.format == 'CLP';
             if(isClp) {
                 // Cada caracter que no sea un numero, se elimina
-                valueParsed = valueParsed.replace(/[^0-9]/g, '');
+                valueParsed = String(valueParsed).replace(/[^0-9]/g, '');
             }
 
             const dataToSelectorFilters = {

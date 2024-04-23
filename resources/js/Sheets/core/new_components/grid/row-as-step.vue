@@ -15,11 +15,8 @@
                     ]"
                     @click="clickInProgressNumber(key)"
                 >
-                    <strong>{{ row.name }}</strong>
-                    <br />
-                    <small v-show="row.errorsFields" class="errors-field-text"
-                        >Existen errores de validación</small
-                    >
+                    <span :class="[{'errors-field-text': row.errorsFields}, 'progress-title']">{{ row.name }} </span>
+                    <span v-show="row.errorsFields" class="errors-field-text" data-toggle="tooltip" data-placement="bottom" title="Existen errores de validación"><i class="bi bi-info-circle-fill"></i></span>
                 </li>
             </ul>
         </div>
@@ -48,7 +45,7 @@
                             {{ key + 1 }}
                         </div>
                     </div>
-                    <small v-show="row.errorsFields">Existen errores de validación</small>
+                    <span v-show="row.errorsFields">Existen errores de validación</span>
                 </div>
                 <button
                     @click="nextStep()"
@@ -88,7 +85,7 @@
             </button>
         </div>
         <div v-if="ifErrorTextForMobile" class="general-error-message">
-            <small>Existen errores de validación</small>
+            <span>Existen errores de validación</span>
         </div>
     </div>
 </template>
@@ -143,7 +140,6 @@ export default {
 
                 const section = Object.assign({}, formRow);
                 let sectionWithErrorsFields = 0;
-
 
                 formRow.sections.forEach((section) => {
                     section.fields.forEach((field) => {
@@ -271,12 +267,12 @@ export default {
     justify-content: center;
     margin-bottom: 30px;
     overflow: hidden;
-    color: lightgrey;
+    color: var(--gray-scale-6, #8A8A8A);
     padding: 0;
 }
 
 #progress .active {
-    color: #000000;
+    color: var(--gray-scale-8, #191A1A);
 }
 
 #progress li {
@@ -289,54 +285,81 @@ export default {
     cursor: pointer;
 }
 
-.progress-number:before {
-    content: counter(line-number);
-}
-
-#progress li:before {
+#progress li.progress-number:before {
+    display: block;
     width: 50px;
     height: 50px;
-    line-height: 45px;
-    display: block;
-    font-size: 18px;
-    color: #ffffff;
-    background: lightgray;
-    border-radius: 50%;
     margin: 0 auto 10px auto;
     padding: 2px;
-    border: 2px solid #00938f;
+    color: var(--primary-color, #00938f);
+    background: var(--gray-scale-1, #fff);
+    content: counter(line-number);
+    line-height: 45px;
+    font-size: 18px;
+    border-radius: 50%;
+    border: solid 2px var(--primary-color, #00938f);
 }
 
-#progress li:after {
-    content: '';
-    width: 100%;
-    height: 2px;
-    background: lightgray;
+#progress li.progress-number:after {
     position: absolute;
     left: 0;
     top: 25px;
     z-index: -1;
+    width: 100%;
+    height: 2px;
+    content: '';
+    background: var(--gray-scale-3, #E5E5E5);
 }
 
-#progress li.active:before,
-#progress li.active:after {
-    background: #00938f;
-    border: solid 1px #00938f;
+#progress li.progress-number:first-child:after {
+    left: 50%;
 }
 
-#progress li.checked:before,
-#progress li.checked:after {
-    background: #00938f;
-    border: solid 1px #00938f;
+#progress li.progress-number:last-child:after {
+    left: -50%;
 }
 
-#progress li.errors-fields:before,
+#progress li.progress-number:not(.active):not(.checked):before {
+    color: var(--gray-scale-4, #CCCCCC);
+    background: var(--gray-scale-3, #E5E5E5);
+    border-color: var(--gray-scale-3, #E5E5E5);
+}
+
+#progress li.active::before {
+    font-weight: 900;
+}
+
+#progress li.active:after, #progress li.checked:before, #progress li.checked:after{
+    background: var(--primary-color, #00938f);
+    border: solid 1px var(--primary-color, #00938f);
+    color: var(--gray-scale-1, #FFFFFF);
+}
+
+#progress li.progress-number:is(.errors-fields):not(.active):not(.checked):before {
+    color: var(--error-color, #FE4B48);
+    background: var(--gray-scale-1, #FFFFFF);
+    border: dotted 2px var(--error-color, #FE4B48);
+}
+
+#progress li span.progress-title {
+    color: var(--gray-scale-8, #191A1A);
+    font-size: var(--font-size, 14px);
+    font-weight: bold;
+}
+
+#progress li.errors-fields:before {
+    color: var(--error-color, #FE4B48);
+    background: var(--gray-scale-1, #FFFFFF);
+    border: dotted 2px var(--error-color, #FE4B48);
+}
+
 #progress li.errors-fields:after {
-    background: red;
-    border: solid 1px #00938f;
+    color: var(--error-color, #FE4B48);
+    background: var(--gray-scale-1, #FFFFFF);
+    border: dotted 1px var(--error-color, #FE4B48);
 }
 
-#progress li small.errors-field-text {
+#progress li span.errors-field-text {
     color: red;
     font-weight: bold;
 }
@@ -355,22 +378,22 @@ export default {
     width: 50px;
     height: 50px;
     margin-top: 0;
-    background-color: #00938f;
+    background-color: var(--primary-color, #00938f);
     border-radius: 50%;
-    color: #ffffff;
+    color: var(--gray-scale-1, #FFFFFF);
     font-size: 18px;
     text-align: center;
     line-height: 45px;
 }
 
-.timeline-mobile small {
-    color: red;
+.timeline-mobile span {
+    color: var(--error-color, #FE4B48);
     text-align: center;
     font-weight: bold;
 }
 
 .progress-mobile div.errors-fields-mobile {
-    background: red;
+    background: var(--error-color, #FE4B48);
 }
 
 .progress-mobile {
@@ -385,19 +408,19 @@ export default {
 }
 
 .progress-mobile button {
-    color: #fff;
-    background: #00938f;
+    color: var(--gray-scale-1, #FFFFFF);
+    background: var(--primary-color, #00938f);
 }
 
-.progress-mobile small.errors-field-text-mobile {
-    color: red;
+.progress-mobile span.errors-field-text-mobile {
+    color: var(--error-color, #FE4B48);
     font-weight: bold;
 }
 
 .general-error-message {
     display: none;
     text-align: center;
-    color: red;
+    color: var(--error-color, #FE4B48);
     font-weight: bold;
 }
 
