@@ -65,6 +65,10 @@ export default {
             type: String,
             default: '',
         },
+        context: {
+            type: Object,
+            default: () => ({}),
+        }
     },
 
     data: () => ({

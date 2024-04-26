@@ -136,6 +136,10 @@ export default {
             default: () => ({}),
             required: false,
         },
+        context: {
+            type: Object,
+            default: () => ({}),
+        }
     },
     components: {
         // "sheets-loading": Loading,
@@ -704,7 +708,15 @@ export default {
                     this.filesUploaded = [];
                     if (this.filesInForm) await this.sendFiles();
                     if (this.errorOnLoadFiles === false) {
-                        await this.save();
+                        if(this.context && this.context.type === 'modal') {
+                            await this.save().then(() => {
+                                setTimeout(() => {
+                                    this.actionsFromModalContext();
+                                }, 1000);
+                            });
+                        } else {
+                            await this.save();
+                        }
                     } else {
                         this.snackbar = {
                             success: false,
@@ -827,6 +839,22 @@ export default {
         async validateRequireFields() {
             await this.validateAllFields();
             await this.getSMAValidation();
+        },
+        actionsFromModalContext() {
+            if(this.context && this.context.type === 'modal') {
+                const modals = this.$store.getters[`${this.context.store_namespace}/modal_contexts`];
+
+                if(modals.length > 0) {
+                    modals.forEach((modal) => {
+                        if(modal.id === this.context.id) {
+                            this.$store.dispatch(`${this.context.store_namespace}/add_modal_context`, {
+                                id: modal.id,
+                                show: false
+                            });
+                        }
+                    });
+                }
+            }
         }
     },
 };

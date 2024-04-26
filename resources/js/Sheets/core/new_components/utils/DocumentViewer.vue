@@ -69,6 +69,7 @@ export default {
     box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
     -webkit-box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
     -moz-box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
+    z-index: 170;
 
     .sidebar-header {
         display: flex;

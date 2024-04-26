@@ -98,7 +98,7 @@ export default {
             let show_section = false;
             if (this.show_by_field_id) {
                 // eslint-disable-next-line eqeqeq
-                if ((fields[this.show_by_field_id] || false) == this.show_by_field_value) {
+                if (fields[this.show_by_field_id] !== undefined && fields[this.show_by_field_id] == this.show_by_field_value) {
                     // eslint-disable-next-line camelcase
                     show_section = true;
                 }
@@ -119,7 +119,9 @@ export default {
                     console.warn(e);
                 }
                 // eslint-disable-next-line camelcase
-            } else show_section = true;
+            } else {
+                show_section = true;
+            }
             // eslint-disable-next-line camelcase
 
             if (!show_section) {

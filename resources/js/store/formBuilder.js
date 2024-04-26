@@ -64,6 +64,7 @@ export default {
         current_user: {},
         form_data: {},
         parent_form_data: {},
+        modal_contexts: [],
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -127,6 +128,7 @@ export default {
         current_user: (state) => state.current_user,
         form_data: (state) => state.form_data,
         parent_form_data: (state) => state.parent_form_data,
+        modal_contexts: (state) => state.modal_contexts,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -402,6 +404,19 @@ export default {
         PARENT_FORM_DATA(state, val) {
             state.parent_form_data = val;
         },
+        ADD_MODAL_CONTEXTS(state, val) {
+            state.modal_contexts.push(val);
+        },
+        UPDATE_MODAL_CONTEXTS(state, newContexts) {
+            state.modal_contexts = newContexts;
+        },
+        DELETE_MODAL_CONTEXT(state, val) {
+            const index = state.modal_contexts.findIndex(i => i.id === val.id);
+            
+            if (index !== -1) {
+                state.modal_contexts.splice(index, 1);
+            }
+        }
     },
     actions: {
         async get({ commit, dispatch, state }, payload) {
@@ -828,6 +843,33 @@ export default {
                 .finally(() => {
                     //
                 });
+        },
+        add_modal_context({ commit, state }, modalContext) {
+            // find in the state if the modal context already not exists
+            const findModal = state.modal_contexts.find((context) => context.id === modalContext.id);
+
+            // if the modal context does not exists, add it
+            if (!findModal) {
+                commit('ADD_MODAL_CONTEXTS', modalContext);
+            }
+
+            // if the modal context exists, update the context
+            if(findModal) {
+                const updateContext = state.modal_contexts.map((context) => {
+                    if (context.id === modalContext.id) {
+                        return modalContext;
+                    }
+
+                    return context;
+                });
+
+                commit('UPDATE_MODAL_CONTEXTS', updateContext);
+            }
+        },
+        // delete modal context
+        delete_modal_context({ commit }, modalContext) {
+            commit('DELETE_MODAL_CONTEXT', modalContext);
         }
+        
     },
 };

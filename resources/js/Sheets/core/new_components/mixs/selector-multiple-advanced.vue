@@ -538,9 +538,7 @@ export default {
                                     console.warn('col_id not Found🥲')
                                 }
 
-                                const entity_id = instance.getDataAtCell(row, col_id);
                                 const entities_fk = cellProperties.entityInfo.entities_fk;
-                                const entity_fk = cellProperties.main.entity_type_id;
                                 const entity = entities_fk[main.entity_type_fk].find(e => e.id == form_id);
 
                                 if (entity) {
@@ -569,6 +567,12 @@ export default {
                                         const genericModal = new GenericModalClass({
                                             propsData: {
                                                 show: true,
+                                                store: this.$store,
+                                                state: this.state,
+                                                context: {
+                                                    id: form_id,
+                                                    show: true
+                                                }
                                             }
                                         });
                                         genericModal.$on('show', (val) => {
@@ -583,7 +587,11 @@ export default {
                                             propsData: {
                                                 entityId: form_id,
                                                 record_id: record_id,
-                                                // is_nested: true
+                                                context: {
+                                                    id: form_id,
+                                                    type: 'modal',
+                                                    store_namespace: this.state,
+                                                }
                                             },
                                             store
                                         });

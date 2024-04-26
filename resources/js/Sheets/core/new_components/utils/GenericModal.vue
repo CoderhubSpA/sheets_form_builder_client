@@ -32,17 +32,46 @@ export default {
         show: {
             type: Boolean,
             require: true,
+            default: false,
         },
+        state: {
+            type: String,
+            require: false,
+            default: '',
+        },
+        store: {
+            type: Object,
+            required: false,
+            default: () => ({}),
+        },
+        context: {
+            type: Object,
+            required: false,
+            default: () => ({}),
+        }
     },
     computed: {
         dialog() {
             return this.show;
         },
+        modalContexts() {
+            return this.store.getters[`${this.state}/modal_contexts`];
+        }
     },
     watch: {
         dialog(value) {
             const { modal } = this.$refs;
             modal.style.display = value ? 'block' : 'none';
+        },
+        modalContexts(value) {
+            if (value.length > 0) {
+                const findContext = value.find((context) => context.id === this.context.id);
+
+                if (findContext && findContext.show == false) {
+                    this.$emit('show', false);
+                    this.deleteContext();
+                }
+            }
         },
     },
     mounted() {
@@ -50,11 +79,21 @@ export default {
             const { modal } = this.$refs;
             modal.style.display = this.dialog ? 'block' : 'none';
         });
+
+        this.setContext();
     },
     methods: {
         close() {
             this.$emit('show', false);
         },
+        setContext() {
+            if(this.store && this.state && this.context) {
+                this.store.dispatch(`${this.state}/add_modal_context`, this.context);
+            }
+        },
+        deleteContext() {
+            this.store.dispatch(`${this.state}/delete_modal_context`, this.context);
+        }
     },
 };
 </script>
