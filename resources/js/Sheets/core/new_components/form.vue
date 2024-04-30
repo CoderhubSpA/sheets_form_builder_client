@@ -584,6 +584,12 @@ export default {
                                 this.$emit('input', response.content);
                                 this.postMessage(response);
                                 this.action = {};
+
+                                if(this.context && this.context.type === 'modal') {
+                                    setTimeout(() => {
+                                        this.actionsFromModalContext();
+                                    }, 1000);
+                                }
                             }
                             this.disabledAction = false;
 
@@ -708,15 +714,7 @@ export default {
                     this.filesUploaded = [];
                     if (this.filesInForm) await this.sendFiles();
                     if (this.errorOnLoadFiles === false) {
-                        if(this.context && this.context.type === 'modal') {
-                            await this.save().then(() => {
-                                setTimeout(() => {
-                                    this.actionsFromModalContext();
-                                }, 1000);
-                            });
-                        } else {
-                            await this.save();
-                        }
+                        await this.save();
                     } else {
                         this.snackbar = {
                             success: false,
