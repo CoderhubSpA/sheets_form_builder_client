@@ -19,7 +19,7 @@ class Dialogs {
                                             type: 'checkbox',
                                             name: id,
                                             label: values.name,
-                                            enabled: false,
+                                            enabled: true,
                                         },
                                         {
                                             type: 'input',

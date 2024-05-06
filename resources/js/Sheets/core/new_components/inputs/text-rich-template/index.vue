@@ -259,6 +259,7 @@ export default {
                     toolbar_mode: "wrap",
                     plugins: "pagebreak table link image lists",
                     table_sizing_mode: "relative",
+                    promotion: false,
                     height: 600,
                     toolbar:
                         "undo redo | mybutton | blocks | bold italic underline forecolor | link image | alignleft aligncenter alignright alignjustify lineheight | bullist numlist indent outdent | removeformat |  pagebreak",

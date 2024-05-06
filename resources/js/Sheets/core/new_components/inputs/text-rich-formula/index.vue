@@ -212,6 +212,7 @@ export default {
                     height: 600,
                     menubar: false,
                     contextmenu: false,
+                    promotion: false,
                     toolbar:
                         "undo redo | mybutton",
                     setup: (editor) => {

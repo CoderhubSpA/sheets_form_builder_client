@@ -249,6 +249,7 @@ export default {
                 // eslint-disable-next-line no-param-reassign
                 data.content.action = this.action;
                 data.source = 'sheets_form_builder';
+                data.source_namespace = this.namespace;
                 // Si no es un form nested
                 if (!this.is_nested) {
                     // enviar postmessage
