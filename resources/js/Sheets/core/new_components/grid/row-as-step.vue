@@ -8,7 +8,7 @@
                     :id="row.id"
                     :class="[
                         { active: key === currentStep},
-                        { checked: row.checked},
+                        { checked: checked.includes(row.id)},
                         { 'cursor-disabled': is_strict === '2' },
                         { 'errors-fields': row.errorsFields },
                         'progress-number',
@@ -127,6 +127,7 @@ export default {
             rowStepGroups:[],
             ifRowHasStepGroups: false,
             last_row: false,
+            checked: []
         };
     },
     computed: {
@@ -208,9 +209,7 @@ export default {
         },
         nextStep() {
             if(this.rows[this.currentStep].errorsFields === false) {
-                this.rows[this.currentStep].checked = true;
-            } else {
-                this.rows[this.currentStep].checked = false;
+                this.checked.push(this.rows[this.currentStep].id);
             }
 
             //If the current step is less than the total number of rows, go forward one step
@@ -221,6 +220,10 @@ export default {
             //If the current step is the last step, set the last_row variable to true
             if(this.currentStep + 1 === this.rows.length) {
                 this.last_row = true;
+            }
+
+            if(this.currentStep + 1 === this.rows.length && this.rows[this.currentStep].errorsFields === false) {
+                this.checked.push(this.rows[this.currentStep].id);
             }
 
             this.activePreviousNextButtons();
@@ -350,13 +353,13 @@ export default {
 #progress li.errors-fields:before {
     color: var(--error-color, #FE4B48);
     background: var(--gray-scale-1, #FFFFFF);
-    border: dotted 2px var(--error-color, #FE4B48);
+    border: solid 2px var(--error-color, #FE4B48);
 }
 
 #progress li.errors-fields:after {
     color: var(--error-color, #FE4B48);
     background: var(--gray-scale-1, #FFFFFF);
-    border: dotted 1px var(--error-color, #FE4B48);
+    border: solid 1px var(--error-color, #FE4B48);
 }
 
 #progress li span.errors-field-text {
