@@ -55,10 +55,12 @@ export default {
 </script>
 <style>
 span.vs__selected {
+    display: flex;
+    justify-content: start;
+    align-items: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: inline-block;
 }
 input.vs__search {
     width: 1px;

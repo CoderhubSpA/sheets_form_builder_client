@@ -443,8 +443,11 @@ export default {
         this.getPermissionsForCreate();
     },
     methods: {
-        createdOption(id) {
-            const optionToSelect = this.options.find((option) => option.id === id);
+        createdOption(newRecord) {
+            const id = newRecord.content.inserted_id;
+            const name = newRecord.content.inserted_name;
+
+            let optionToSelect = this.options.find((option) => option.id === id);
 
             if(optionToSelect) {
                 this.newOptionsFromNested.push(optionToSelect);
@@ -459,9 +462,15 @@ export default {
 
                 if (ifExistOption) {
                     this.selected = this.selected.filter((option) => option.id !== id);
+                } else {
+                    const correlation = this.selected.length + 1;
+                    optionToSelect = {
+                        id: id,
+                        name: name ? name : 'Nuevo registro ' + correlation,
+                    };
                 }
 
-                if (this.selected) {
+                if (this.selected.length > 0) {
                     this.selected.push(optionToSelect);
                 } else {
                     this.selected = [optionToSelect];
@@ -472,7 +481,6 @@ export default {
 
             this.recordId = '';
         },
-
         openNestedForEdit(id) {
             if (this.$refs['ref-' + this.id].$attrs.id === this.id) {
                this.$refs['ref-' + this.id].searchEl.blur();
