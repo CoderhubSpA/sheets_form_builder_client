@@ -414,7 +414,7 @@ export default {
         },
         DELETE_MODAL_CONTEXT(state, val) {
             const index = state.modal_contexts.findIndex(i => i.id === val.id);
-            
+
             if (index !== -1) {
                 state.modal_contexts.splice(index, 1);
             }
@@ -529,13 +529,13 @@ export default {
 
                         return response.data.content;
                     })
-                    .then((content) => {
+                    .then(async (content) => {
                         if (Object.keys(content) !== 0) {
                             if(record.id) {
-                                dispatch('get_record', record)
+                                await dispatch('get_record', record)
                             }
 
-                            dispatch('info', content);
+                            await dispatch('info', content);
                         }
                     })
                     .catch((error) => {
@@ -641,7 +641,7 @@ export default {
                             f[key] = fields[key];
                             commit('FIELDS', f);
                         });
-                        
+
                         commit('PIVOTS', response.data.content.pivots);
 
                         commit('ENTITIES_FK_FROM_RECORD_ID', response.data.content.entities_fk);
@@ -892,6 +892,6 @@ export default {
         delete_modal_context({ commit }, modalContext) {
             commit('DELETE_MODAL_CONTEXT', modalContext);
         }
-        
+
     },
 };
