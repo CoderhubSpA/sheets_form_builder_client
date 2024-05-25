@@ -1,37 +1,33 @@
 <template>
     <div class="index-container" :class="setTheme" :style="setStyles">
         <loading-message :status="loading"></loading-message>
-
-        <sheets-form
-            v-if="isPoll === false"
-            class="not-is-poll"
-            :entityId="id"
-            :record_id="record_id"
-            :params="params"
-            :base_url="base_url"
-            :is_test="form_test"
-            :params_actions="actions"
-            :is_step_row="is_step_row"
-            :context="context"
-            :data="form"
-            :namespace="namespace"
-        ></sheets-form>
-
-        <sheets-poll-render v-if="isPoll === true" :id="id" class="is-poll"/>
+        <div v-if="isPoll === false" class="not-is-poll">
+            <sheets-form
+                :entityId="id"
+                :record_id="record_id"
+                :params="params"
+                :base_url="base_url"
+                :is_test="form_test"
+                :params_actions="actions"
+                :is_step_row="is_step_row"
+            ></sheets-form>
+        </div>
+        <div v-if="isPoll === true" class="is-poll">
+            <sheets-poll-render :id="id" />
+        </div>
     </div>
 </template>
 
 <script>
+/* eslint-disable no-console */
 import SheetsForm from '../new_components/form.vue';
 import SheetsPollRender from './poll/render.vue';
 import LoadingMessage from './loading-message.vue';
 import FormTestJson from '../../resources/formtestjson.json';
-import FormBuilderStore from '../../../store/formBuilder';
-import registerStore from '../new_components/utils/reusabale-store';
 
 export default {
-    name: 'form-builder-index',
     components: {
+        // SheetsFormRender,
         SheetsForm,
         SheetsPollRender,
         LoadingMessage,
@@ -72,24 +68,19 @@ export default {
         context: {
             type: Object,
             default: () => ({}),
-        },
+        }
     },
+
     data: () => ({
         loading: false,
         isPoll: undefined,
         is_step_row: null,
-        form: null,
     }),
-    beforeCreate() {
-        const { namespace } = registerStore(this.$store, FormBuilderStore, 'myStore');
-        this.namespace = namespace;
-    },
     mounted() {
         this.loading = true;
-
         if (this.form_test === 'false') {
             this.$store
-                .dispatch(`${this.namespace}/get`, {
+                .dispatch('form/get_form', {
                     id: this.id,
                     recordid: this.record_id,
                     params: this.params,
@@ -114,17 +105,21 @@ export default {
                         default:
                             this.isPoll = false;
 
-                            if (response.is_step) {
-                                this.is_step_row = response.is_step
+                            if (response.fullResponse.data.content.is_step) {
+                                this.is_step_row = response.fullResponse.data.content.is_step
                             }
 
-                            this.form = response
-
-                            this.loading = false;
-
+                            this.$store
+                                .dispatch('form/load_form', response.fullResponse.data)
+                                .then(() => {
+                                    this.loading = false;
+                                })
+                                .catch((err) => {
+                                    // eslint-disable-next-line no-console
+                                    console.error('error cargando formulario', err);
+                                });
                             break;
                     }
-
                     if (response.poll === 1) {
                         this.isPoll = true;
                         this.$store
@@ -143,7 +138,6 @@ export default {
                     this.isPoll = false;
                     // eslint-disable-next-line no-console
                     console.log('error', err);
-                    // this.form = err.error;
                 });
         } else {
             this.loading = false;

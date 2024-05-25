@@ -65,7 +65,6 @@ export default {
         form_data: {},
         parent_form_data: {},
         modal_contexts: [],
-        entities_fk_from_record_id: null
     }),
     getters: {
         form_loaded: (state) => state.form_loaded,
@@ -130,7 +129,6 @@ export default {
         form_data: (state) => state.form_data,
         parent_form_data: (state) => state.parent_form_data,
         modal_contexts: (state) => state.modal_contexts,
-        entities_fk_from_record_id: (state) => state.entities_fk_from_record_id,
     },
     mutations: {
         FORM_LOADED(state, val) {
@@ -414,17 +412,14 @@ export default {
         },
         DELETE_MODAL_CONTEXT(state, val) {
             const index = state.modal_contexts.findIndex(i => i.id === val.id);
-
+            
             if (index !== -1) {
                 state.modal_contexts.splice(index, 1);
             }
-        },
-        ENTITIES_FK_FROM_RECORD_ID(state, val) {
-            state.entities_fk_from_record_id = val;
         }
     },
     actions: {
-        async get({ commit, dispatch }, payload) {
+        async get({ commit, dispatch, state }, payload) {
             commit('LOADING', true);
 
             const { id } = payload;
@@ -521,21 +516,19 @@ export default {
                             actions: actions.sort((a, b) => (a.save_form > b.save_form ? 1 : -1)),
                             success: response.data.success,
                             message: response.data.message,
-                            type: response.data.content.type,
-                            is_step: response.data.content.is_step,
                         };
-
                         resolve(form);
 
                         return response.data.content;
                     })
-                    .then(async (content) => {
+                    .then((content) => {
                         if (Object.keys(content) !== 0) {
                             if(record.id) {
-                                await dispatch('get_record', record)
+                                dispatch('data', content);
+                                dispatch('get_record', record)
+                            } else {
+                                dispatch('info', content.entity_type_id);
                             }
-
-                            await dispatch('info', content);
                         }
                     })
                     .catch((error) => {
@@ -626,13 +619,12 @@ export default {
                     });
             });
         },
-        get_record({ commit, state }, data) {
-            // woking here!
+        get_record({ commit }, data) {
             commit('LOADING', true);
             commit('RECORD_ID', data.id);
             return new Promise((resolve, reject) => {
                 axios
-                    .get(`/api/sheets/getrecord/${data.entity_name}/${data.id}?form_id=${state.form_id}`)
+                    .get(`/api/sheets/getrecord/${data.entity_name}/${data.id}`)
                     .then((response) => {
                         const fields = response.data.content.data[0];
 
@@ -641,11 +633,7 @@ export default {
                             f[key] = fields[key];
                             commit('FIELDS', f);
                         });
-
                         commit('PIVOTS', response.data.content.pivots);
-
-                        commit('ENTITIES_FK_FROM_RECORD_ID', response.data.content.entities_fk);
-
                         resolve(response.data);
                     })
                     .catch((error) => {
@@ -711,18 +699,32 @@ export default {
                     });
             });
         },
-        async info({ commit, state }, data) {
+        async info({ commit }, id) {
+            if (id) {
+                commit('LOADING', true);
+                await axios
+                    .get(`/api/sheets/entity/info/${id}`)
+                    .then((response) => {
+                        commit('CONTENT_INFO', response.data.content);
+                        return response.data.content;
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        commit('FORM_LOADED', true);
+                        commit('LOADING', false);
+                    });
+            }
+        },
+
+        async data({ commit }, data) {
             if (data) {
                 commit('LOADING', true);
 
                 await axios
-                    .get(`/api/sheets/entity/info/${data.entity_type_id}?form_id=${data.id}`)
+                    .get(`/api/sheets/entity/data/${data.entity_type_id}?form_id=${data.id}`)
                     .then((response) => {
-
-                        if(state.record_id) {
-                            response.data.content.content.entities_fk = state.entities_fk_from_record_id;
-                        }
-
                         commit('CONTENT_INFO', response.data.content);
 
                         return response.data.content;
@@ -810,11 +812,11 @@ export default {
                             a.save_form > b.save_form ? 1 : -1
                         );
                         // commit('POLL_ACTIONS', actions)
-                        return data;
+                        return data.entity_type_id;
                     })
-                    .then((data) => {
-                        if (data) {
-                            dispatch('info', data);
+                    .then((entityTypeId) => {
+                        if (entityTypeId) {
+                            dispatch('info', entityTypeId);
                         }
                     })
                     .catch((error) => {
@@ -835,11 +837,11 @@ export default {
                 }
             }
         },
-        async get_entity_permissions({ commit, state }, id) {
+        async get_entity_permissions({ commit }, id) {
             if (id) {
                 commit('LOADING', true);
                 await axios
-                    .get(`/api/sheets/entity/info/${id}?form_id=${state.form_id}`)
+                    .get(`/api/sheets/entity/info/${id}`)
                     .then((response) => {
                         commit('ENTITY_PERMISSIONS', response.data.content.content.entity_type_permission);
                     })
@@ -892,6 +894,6 @@ export default {
         delete_modal_context({ commit }, modalContext) {
             commit('DELETE_MODAL_CONTEXT', modalContext);
         }
-
+        
     },
 };
