@@ -28,10 +28,14 @@
                     v-on:input="emitData"
                 >
                 </sheets-section>
-                <div class="d-flex justify-content-end p-4">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-end">
                     <button
                         type="button"
-                        class="btn btn-secondary mr-2 step-as-step-previous"
+                        class="btn btn-secondary mr-1"
                         @click="previousStep()"
                     >
                         Anterior
@@ -39,7 +43,7 @@
                     <button
                         :disabled="currentStep + 1 === countSteps && lastRow"
                         type="button"
-                        class="btn btn-success step-as-step-next"
+                        class="btn btn-success"
                         @click="nextStep()"
                     >
                         Siguiente

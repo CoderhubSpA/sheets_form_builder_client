@@ -1,13 +1,13 @@
 <template>
-    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target"
-        :linkDescription="link_description" :tooltipInfo="tooltip" v-if="show_field">
+    <form-group :id="id" :label="label" :required="required" :linkTarget="link_target" :linkDescription="link_description"
+        :tooltipInfo="tooltip" v-if="show_field">
         <div v-if="loading" class="d-flex justify-content-center">
             <div class="spinner-border" role="status">
                 <span class="sr-only">Cargando...</span>
             </div>
         </div>
-        <Editor api-key="no-api-key" :init="tinymceConfig" :id="'Editor' + id" v-else-if="tinymceConfig"
-            v-model="content" />
+        <Editor api-key="no-api-key" :init="tinymceConfig" :id="'Editor' + id"
+            v-else-if="tinymceConfig" v-model="content" />
         <h3 v-else>
             Seleccione una entidad para poder usar este campo
         </h3>
@@ -164,22 +164,21 @@ export default {
         },
         // Si una columna tiene entity_type_permission_fk se realiza nuevamente la request de sus columnas
         async fetchSubdata(column) {
-            //TODO: Esto funciona para columnas con formato SELECTOR[MULTIPLE][ADVANCED] generadas desde el modulo template. Si se configuran de otra forma, no se garantiza que funcione
-            if (column.format == 'SELECTOR[MULTIPLE][ADVANCED]') {
+            if (column.entity_type_permission_fk) {
                 var columnfilteredData = await this.fetchValidColumns(
-                    column.entity_type_pivot_fk
-                );
-            }
-            else {
-                columnfilteredData = await this.fetchValidColumns(
                     column.entity_type_permission_fk
                 );
+                if (columnfilteredData.length == 0) {
+                    columnfilteredData = await this.fetchValidColumns(
+                        column.entity_type_pivot_fk
+                    );
+                }
+                column.name = column.name;
+                column.subdata = columnfilteredData;
             }
-            column.name = column.name;
-            column.subdata = columnfilteredData;
         },
         createDropDown(data, editor, prevName = "") {
-            return Object.entries(data).map(([id, values]) => {
+            return Object.entries(data).map(([id, values, columns_parents]) => {
                 var type;
                 if (values.values == null) {
                     type = "menuitem";
@@ -234,7 +233,7 @@ export default {
                         text: values.name,
                         onAction: () => {
                             editor.insertContent(
-                                `&nbsp;<strong data-id="${id}" data-entity-type-id="${values.entity_type_id}"><span contenteditable="false">{{${prevName}${values.name}}}</span></strong>&nbsp;`
+                                `&nbsp;<strong data-id="${id}"><span contenteditable="false">{{${prevName}${values.name}}}</span></strong>&nbsp;`
                             );
                         },
                     };
@@ -260,6 +259,7 @@ export default {
                     toolbar_mode: "wrap",
                     plugins: "pagebreak table link image lists",
                     table_sizing_mode: "relative",
+                    promotion: false,
                     height: 600,
                     toolbar:
                         "undo redo | mybutton | blocks | bold italic underline forecolor | link image | alignleft aligncenter alignright alignjustify lineheight | bullist numlist indent outdent | removeformat |  pagebreak",
@@ -285,7 +285,6 @@ export default {
                             }
                         );
                     },
-                    promotion: false,
                     pagebreak_separator: '<div class="pagebreak"></div>',
                     // Estilo para semejanza a word
                     content_style: `
