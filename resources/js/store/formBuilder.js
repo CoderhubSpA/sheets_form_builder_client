@@ -518,17 +518,13 @@ export default {
                             message: response.data.message,
                         };
                         resolve(form);
-
                         return response.data.content;
                     })
                     .then((content) => {
-                        if (Object.keys(content) !== 0) {
-                            if(record.id) {
-                                dispatch('data', content);
-                                dispatch('get_record', record)
-                            } else {
-                                dispatch('info', content.entity_type_id);
-                            }
+                        if (content) {
+                            dispatch('info', content.entity_type_id);
+
+                            if (record.id) dispatch('get_record', record);
                         }
                     })
                     .catch((error) => {
@@ -709,27 +705,7 @@ export default {
                         return response.data.content;
                     })
                     .catch((error) => {
-                        console.log(error);
-                    })
-                    .finally(() => {
-                        commit('FORM_LOADED', true);
-                        commit('LOADING', false);
-                    });
-            }
-        },
-
-        async data({ commit }, data) {
-            if (data) {
-                commit('LOADING', true);
-
-                await axios
-                    .get(`/api/sheets/entity/data/${data.entity_type_id}?form_id=${data.id}`)
-                    .then((response) => {
-                        commit('CONTENT_INFO', response.data.content);
-
-                        return response.data.content;
-                    })
-                    .catch((error) => {
+                        // eslint-disable-next-line no-console
                         console.log(error);
                     })
                     .finally(() => {
