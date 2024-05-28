@@ -21,7 +21,7 @@
 
 <script>
 import Vue from 'vue';
-import formbuilder from './form.vue';
+import formbuilder from '../components/index.vue';
 
 export default {
     props: {
@@ -87,7 +87,7 @@ export default {
 
             const instance = new FormBuilderClass({
                 propsData: {
-                    entityId: this.entity_type_permission_fk,
+                    id: this.entity_type_permission_fk,
                     record_id: this.recordId,
                     store: this.entity_type_permission_fk,
                     is_nested: true,

@@ -467,7 +467,6 @@ export default {
 
             this.recordId = '';
         },
-
         openNestedForEdit(id) {
             if (this.$refs['ref-' + this.id].$attrs.id === this.id) {
                this.$refs['ref-' + this.id].searchEl.blur();
