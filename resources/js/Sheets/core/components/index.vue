@@ -1,23 +1,25 @@
 <template>
     <div class="index-container" :class="setTheme" :style="setStyles">
         <loading-message :status="loading"></loading-message>
-
-        <sheets-form
-            v-if="isPoll === false"
-            class="not-is-poll"
-            :entityId="id"
-            :record_id="record_id"
-            :params="params"
-            :base_url="base_url"
-            :is_test="form_test"
-            :params_actions="actions"
-            :is_step_row="is_step_row"
-            :context="context"
-            :data="form"
-            :namespace="namespace"
-        ></sheets-form>
-
-        <sheets-poll-render v-if="isPoll === true" :id="id" class="is-poll"/>
+        <div v-if="isPoll === false" class="not-is-poll">
+            <sheets-form
+                :entityId="id"
+                :record_id="record_id"
+                :params="params"
+                :base_url="base_url"
+                :is_test="form_test"
+                :params_actions="actions"
+                :is_step_row="is_step_row"
+                :context="context"
+                :data="form"
+                :namespace="namespace"
+                @input="$emit('input', $event)"
+                @name="$emit('name', $event)"
+            ></sheets-form>
+        </div>
+        <div v-if="isPoll === true" class="is-poll">
+            <sheets-poll-render  :id="id" />
+        </div>
     </div>
 </template>
 
@@ -142,7 +144,7 @@ export default {
                     this.loading = false;
                     this.isPoll = false;
                     // eslint-disable-next-line no-console
-                    console.log('error', err);
+                    console.error('error', err);
                     // this.form = err.error;
                 });
         } else {
