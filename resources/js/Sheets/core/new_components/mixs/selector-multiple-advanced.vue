@@ -13,7 +13,7 @@ import {
 import 'handsontable-multi-select/dist/css/handsontable-multi-select.css';
 import 'handsontable/dist/handsontable.full.css';
 import Vue from 'vue';
-import FormBuilder from '../../components/index.vue';
+import FormBuilder from '../form';
 import GenericModal from '../utils/GenericModal';
 
 export default {
@@ -585,7 +585,7 @@ export default {
                                         const store = this.$store;
                                         const formBuilderInstance = new FormBuilderClass({
                                             propsData: {
-                                                id: form_id,
+                                                entityId: form_id,
                                                 record_id: record_id,
                                                 context: {
                                                     id: form_id,

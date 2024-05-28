@@ -424,7 +424,7 @@ export default {
         }
     },
     actions: {
-        async get({ commit, dispatch }, payload) {
+        async get({ commit, dispatch, state }, payload) {
             commit('LOADING', true);
 
             const { id } = payload;
@@ -521,10 +521,7 @@ export default {
                             actions: actions.sort((a, b) => (a.save_form > b.save_form ? 1 : -1)),
                             success: response.data.success,
                             message: response.data.message,
-                            type: response.data.content.type,
-                            is_step: response.data.content.is_step,
                         };
-
                         resolve(form);
 
                         return response.data.content;
