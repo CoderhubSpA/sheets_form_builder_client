@@ -439,7 +439,22 @@ export default {
             return new Promise((resolve, reject) => {
                 axios
                     .get(URL)
-                    .then((response) => {
+                    .then(async (response) => {
+                        const scripts = response.data.scripts;
+
+                        if(scripts && scripts.scripts.length > 0) {
+                            await dispatch('load_form_from_scripts', scripts.scripts).then(async (form_id) => {
+                                if(form_id) {
+                                    await axios
+                                    .get(`/api/sheets/form/${form_id}`).then(async (res) => {
+                                        response = res;
+                                    }).catch((err) => {
+                                        reject(err);
+                                    });
+                                }
+                            });
+                        }
+
                         const data = response.data.content;
 
                         // Set record_id to data properties
@@ -891,7 +906,35 @@ export default {
         // delete modal context
         delete_modal_context({ commit }, modalContext) {
             commit('DELETE_MODAL_CONTEXT', modalContext);
-        }
+        },
+        load_form_from_scripts({}, payload) {
+            return new Promise((resolve, reject) => {
+                if(payload.length > 0) {
+                    payload.forEach((script) => {
+                        if(script.success) {
+                            if(Array.isArray(script.actions) && script.actions.length > 0) {
+                                script.actions.forEach((action) => {
+                                    if(action.type) {
+                                        switch (action.type) {
+                                            case "load_form":
+                                                if(action.params.length > 0) {
+                                                    action.params.forEach((param) => {
+                                                        resolve(param.value)
+                                                    });
+                                                }
+                                                break;
+                                            default:
+                                                reject('No se ha encontrado la acción');
+                                                break;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            } );
+        },
 
     },
 };
