@@ -57,6 +57,15 @@ export default {
         sectionModel() {
             this.$emit('input', this.sectionModel);
         },
+        field_section_show_hide(value) {
+            if (Object.entries(value).length > 0) {
+                Object.entries(value).forEach((f) => {
+                    if (f[0] == this.show_by_field_id && f[1] == this.show_by_field_value) {
+                        this.showSectionFromHiddenField = true;
+                    }
+                });
+            }
+        }
     },
     computed: {
         id() {
@@ -158,17 +167,6 @@ export default {
             }
 
             return show_section;
-        },
-    },
-    watch: {
-        field_section_show_hide(value) {
-            if (Object.entries(value).length > 0) {
-                Object.entries(value).forEach((f) => {
-                    if (f[0] == this.show_by_field_id && f[1] == this.show_by_field_value) {
-                        this.showSectionFromHiddenField = true;
-                    }
-                });
-            }
         },
     },
     methods: {
