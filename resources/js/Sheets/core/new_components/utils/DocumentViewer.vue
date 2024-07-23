@@ -20,7 +20,7 @@ export default {
             default: ''
         },
         src: {
-            type: String,
+            type: [String, File],
             require: true
         },
         value: {
@@ -62,7 +62,6 @@ export default {
     position: fixed;
     right: 0;
     top: 0;
-    padding-top: 40px;
     background-color: #fff;
     animation-name: showSidebar;
     animation-duration: 0.5s;

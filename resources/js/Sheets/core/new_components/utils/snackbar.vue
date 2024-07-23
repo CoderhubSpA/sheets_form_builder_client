@@ -19,7 +19,7 @@ export default {
         },
         timeout: {
             type: Number,
-            default: 5000,
+            default: 8000,
         },
         type: {
             type: Boolean,
@@ -63,8 +63,8 @@ export default {
     padding: 16px;
     position: fixed;
     z-index: 1000;
-    left: 50%;
-    bottom: 30px;
+    left: 49%;
+    bottom: 77px;
     font-size: 17px;
 }
 .success {

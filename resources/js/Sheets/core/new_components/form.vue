@@ -1,9 +1,9 @@
 <template>
     <div class="form-border">
         <loading-message :status="loadingForm"></loading-message>
-        <h3 class="sheets-form-title">
+        <h1 class="sheets-form-title">
             {{ form_title }}
-        </h3>
+        </h1>
         <div v-if="is_step_row != '1' && is_step_row != '2'" class="is-step-row">
             <div class="sheets-rows sheets-form-scrolling">
                 <sheets-row
@@ -190,6 +190,7 @@ export default {
         CAN_SEE_EDIT: 2,
         show_actions_from_step: false,
         form: null,
+        data_form_before_save: null,
     }),
     computed: {
         loading() {
@@ -643,24 +644,51 @@ export default {
         async sendFiles() {
             this.errorOnLoadFiles = false;
             this.uploadingForm = true;
+
             const files = this.$store.getters[`${this.namespace}/files`];
             const promises = [];
             const req = [];
-            Object.entries(files).forEach((file) => {
-                req.push(file[1].id);
-                const form = new FormData();
+            let filesInArray = false;
 
-                form.append('file', file[1].file);
-                form.append('fileid', file[1].id);
-                if (file[1].metadata) {
-                    form.append('metadata', JSON.stringify({ sheets: [file[1].metadata] }));
+            Object.entries(files).forEach((file) => {
+                if(Array.isArray(file[1].file)) {
+                    filesInArray = true;
+
+                    file[1].file.forEach((f) => {
+                        req.push(file[1].id);
+
+                        const form = new FormData();
+                        form.append('file', f.file);
+                        form.append('fileid', file[1].id);
+
+                        if (f.metadata) {
+                            form.append('metadata', JSON.stringify({ sheets: [f.metadata] }));
+                        }
+
+                        const data = {
+                            form,
+                            file: f,
+                        };
+
+                        promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, data));
+                    });
+                } else {
+                    req.push(file[1].id);
+                    const form = new FormData();
+
+                    form.append('file', file[1].file);
+                    form.append('fileid', file[1].id);
+                    if (file[1].metadata) {
+                        form.append('metadata', JSON.stringify({ sheets: [file[1].metadata] }));
+                    }
+                    const data = {
+                        form,
+                        file: file[1],
+                    };
+                    promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, data));
                 }
-                const data = {
-                    form,
-                    file: file[1],
-                };
-                promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, data));
             });
+
             await Promise.all(promises).then((resp) => {
                 for (let index = 0; index < resp.length; index += 1) {
                     if (resp[index].id !== 'error-on-upload') {
@@ -670,7 +698,37 @@ export default {
                                 this.filesUploaded.id = resp[index].id;
                             }
                         } else {
-                            this.filesUploaded[req[index]] = resp[index].id;
+                            if(filesInArray) {
+                                if(!this.filesUploaded[req[index]]) {
+                                    this.filesUploaded[req[index]] = [];
+                                }
+                                // Working here!
+                                let findFieldValue = null;
+
+                                this.result.forEach((f) => {
+                                    Object.entries(f).forEach((field) => {
+                                        if(field[0] === req[index]) {
+                                            findFieldValue = field[1];
+                                        }
+                                    });
+                                });
+
+
+                                if(findFieldValue !== null) {
+                                    //remove the findFieldValue all values "file-pending-*"
+                                    findFieldValue = findFieldValue.filter((fv) => {
+                                        return fv.indexOf('file-pending-') === -1;
+                                    });
+
+                                    findFieldValue.forEach((pfv) => {
+                                        this.filesUploaded[req[index]].push(pfv);
+                                    });
+                                }
+
+                                this.filesUploaded[req[index]].push(resp[index].id);
+                            } else {
+                                this.filesUploaded[req[index]] = resp[index].id;
+                            }
                         }
                     } else {
                         this.errorOnLoadFiles = true;

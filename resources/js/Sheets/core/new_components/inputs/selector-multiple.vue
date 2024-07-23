@@ -43,6 +43,7 @@
                 :state="state"
                 :openForm="openNested"
                 :recordId="recordId"
+                :showCreateNew="show_create_new"
                 v-on:opened-nested="recordId = ''"
                 v-on:closed-nested="openNested = false"
                 @inserted="createdOption"

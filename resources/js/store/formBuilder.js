@@ -4,7 +4,7 @@
 /* eslint-disable no-param-reassign */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import axios from 'axios';
-import { isObject } from 'lodash';
+import { get, isObject } from 'lodash';
 import Vue from 'vue';
 
 const DEFAULT_ACTION = {
@@ -165,11 +165,30 @@ export default {
         },
         FILES(state, val) {
             state.hasFiles = true;
-            state.files[val.id] = val;
+
+            const getFile = state.files.find((file) => file.id === val.id);
+
+            if (Array.isArray(val.file) && val.file.length > 0 && !getFile) {
+                state.files.push(val);
+            }
+
+            if (Array.isArray(val.file) && val.file.length > 0 && getFile) {
+                state.files = state.files.filter((file) => file.id !== val.id);
+
+                state.files.push(val);
+            }
+            
+            if (!Array.isArray(val.file)) {
+                state.files[val.id] = val;
+            }
         },
         DELETE_FILE(state, val) {
-            state.files[val] = null;
+            let filter_files = state.files.filter((file) => file.id !== val);
+
+            state.files = filter_files;
+
             let validation = false;
+
             state.files.forEach((file) => {
                 if (file !== null) {
                     validation = true;

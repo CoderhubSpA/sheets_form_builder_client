@@ -108,8 +108,11 @@ export default {
             validation[this.id] = null;
             this.$emit('input', validation);
         },
-        onShowFile() {
+        onShowFile(file = null) {
+            this.$refs.preview.innerHTML = '';
+
             this.viewer_open = true;
+
             if (process.env.MIX_SHOW_DOCUMENT_OUTSIDE_IFRAME === 'true') {
                 window.postMessage({
                     type: 'show_document_visualizer',
@@ -126,7 +129,7 @@ export default {
                     params: [
                         {
                             filename: this.document_name,
-                            src: this.previewLink
+                            src: file ? file : this.previewLink
                         }
                     ],
                 })
@@ -134,12 +137,13 @@ export default {
                 const instance = new DocumentViewerClass({
                     propsData: {
                         filename: this.document_name,
-                        src: this.previewLink,
+                        src: file ? file : this.previewLink,
                         value: true,
                     },
                 });
                 instance.$on('input', () => {
                     this.viewer_open = false;
+                    this.$refs.preview.innerHTML = '';
                 });
                 instance.$mount();
                 this.$refs.preview.appendChild(instance.$el);
