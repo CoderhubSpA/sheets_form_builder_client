@@ -55,7 +55,7 @@ export default {
             return this.show;
         },
         modalContexts() {
-            return this.$store.getters[`${this.state}/modal_contexts`];
+            return this.store.getters[`${this.state}/modal_contexts`];
         }
     },
     watch: {

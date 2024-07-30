@@ -393,6 +393,12 @@ export default {
                         else this.selected = [option];
                     } else this.selected = option;
                 }
+
+                if(this.multiple && this.newOptionsFromNested.length > 0) {
+                    this.newOptionsFromNested.forEach((option) => {
+                        this.selected.push(option);
+                    });
+                }
             }
         },
         selectorFilters(val) {
@@ -431,42 +437,42 @@ export default {
                     }
                 })
             }
-        },
-        newOptionsFromNested(val) {
-            if(val.length > 0 && this.multiple) {
-                this.newOptionsFromNested.forEach((option) => {
-                    const ifExistOption = this.selected.find((opt) => opt.id === option.id);
-
-                    if (!ifExistOption) {
-                        this.selected.push(option);
-                    }
-                });
-            }
         }
     },
     mounted() {
         this.getPermissionsForCreate();
     },
     methods: {
-        createdOption(newRecord) {
-            const id = newRecord.content.inserted_id;
-            const name = newRecord.content.inserted_name;
+        createdOption(id) {
+            const optionToSelect = this.options.find((option) => option.id === id);
+
+            if(optionToSelect) {
+                this.newOptionsFromNested.push(optionToSelect);
+            }
 
             if (this.multiple) {
                 if (!this.selected) {
                     this.selected = [];
                 }
 
-                const correlation = this.newOptionsFromNested.length + 1;
+                const ifExistOption = this.selected.find((option) => option.id === id);
 
-                this.newOptionsFromNested.push({
-                    id: id,
-                    name: name ? name : 'Nuevo registro ' + correlation,
-                });
+                if (ifExistOption) {
+                    this.selected = this.selected.filter((option) => option.id !== id);
+                }
+
+                if (this.selected) {
+                    this.selected.push(optionToSelect);
+                } else {
+                    this.selected = [optionToSelect];
+                }
+            } else {
+                this.selected = optionToSelect;
             }
 
             this.recordId = '';
         },
+
         openNestedForEdit(id) {
             if (this.$refs['ref-' + this.id].$attrs.id === this.id) {
                this.$refs['ref-' + this.id].searchEl.blur();

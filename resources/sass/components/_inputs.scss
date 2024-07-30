@@ -4,7 +4,7 @@ div[class*="col-"] {
 }
 
 input.form-control {
-    min-height: 40px !important;
+    min-height: 38px !important;
 }
 
 .sheets-select {
@@ -42,7 +42,7 @@ input.form-control {
 
 .mx-datepicker {
     width: 100% !important;
-    min-height: 40px !important;
+    min-height: 38px !important;
     border-radius: 4px !important;
 
     .mx-datepicker-disabled {
@@ -55,7 +55,7 @@ input.form-control {
     }
 
     .mx-input {
-        min-height: 40px !important;
+        min-height: 38px !important;
         background-color: #F9F9F9 !important;
         border: solid 1px #6C757D !important;
 
@@ -98,7 +98,7 @@ input.form-control {
 
 .month-year-display.input.placeholder {
     width: 79.5% !important;
-    min-height: 40px !important;
+    min-height: 38px !important;
     background-color: #F9F9F9 !important;
     border: solid 1px #6C757D !important;
     border-radius: 4px !important;
@@ -111,6 +111,33 @@ input.form-control {
     }
 }
 
+.vs__dropdown-toggle {
+    min-height: 38px;
+    background-color: #F9F9F9 !important;
+    border: solid 1px #6C757D;
+
+    &:focus {
+        border: solid 2px #005B61 !important;
+        box-shadow: none !important;
+        outline: 0 none;
+    }
+}
+
+.vs--disabled>.vs__dropdown-toggle {
+    color: #999999 !important;
+    background-color: #e6e6e6 !important;
+    border: none !important;
+
+    span, div.vs__actions i {
+        background-color: #e6e6e6 !important;
+    }
+}
+
+.vs__dropdown-menu {
+    background-color: #F9F9F9 !important;
+    border: solid 1px #005B61 !important;
+}
+
 .input-group>.custom-file .custom-file-input:focus {
     box-shadow: none !important;
     outline: 0 !important;
@@ -120,29 +147,4 @@ input.form-control {
     color: #999999;
     background-color: #e6e6e6 !important;
     border: none !important;
-}
-
-.form-check {
-   margin: 12px 0px;
-
-    .form-check-input {
-        width: 16px !important;
-        height: 16px !important;
-        margin-right: 0.3em;
-        cursor: pointer;
-    }
-}
-
-.date-input {
-    background-color: inherit;
-    width: 100%;
-    border: none;
-
-    &:focus-visible {
-        outline: none;
-    }
-}
-
-.input-group-text {
-    border: solid 1px #6c757d !important;
 }

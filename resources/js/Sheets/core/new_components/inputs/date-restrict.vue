@@ -135,7 +135,7 @@ export default {
 </script>
 <style lang="scss">
     .date-input {
-        width: 100% !important;
+        width: 100%;
         border: none !important;
 
         &:focus-visible {

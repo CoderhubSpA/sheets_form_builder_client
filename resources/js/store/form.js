@@ -1,3 +1,10 @@
+/* eslint-disable no-console */
+/* eslint-disable array-callback-return */
+/* eslint-disable arrow-body-style */
+/* eslint-disable prefer-promise-reject-errors */
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-unused-vars */
 import axios from 'axios';
 import Vue from 'vue';
 

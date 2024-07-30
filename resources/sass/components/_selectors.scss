@@ -3,39 +3,3 @@ div.container-loading {
   flex-direction: row;
   justify-content: center;
 }
-
-.vs__dropdown-toggle {
-  min-height: 40px;
-  background-color: #F9F9F9 !important;
-  border: solid 1px #6C757D !important;
-
-  &:focus {
-      border: solid 2px #005B61 !important;
-      box-shadow: none !important;
-      outline: 0 none;
-  }
-}
-
-.vs--disabled>.vs__dropdown-toggle {
-  color: #999999 !important;
-  background-color: #e6e6e6 !important;
-  border: none !important;
-
-  span, div.vs__actions i {
-      background-color: #e6e6e6 !important;
-  }
-}
-
-.vs__dropdown-menu {
-  background-color: #F9F9F9 !important;
-  border: solid 1px #005B61 !important;
-}
-
-.vs__open-indicator {
-  margin-right: 10px;
-}
-
-.bi-arrow-down-short::before {
-  content: "\f282" !important;
-  font-size: 18px;
-}

@@ -1,15 +1,13 @@
 <template>
     <div class="sidebar" ref="sidebar">
-        <div>
-            <div class="sidebar-header">
-                <h3>
-                    {{ filename }}
-                </h3>
-                <span class="close" @click="close">&times;</span>
-            </div>
-            <div class="sidebar-body">
-                <document-visualizer :src="src" />
-            </div>
+        <div class="sidebar-header">
+            <h3>
+                {{ filename }}
+            </h3>
+            <span class="close" @click="close">&times;</span>
+        </div>
+        <div class="sidebar-body">
+            <document-visualizer :src="src" />
         </div>
     </div>
 </template>
@@ -20,7 +18,7 @@ export default {
             default: ''
         },
         src: {
-            type: [String, File],
+            type: String,
             require: true
         },
         value: {
@@ -58,17 +56,17 @@ export default {
 
 .sidebar {
     height: 100%;
-    width: 50%;
+    width: 70%;
     position: fixed;
     right: 0;
     top: 0;
+    padding-top: 40px;
     background-color: #fff;
     animation-name: showSidebar;
     animation-duration: 0.5s;
     box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
     -webkit-box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
     -moz-box-shadow: -6px 0px 18px -7px rgba(0,0,0,0.75);
-    z-index: 170;
 
     .sidebar-header {
         display: flex;
@@ -91,6 +89,7 @@ export default {
 
 .sidebar-body {
     margin: auto;
+    height: 100%;
 }
 
 /* The Close Button */

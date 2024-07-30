@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button v-if="createPermission && showCreateNew" class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="open">+</button>
+        <button v-if="createPermission" class="btn btn-block btn-primary btn-sm sheets-nested-form" @click="open">+</button>
         <div class="nested-form" v-show="show">
             <div class="content">
                 <div class="header p-2">
@@ -21,7 +21,7 @@
 
 <script>
 import Vue from 'vue';
-import formbuilder from '../components/index.vue';
+import formbuilder from './form.vue';
 
 export default {
     props: {
@@ -51,11 +51,6 @@ export default {
             type: String,
             require: true,
             default: ''
-        },
-        showCreateNew: {
-            type: [Boolean, Number],
-            require: true,
-            default: false
         },
     },
     data: () => ({
@@ -92,7 +87,7 @@ export default {
 
             const instance = new FormBuilderClass({
                 propsData: {
-                    id: this.entity_type_permission_fk,
+                    entityId: this.entity_type_permission_fk,
                     record_id: this.recordId,
                     store: this.entity_type_permission_fk,
                     is_nested: true,
@@ -102,8 +97,14 @@ export default {
                 store,
             });
             instance.$on('input', (val) => {
-                this.$emit('inserted', val);
+                const id = val.content.inserted_id;
 
+                const data = this.$store.getters[`${this.state}/raw`];
+                if (data.entity_type_id) {
+                    this.$store.dispatch(`${this.state}/info`, data.entity_type_id).then(() => {
+                        this.$emit('inserted', id);
+                    });
+                }
                 this.close();
             });
 

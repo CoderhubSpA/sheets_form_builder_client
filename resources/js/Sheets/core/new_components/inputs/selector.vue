@@ -27,10 +27,8 @@
         </v-select>
         <nested-form
             v-if="has_permissions_for_create"
-            :createPermission="has_permissions_for_create"
             :entity_type_permission_fk="entity_type_permission_fk"
             :state="state"
-            :showCreateNew="show_create_new"
             @inserted="createdOption"
         />
         <div class="row" v-if="this.input.default_value !== null">
@@ -57,12 +55,10 @@ export default {
 </script>
 <style>
 span.vs__selected {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: inline-block;
 }
 input.vs__search {
     width: 1px;

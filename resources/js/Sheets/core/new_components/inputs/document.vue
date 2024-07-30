@@ -78,10 +78,6 @@ export default {
                         const entities = contentInfo.content.entities_fk[this.input.entity_type_fk];
                         const imgPre = entities.find((ent) => ent.id === val[this.id]);
 
-                        if(imgPre && imgPre.src) {
-                            this.showDeleteBtn = true;
-                        }
-
                         return imgPre && imgPre.src ? `${this.base_url}${imgPre.src}` : '';
                     }
                 }
