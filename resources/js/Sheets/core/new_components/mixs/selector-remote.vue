@@ -46,7 +46,7 @@ export default {
     }),
     computed: {
         multiple() {
-            const isMultiple = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' || this.input.format === 'DIMENSION[MULTIPLE]';
+            const isMultiple = this.input.format === 'SELECTOR[REMOTE][MULTIPLE]' || this.input.format === 'SELECTOR[REMOTE][MULTIPLE][ALL]' || this.input.format === 'DIMENSION[MULTIPLE]' || this.input.format === 'DIMENSION[MULTIPLE][NOTIN]';
 
             return isMultiple;
         },
@@ -366,7 +366,9 @@ export default {
 
                 let preoptions = null;
 
-                if (this.input.format === 'DIMENSION' || this.input.format === 'DIMENSION[MULTIPLE]') {
+                let thisInputFormatIsDimension = this.input.format === 'DIMENSION' || this.input.format === 'DIMENSION[MULTIPLE]' || this.input.format === 'DIMENSION[MULTIPLE][NOTIN]'
+
+                if (thisInputFormatIsDimension) {
                     const params = {
                         show_by_field_value: this.input.show_by_field_value,
                         col_name: this.input.col_name
@@ -385,10 +387,10 @@ export default {
                             if (pre.id !== null && pre.text !== null) {
                                 optionsToSet.push({
                                     id: pre.id,
-                                    name: (this.input.format === 'DIMENSION' || this.input.format === 'DIMENSION[MULTIPLE]') ? pre.value : pre.text,
+                                    name: (thisInputFormatIsDimension) ? pre.value : pre.text,
                                 });
                                 if (this.input.default_value == pre.id) {
-                                    this.defaultOption = (this.input.format === 'DIMENSION' || this.input.format === 'DIMENSION[MULTIPLE]') ? pre.value : pre.text;
+                                    this.defaultOption = (thisInputFormatIsDimension) ? pre.value : pre.text;
                                 }
                             }
                         });
@@ -557,7 +559,10 @@ export default {
                     case 'SELECTOR[REMOTE][MULTIPLE]':
                     case 'SELECTOR[REMOTE][MULTIPLE][ALL]':
                     case 'DIMENSION[MULTIPLE]':
-                        type = "IN";
+                        type = "IN";//generar una copia del selector, pero con tipo NOT_IN
+                        break;
+                    case 'DIMENSION[MULTIPLE][NOTIN]':
+                        type = "NOT_IN";//generar una copia del selector, pero con tipo NOT_IN
                         break;
                     case 'SELECTOR[METRIC]':
                         type = "METRIC";
