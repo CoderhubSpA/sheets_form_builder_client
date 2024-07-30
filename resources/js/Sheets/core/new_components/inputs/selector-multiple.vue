@@ -39,10 +39,12 @@
             </v-select>
             <nested-form
                 v-if="has_permissions_for_create"
+                :createPermission="has_permissions_for_create"
                 :entity_type_permission_fk="entity_type_permission_fk"
                 :state="state"
                 :openForm="openNested"
                 :recordId="recordId"
+                :showCreateNew="show_create_new"
                 v-on:opened-nested="recordId = ''"
                 v-on:closed-nested="openNested = false"
                 @inserted="createdOption"

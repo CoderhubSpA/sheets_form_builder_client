@@ -151,6 +151,9 @@ export default {
         tooltip() {
             return this.input.description || '';
         },
+        show_create_new() {
+            return this.input.show_create_new;
+        },
     },
     methods: {
         readInputValue() {

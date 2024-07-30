@@ -1,9 +1,8 @@
 import Handsontable from 'handsontable';
-import FormBuilder from '../form';
+import Vue from 'vue';
+import FormBuilder from '../../components/index.vue';
 import GenericModal from '../utils/GenericModal';
 import FormBuilderStore from '../../../../store/formBuilder';
-import Vue from 'vue';
-import Vuex from 'vuex';
 
 export function clpRenderer(instance, td, row, col, prop, value, cellProperties) {
     const span = document.createElement('SPAN');
@@ -83,7 +82,6 @@ export function customDateRenderer(instance, td, row, col, prop, value, cellProp
 
 export function customMultiSelectRenderer(instance, td, row, col, prop, value, cellProperties) {
     const span = document.createElement('SPAN');
-    let selectedId;
     const optionsList = cellProperties.selectOptions;
     const valuesSplit = `${value}`.split(';');
     const values = valuesSplit.map((string) => string.trim());
@@ -150,19 +148,7 @@ function getEntityFk(entities_fk, entity_fk_id, id) {
 
     return entity;
 }
-function getEscaped(entity_fk, name_fk) {
-    let value = undefined;
-    try {
-        if (entity_fk) {
-            value = Handsontable.helper.stringify(entity_fk[name_fk]);
-            value = value.replaceAll("\n", "<br>");
-        }
-    } catch (e) {
-        console.warn(e);
-    }
 
-    return value;
-}
 export function customRenderFormButton(instance, td, row, column, prop, value, cellProperties) {
     const main = cellProperties.main;
     const result = cellProperties.entityInfo.columns.find(c => c.col_name === main.col_name_fk)
@@ -217,13 +203,12 @@ export function customRenderFormButton(instance, td, row, column, prop, value, c
 
             const formBuilderInstance = new FormBuilderClass({
                 propsData: {
-                    entityId: form_id,
-                    record_id: record_id,
-                    // is_nested: true
+                    id: form_id,
+                    record_id: record_id
                 },
                 store: FormBuilderStore
             });
-            formBuilderInstance.$mount()
+            formBuilderInstance.$mount();
             genericModal.$mount();
             genericModal.$refs.content.appendChild(formBuilderInstance.$el);
             divModal.appendChild(genericModal.$el)

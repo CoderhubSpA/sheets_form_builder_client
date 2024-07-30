@@ -27,7 +27,7 @@
                 @option:deselected="deselected"
             >
                 <template #selected-option="{ name, id }">
-                    <div style="display: inline-flex; justify-content: start">
+                    <div style="display: inline-flex; justify-content: start; align-items: center">
                         <span>{{ name }}</span>
                         <span
                             @click="openNestedForEdit(id)"
@@ -44,6 +44,7 @@
                 :openForm="openNested"
                 :recordId="recordId"
                 :parent_input_id="id"
+                :showCreateNew="show_create_new"
                 v-on:opened-nested="recordId = ''"
                 v-on:closed-nested="openNested = false"
                 @inserted="createdOption"
@@ -81,7 +82,7 @@ export default {
 .actions {
     cursor: pointer;
     color: rgb(150, 150, 150);
-    margin: 2px 2px 2px 8px;
+    margin: 4px 2px 4px 8px;
     padding: 1px 4px;
     border: solid 1px rgb(150, 150, 150);
     border-radius: 4px;

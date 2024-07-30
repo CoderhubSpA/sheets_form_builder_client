@@ -1,5 +1,5 @@
 <template>
-    <div :class="`${sm} ${md} ${xl}`" v-if="show_section" :id="section.id">
+    <div :class="[`${sm} ${md} ${xl}`, 'mb-4']" v-if="show_section || showSectionFromHiddenField" :id="section.id">
         <h5 class="sheets-section-title">
             {{ name }}
         </h5>
@@ -51,11 +51,21 @@ export default {
     },
     data: () => ({
         sectionModel: [],
+        showSectionFromHiddenField: false,
     }),
     watch: {
         sectionModel() {
             this.$emit('input', this.sectionModel);
         },
+        field_section_show_hide(value) {
+            if (Object.entries(value).length > 0) {
+                Object.entries(value).forEach((f) => {
+                    if (f[0] == this.show_by_field_id && f[1] == this.show_by_field_value) {
+                        this.showSectionFromHiddenField = true;
+                    }
+                });
+            }
+        }
     },
     computed: {
         id() {
@@ -92,8 +102,11 @@ export default {
         show_by_field_value() {
             return this.section.show_by_field_value;
         },
+        field_section_show_hide() {
+            return this.$store.getters[`${this.state}/field_section_show_hide`];
+        },
         show_section() {
-            const fields = this.$store.getters[`${this.state}/field_section_show_hide`];
+            const fields = this.field_section_show_hide;
             // eslint-disable-next-line camelcase
             let show_section = false;
             if (this.show_by_field_id) {
@@ -102,6 +115,22 @@ export default {
                     // eslint-disable-next-line camelcase
                     show_section = true;
                 }
+                // si no se encuentra el campo en el objeto fields, se busca en los campos como objetos
+                if(Object.keys(fields).length === 0 && show_section == false) {
+                    const hiddenFields = this.$store.getters[`${this.state}/fields_as_object`];
+
+                    const findField = hiddenFields.find((field) => field.form_field_id == this.show_by_field_id && field.send_hidden_field == 1);
+
+                    if(findField) {
+                        const selectValue = this.selectedValue(findField);
+
+                        if(selectValue !== null && selectValue == this.show_by_field_value) {
+                            this.$store.commit(`${this.state}/FIELD_SECTION_SHOW_HIDE`, {[findField.form_field_id]: selectValue});
+                        }
+
+                    }
+                }
+
                 try {
                     // Permite validar si entre un selector multiple existe el
                     // valor que condiciona que el elemento se vea o no
@@ -161,6 +190,22 @@ export default {
                 });
             });
         },
+        selectedValue(field) {
+            let result = null;
+
+            const fields = this.$store.getters[`${this.state}/fields`];
+
+            if(fields && fields.length > 0) {
+                const filterField = fields.filter((f) => Object.keys(f)[0] == field.id)[0];
+
+                if(filterField) {
+                    const key = Object.keys(filterField)[0];
+                    result = filterField[key];
+                }
+            }
+
+            return result;
+        }
     },
 };
 </script>

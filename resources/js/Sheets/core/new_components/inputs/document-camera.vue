@@ -6,6 +6,7 @@
         <button class="btn btn-info btn-block" @click="startCam">
             <i class="fa fa-camera fa-lg"></i>
         </button>
+         <pre v-if="document_name" class="text-center">{{ document_name }}</pre>
         <GenericModal :show="modal" @show="closeModal" ref="genericModal">
             <template>
                 <video autoplay="true" :id="webcamVideoId" style="display: none;"/>
@@ -24,19 +25,16 @@
                 <span>&#x2715;</span>
             </div>
         </div>
-        <!-- <figure class="thumbnail-cam">
-            <img src="" alt="thumbnail" :id="resultId" :ref="thumbnail"/>
-            <figcaption @click="dismiss">
-                &#x2715;
-            </figcaption>
-        </figure> -->
     </div>
 </template>
 <script>
 import GenericModal from '../utils/GenericModal.vue';
-import InputMix from '../mixs/input.vue'
+import InputMix from '../mixs/input.vue';
+import mixFile from '../mixs/files.vue';
+
+
 export default {
-    mixins: [InputMix],
+    mixins: [InputMix, mixFile],
     components: {
         GenericModal,
     },
@@ -105,14 +103,12 @@ export default {
                 videoElement.srcObject = stream 
                 videoElement.play()
                 const settings = stream.getVideoTracks()[0].getSettings()
-                console.log(settings)
                 this.width = settings.width;
                 this.height = settings.height;
                 displayCanvas.width = this.width;
                 displayCanvas.height = this.height;
                 canvas.width = this.width;
                 canvas.height = this.height;
-                // canvas.height = settings.height;
                 this.drawImage(videoElement);
             }).catch((error) => {
                 console.error(error)
@@ -185,7 +181,7 @@ export default {
             }
             
             this.stopCam()
-            this.onInput(data)
+            this.setDataCam(data)
         },
         /**
          * Detener la ejecucion de la camara
@@ -198,8 +194,8 @@ export default {
             const tracks = stream.getTracks();
             // now close each track by having forEach loop
             tracks.forEach(function(track) {
-            // stopping every track
-            track.stop();
+                // stopping every track
+                track.stop();
             });
             // assign null to srcObject of video
             videoEl.srcObject = null;
@@ -209,9 +205,10 @@ export default {
          * Emision de data para ser entregada en formbuilder
          * @param {*} data 
          */
-        onInput(data) {
+        setDataCam(data) {
             const file = this.base64ToFile(data.image)
             const storeData = {}
+
             storeData[this.id] = {
                 file: file,
                 metadata: {
@@ -219,6 +216,7 @@ export default {
                     interest: data.interest
                 }
             }
+
             const store = { id: this.id, file: file, metadata: storeData[this.id].metadata };
             this.$store.commit(`${this.state}/FILES`, store);
             this.$emit('input', storeData)
@@ -229,15 +227,17 @@ export default {
         dismiss() {
             const el = this.$refs[this.refThumb];
             el.removeAttribute('src', '')
-            this.$emit('input', {});
-            this.has_preview = false;
 
+            this.$emit('input', {target: {value: null} });
+
+            this.has_preview = false;
         },
         /**
          * Cierre de modal
          */
         closeModal() {
             this.modal = false;
+
             this.stopCam();
         },
         /**
@@ -253,9 +253,10 @@ export default {
 
             while(n--)
                 u8arr[n] = bstr.charCodeAt(n);
-            
+
             const ext = mime.split('/')[1]
             const filename = `${Date.now()}.${ext}`
+
             return new File([u8arr], filename, {type:mime});
         }
     }

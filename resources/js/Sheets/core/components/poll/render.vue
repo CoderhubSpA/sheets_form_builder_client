@@ -440,7 +440,7 @@ export default {
 }
 .sidebar {
     background-color: white;
-    padding: 25px;
+    padding: 0px 10px;
     border-right: 1px solid #dddddd;
     position: fixed;
     z-index: 99;

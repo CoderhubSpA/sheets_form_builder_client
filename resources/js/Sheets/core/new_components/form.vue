@@ -1,9 +1,9 @@
 <template>
     <div class="form-border">
         <loading-message :status="loadingForm"></loading-message>
-        <h3 class="sheets-form-title">
+        <h1 class="sheets-form-title">
             {{ form_title }}
-        </h3>
+        </h1>
         <div v-if="is_step_row != '1' && is_step_row != '2'" class="is-step-row">
             <div class="sheets-rows sheets-form-scrolling">
                 <sheets-row
@@ -81,8 +81,6 @@ import Row from './grid/row.vue';
 import Action from './actions/button.vue';
 import LoadingMessage from '../components/loading-message.vue';
 import Snackbar from './utils/snackbar.vue';
-import FormBuilderStore from '../../../store/formBuilder';
-import registerStore from './utils/reusabale-store';
 import FormBuilderResponseTest from '../../resources/formbuildertest.json';
 import FormBuilderEntityInfoTest from '../../resources/entityinfotest.json';
 import { v4 as uuidv4 } from 'uuid';
@@ -139,15 +137,42 @@ export default {
         context: {
             type: Object,
             default: () => ({}),
-        }
+        },
+        data: {
+            type: Object,
+            default: () => ({}),
+        },
+        namespace: {
+            type: String,
+            default: '',
+        },
     },
     components: {
-        // "sheets-loading": Loading,
         'sheets-row': Row,
         'sheets-action': Action,
         'sheets-snackbar': Snackbar,
         'sheets-row-as-step': RowAsStep,
         LoadingMessage,
+    },
+    created() {
+        if (this.base_url) {
+            this.$store.commit(`${this.namespace}/BASE_URL`, this.base_url);
+        }
+
+        this.$store.commit(`${this.namespace}/UUID`, uuidv4());
+    },
+    mounted() {
+        this.form = this.data;
+        this.initForm();
+
+        window.name = this.windowName;
+        this.window = window;
+
+        // If the parent form data is set, commit it to the store
+        if (this.parent_form_data) {
+            // Set data to the store
+            this.$store.commit(`${this.namespace}/PARENT_FORM_DATA`, this.parent_form_data);
+        }
     },
     data: () => ({
         formRows: [],
@@ -163,7 +188,9 @@ export default {
         uploadingForm: false,
         loadingForm: false,
         CAN_SEE_EDIT: 2,
-        show_actions_from_step: false
+        show_actions_from_step: false,
+        form: null,
+        data_form_before_save: null,
     }),
     computed: {
         loading() {
@@ -222,27 +249,6 @@ export default {
             }
         },
     },
-    beforeCreate() {
-        const { namespace } = registerStore(this.$store, FormBuilderStore, 'myStore');
-        this.namespace = namespace;
-    },
-    created() {
-        if (this.base_url) {
-            this.$store.commit(`${this.namespace}/BASE_URL`, this.base_url);
-        }
-        this.$store.commit(`${this.namespace}/UUID`, uuidv4());
-    },
-    mounted() {
-        window.name = this.windowName;
-        this.window = window;
-        this.initForm();
-
-        // If the parent form data is set, commit it to the store
-        if (this.parent_form_data) {
-            // Set data to the store
-            this.$store.commit(`${this.namespace}/PARENT_FORM_DATA`, this.parent_form_data);
-        }
-    },
     methods: {
         postMessage(data) {
             try {
@@ -262,37 +268,35 @@ export default {
         },
         initForm() {
             this.loadingForm = true;
+
             if (this.is_test === 'false') {
-                this.$store
-                    .dispatch(`${this.namespace}/get`, {
-                        id: this.entityId,
-                        recordid: this.record_id,
-                        params: this.params,
-                    })
-                    .then((form) => {
-                        this.loadingForm = false;
-                        if (form.success) {
-                            this.formRows = form.rows;
-                            this.formActions = form.actions;
-                        } else {
-                            this.snackbar = {
-                                message: form.message,
-                                success: form.success,
-                                show: true,
-                            };
-                        }
-                    })
-                    .then(() => {
-                        // this.get_record();
-                    })
-                    .catch((error) => {
-                        this.loadingForm = false;
-                        this.snackbar = {
-                            message: error.message,
-                            success: false,
-                            show: true,
-                        };
-                    });
+                if(this.form && this.form.success) {
+                    this.loadingForm = false;
+
+                    this.formRows = this.form.rows;
+
+                    this.formActions = this.form.actions;
+                }
+
+                if(this.form && !this.form.success) {
+                    this.snackbar = {
+                        message: this.form.message,
+                        success: this.form.success,
+                        show: true,
+                    };
+
+                    this.loadingForm = false;
+                }
+                
+                if(!this.form) {
+                    this.snackbar = {
+                        message: 'No se pudo cargar el formulario',
+                        success: false,
+                        show: true,
+                    };
+
+                    this.loadingForm = false;
+                }
             } else {
                 const responseTest = FormBuilderResponseTest;
                 const entityinfoTest = FormBuilderEntityInfoTest;
@@ -640,24 +644,51 @@ export default {
         async sendFiles() {
             this.errorOnLoadFiles = false;
             this.uploadingForm = true;
+
             const files = this.$store.getters[`${this.namespace}/files`];
             const promises = [];
             const req = [];
-            Object.entries(files).forEach((file) => {
-                req.push(file[1].id);
-                const form = new FormData();
+            let filesInArray = false;
 
-                form.append('file', file[1].file);
-                form.append('fileid', file[1].id);
-                if (file[1].metadata) {
-                    form.append('metadata', JSON.stringify({ sheets: [file[1].metadata] }));
+            Object.entries(files).forEach((file) => {
+                if(Array.isArray(file[1].file)) {
+                    filesInArray = true;
+
+                    file[1].file.forEach((f) => {
+                        req.push(file[1].id);
+
+                        const form = new FormData();
+                        form.append('file', f.file);
+                        form.append('fileid', file[1].id);
+
+                        if (f.metadata) {
+                            form.append('metadata', JSON.stringify({ sheets: [f.metadata] }));
+                        }
+
+                        const data = {
+                            form,
+                            file: f,
+                        };
+
+                        promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, data));
+                    });
+                } else {
+                    req.push(file[1].id);
+                    const form = new FormData();
+
+                    form.append('file', file[1].file);
+                    form.append('fileid', file[1].id);
+                    if (file[1].metadata) {
+                        form.append('metadata', JSON.stringify({ sheets: [file[1].metadata] }));
+                    }
+                    const data = {
+                        form,
+                        file: file[1],
+                    };
+                    promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, data));
                 }
-                const data = {
-                    form,
-                    file: file[1],
-                };
-                promises.push(this.$store.dispatch(`${this.namespace}/upload_files`, data));
             });
+
             await Promise.all(promises).then((resp) => {
                 for (let index = 0; index < resp.length; index += 1) {
                     if (resp[index].id !== 'error-on-upload') {
@@ -667,7 +698,37 @@ export default {
                                 this.filesUploaded.id = resp[index].id;
                             }
                         } else {
-                            this.filesUploaded[req[index]] = resp[index].id;
+                            if(filesInArray) {
+                                if(!this.filesUploaded[req[index]]) {
+                                    this.filesUploaded[req[index]] = [];
+                                }
+                                // Working here!
+                                let findFieldValue = null;
+
+                                this.result.forEach((f) => {
+                                    Object.entries(f).forEach((field) => {
+                                        if(field[0] === req[index]) {
+                                            findFieldValue = field[1];
+                                        }
+                                    });
+                                });
+
+
+                                if(findFieldValue !== null) {
+                                    //remove the findFieldValue all values "file-pending-*"
+                                    findFieldValue = findFieldValue.filter((fv) => {
+                                        return fv.indexOf('file-pending-') === -1;
+                                    });
+
+                                    findFieldValue.forEach((pfv) => {
+                                        this.filesUploaded[req[index]].push(pfv);
+                                    });
+                                }
+
+                                this.filesUploaded[req[index]].push(resp[index].id);
+                            } else {
+                                this.filesUploaded[req[index]] = resp[index].id;
+                            }
                         }
                     } else {
                         this.errorOnLoadFiles = true;
